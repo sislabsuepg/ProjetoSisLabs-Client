@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
+import { Providers } from '@/context/providers';
+import type { Metadata } from 'next';
 import React from 'react';
-import "./globals.scss";
-import { Providers } from "@/context/providers";
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "SisLabs",
-  description: "Sistema de gerenciamento de laboratórios do DEINFO.",
+  title: 'SisLabs',
+  description: 'Sistema de gerenciamento de laboratórios do DEINFO.',
 };
 
 export default function RootLayout({
@@ -15,13 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body
-        className={`antialiased`}
-      >
+      <body className={`antialiased`}>
         {/* <p>HEADER</p> */}
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
         {/* <p>FOOTER</p> */}
       </body>
     </html>
