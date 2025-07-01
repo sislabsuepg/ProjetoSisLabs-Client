@@ -1,6 +1,7 @@
-import autoprefixer from 'autoprefixer';
-import tailwindcss from 'tailwindcss';
-
 export default {
-  plugins: [tailwindcss, autoprefixer],
+  plugins: {
+    // Agora usando o novo plugin
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
 };
