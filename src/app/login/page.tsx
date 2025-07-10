@@ -41,9 +41,11 @@ export default function Login() {
       // redirecionar para a pagina inicial
     } catch (err: any) {
       const apiErrors = err.response?.data?.erros || [];
+      console.log(apiErrors);
       if (apiErrors.length > 0) {
         const apiErrObj: { [key: string]: string } = {};
         apiErrors.forEach((erro: { campo: string; mensagem: string }) => {
+          toast.error(erro);
           apiErrObj[erro.campo] = erro.mensagem;
         });
         setErrors(apiErrObj);
