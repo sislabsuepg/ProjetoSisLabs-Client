@@ -32,9 +32,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const callRoute = form.login.match(/^(?:\d{1,13}|[a-zA-Z0-9]+)$/)
-        ? "aluno/"
-        : "usuario/";
+      const callRoute = form.login.match(/^\d{1,13}$/) ? "aluno/" : "usuario/";
       const data = await apiOnline.post(`/${callRoute}login`, {
         login: form.login,
         senha: form.senha,
