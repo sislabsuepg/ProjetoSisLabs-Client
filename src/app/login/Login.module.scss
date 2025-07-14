@@ -1,14 +1,13 @@
-
 @use '../variables' as *;
 
 .sectionLogin {
-display: flex;
-align-items: center;
-justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sideLogo {
-  width: 35%;
+  width: 40%;
   padding: 2.5rem;
   height: 100vh;
   background-color: $blue;
@@ -34,7 +33,7 @@ justify-content: center;
 }
 
 .sideLogin {
-  width: 65%;
+  width: 60%;
   padding: 2rem;
   height: 100vh;
 }

@@ -1,9 +1,11 @@
-import logo_uepg_desktop from '../assets/images/logosUEPG/logo_uepg_desktop.webp'
-import logo_uepg_desktop_white from '../assets/images/logosUEPG/logo_uepg_desktop_white.webp'
-import logo_uepg_mobile from '../assets/images/logosUEPG/logo_uepg_mobile.webp'
+import logo_uepg_desktop from '../assets/images/logosUEPG/logo_uepg_desktop.webp';
+import logo_uepg_desktop_white from '../assets/images/logosUEPG/logo_uepg_desktop_white.webp';
+import logo_uepg_mobile from '../assets/images/logosUEPG/logo_uepg_mobile.webp';
+import user_login from '../assets/images/user_login.webp';
 
 export const data_images = {
   logo_uepg_desktop: logo_uepg_desktop.src,
   logo_uepg_desktop_white: logo_uepg_desktop_white.src,
   logo_uepg_mobile: logo_uepg_mobile.src,
-}
+  user_login: user_login.src,
+};
