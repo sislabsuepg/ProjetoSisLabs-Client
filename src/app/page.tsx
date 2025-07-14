@@ -1,9 +1,5 @@
-import React from 'react';
+import { redirect } from 'next/navigation';
 
-export default function Login() {
-  return (
-    <div>
-      <p>Página Home</p>
-    </div>
-  )
+export default function Page() {
+  redirect('/login');
 }

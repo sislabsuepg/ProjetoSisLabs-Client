@@ -1,6 +1,7 @@
 'use client';
 import { data_images } from '@/assets/data';
 import { apiOnline } from '@/services/services';
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { toast } from 'react-toastify';
 import styles from './Login.module.scss';
@@ -21,6 +22,7 @@ export default function Login() {
   const [form, setForm] = useState({ login: '', senha: '' });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const router = useRouter();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -50,6 +52,7 @@ export default function Login() {
       });
       toast.success('teste!');
       console.log('testeee - ', data);
+      router.push('/dashboard');
       // redirecionar para a pagina inicial
     } catch (err: unknown) {
       if (isCustomAxiosError(err)) {
@@ -164,6 +167,10 @@ export default function Login() {
             </button>
           </form>
         </div>
+
+        <button onClick={() => router.push('/dashboard')}>
+          ir para a home (teste)
+        </button>
       </div>
     </section>
   );
