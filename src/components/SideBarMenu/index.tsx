@@ -38,7 +38,7 @@ function SidebarItem({
       <div className={`mr-4 text-theme-white`}>
         <img className="w-full max-w-[20px]" src={icon} alt="Menu" />
       </div>
-      <span className="text-[1rem] font-medium text-theme-white">{text}</span>
+      <span className="text-[0.9rem] font-medium text-theme-white">{text}</span>
       {active && isOpen && (
         <div
           className="absolute -right-7 top-1/2 -translate-y-1/2 w-0 h-0
@@ -73,16 +73,22 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             }
           `}
       >
-        <div className="flex items-center justify-between gap-2 px-2 py-4 border-b border-theme-blue/70">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-2 px-2 border-b border-theme-blue/70">
+          <div
+            onClick={() => {
+              setActiveItem('');
+              router.push('/dashboard/perfil');
+            }}
+            className="cursor-pointer flex items-center gap-2"
+          >
             <div className="p-2 border-4 border-[#4F6B98] rounded-full bg-theme-white">
               <PersonIcon sx={{ fontSize: 40 }} className="text-theme-blue" />
             </div>
             <div className="flex flex-col text-theme-white">
-              <span className="font-semibold text-lg text-theme-lightBlue leading-4">
+              <span className="font-medium text-[0.9rem] text-theme-lightBlue leading-4">
                 João Ribeiro dos Santos
               </span>
-              <span className="text-sm font-semibold text-[#6481B0]">
+              <span className="text-sm font-medium text-[0.9rem] text-[#6481B0]">
                 Administrador Geral
               </span>
             </div>
@@ -178,7 +184,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           />
         </ul>
 
-        <div className="mt-auto pt-4">
+        <div className="mt-auto">
           <div className="flex justify-center">
             <img
               className="w-full max-w-[150px]"

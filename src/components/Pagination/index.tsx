@@ -24,19 +24,19 @@ export default function Pagination({
       <button
         onClick={handlePrevious}
         disabled={currentPage === 1}
-        className="px-3 py-1 bg-theme-blue text-white rounded disabled:opacity-50"
+        className="px-3 py-1 bg-theme-blue font-normal text-white rounded disabled:opacity-50"
       >
         Anterior
       </button>
 
-      <span className="text-sm text-gray-600">
+      <span className="text-sm font-normal text-theme-text">
         Página {currentPage} de {totalPages}
       </span>
 
       <button
         onClick={handleNext}
         disabled={currentPage === totalPages}
-        className="px-3 py-1 bg-theme-blue text-white rounded disabled:opacity-50"
+        className="px-3 py-1 bg-theme-blue font-normal text-white rounded disabled:opacity-50"
       >
         Próxima
       </button>

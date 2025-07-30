@@ -119,7 +119,7 @@ export default function Inicio() {
             } h-12 py-2 px-4 rounded-[10px]`}
           >
             <div className="h-2 w-2 bg-[#22FF00] rounded-full"></div>
-            <p>
+            <p className="text-theme-text text-[0.9rem] font-normal">
               Laboratório <span className="font-semibold">{item?.lab}</span> -
               Chave do Laboratório {item?.lab} foi emprestado pelo(a) aluno(a){' '}
               <span className="font-semibold">{item?.usuario}</span> -{' '}

@@ -98,33 +98,38 @@ export default function Login() {
     ) : null;
 
   return (
-    <section id="login" className={`${styles.sectionLogin}`}>
-      <div className={`${styles.sideLogo}`}>
+    <section
+      id="login"
+      className={`${styles.sectionLogin} lsm:flex-row flex-col h-screen`}
+    >
+      <div
+        className={`${styles.sideLogo} lsm:flex hidden dlg:p-[2.5rem] p-[1.5rem] dlg:w-[40%] w-[45%]`}
+      >
         <img
           className={`${styles.logoImg}`}
           src={data_images?.logo_uepg_desktop_white}
           alt={'Logo UEPG DESKTOP'}
         />
-        <p className="text-[1.2rem]">
+        <p className="dlg:text-[1.1rem] text-[1rem] leading-6 font-normal">
           A instituição que, diferentemente de uma ruptura com o passado,{' '}
           <strong>avança</strong> a partir de suas <strong>conquistas</strong>.
         </p>
       </div>
 
       <div
-        className={`flex flex-col items-center justify-center ${styles.sideLogin}`}
+        className={`flex flex-col items-center justify-center dlg:w-[60%] lsm:w-[55%] w-full ${styles.sideLogin}`}
       >
         <div>
           <div className="relative mb-5 flex flex-col items-center">
             <img src={data_images?.user_login} alt="Login do usuário" />
-            <p className="text-theme-text text-lg text-center mt-2">
+            <p className="text-theme-text font-normal text-[0.9rem] text-center mt-2">
               {' '}
               Acesso ao controle dos laboratórios do DEINFO
             </p>
           </div>
 
           <form onSubmit={handleSubmit} noValidate className="w-full">
-            <div className="mb-4">
+            <div className="mb-2">
               {' '}
               <input
                 type="text"
@@ -133,12 +138,12 @@ export default function Login() {
                 value={form.login}
                 onChange={handleChange}
                 disabled={loading}
-                className="w-full p-3 text-base rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
+                className="w-full p-3 font-normal text-[0.9rem] rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
               />
               <ErrorMessage field="login" />
             </div>
 
-            <div className="mb-6">
+            <div className="mb-3">
               {' '}
               <input
                 type="password"
@@ -147,7 +152,7 @@ export default function Login() {
                 value={form.senha}
                 onChange={handleChange}
                 disabled={loading}
-                className="w-full p-3 text-base rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
+                className="w-full font-normal p-3 text-[0.9rem] rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
               />
               <ErrorMessage field="senha" />
             </div>
@@ -155,7 +160,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full p-3 text-base rounded-md border-none text-theme-white font-semibold transition-colors duration-200
+              className={`w-full px-3 py-2 text-base font-normal rounded-md border-none text-theme-white text-[0.9rem] transition-colors duration-200
               ${
                 loading
                   ? 'bg-gray-400 cursor-not-allowed'
@@ -171,6 +176,14 @@ export default function Login() {
         <button onClick={() => router.push('/dashboard')}>
           ir para a home (teste)
         </button>
+      </div>
+
+      <div className="w-full h-[300px] bg-[#263E66] rounded-t-[100%] flex lsm:hidden items-center justify-center mt-10">
+        <img
+          src={data_images?.logo_uepg_mobile}
+          alt={'Logo UEPG MOBILE'}
+          className="w-full max-w-[250px]"
+        />
       </div>
     </section>
   );

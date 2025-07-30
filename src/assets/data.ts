@@ -9,7 +9,7 @@ import icon_relatorio from '../assets/images/icon_relatorio.webp';
 import icon_sair from '../assets/images/icon_sair.webp';
 import logo_uepg_desktop from '../assets/images/logosUEPG/logo_uepg_desktop.webp';
 import logo_uepg_desktop_white from '../assets/images/logosUEPG/logo_uepg_desktop_white.webp';
-import logo_uepg_mobile from '../assets/images/logosUEPG/logo_uepg_mobile.webp';
+import logo_uepg_mobile from '../assets/images/logosUEPG/logo_uepg_mobile.png';
 import user_login from '../assets/images/user_login.webp';
 
 export const data_images = {
