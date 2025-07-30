@@ -16,6 +16,7 @@ export default {
         'theme-bg': '#FAFAFA',
         'theme-text': '#5E5E5E',
         'theme-inputBg': '#EAE9E9',
+        'theme-container': '#ECECEC',
       },
     },
     screens: {

@@ -4,7 +4,7 @@ import Pagination from '@/components/Pagination';
 import { useState } from 'react';
 
 export default function Inicio() {
-  const itemsPerPage = 10;
+  const itemsPerPage = 8;
   const [currentPage, setCurrentPage] = useState(1);
 
   const listaTeste = [
@@ -105,12 +105,12 @@ export default function Inicio() {
   const currentItems = listaTeste.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="w-full flex flex-col items-start">
+    <div className="w-full flex flex-col h-full items-start">
       <p className="text-theme-blue font-semibold text-[1.2rem] w-full text-start">
         Laboratórios em uso
       </p>
 
-      <div className="w-full flex flex-col gap-2 mt-5">
+      <div className="w-full flex flex-col justify-between h-full gap-2 mt-5">
         {currentItems?.map((item) => (
           <div
             key={item?.id}
