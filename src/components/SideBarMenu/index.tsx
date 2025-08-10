@@ -5,7 +5,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import PersonIcon from "@mui/icons-material/Person";
 import { useRouter } from "next/navigation";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { usuarioStore } from "@/store/globalStore";
 
@@ -55,7 +55,21 @@ function SidebarItem({
 export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const [activeItem, setActiveItem] = useState("Início");
   const router = useRouter();
-  const { nome, permissao } = usuarioStore();
+  const [mounted, setMounted] = useState(false);
+  const { nome, permissao, resetUsuario } = usuarioStore();
+  let lastLogin: string = "";
+  useEffect(() => {
+    setMounted(true);
+    lastLogin = localStorage.getItem("LastLogin") || "";
+    if (!lastLogin || !nome || !permissao?.nomePermissao) {
+      router.push("/login");
+    }
+  }, [resetUsuario]);
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <>
       {!isOpen && (
@@ -197,7 +211,11 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           <SidebarItem
             icon={data_images?.icon_sair}
             text="Sair"
-            //   onClick={}
+            onClick={() => {
+              resetUsuario();
+              localStorage.removeItem("LastLogin");
+              router.push("/login");
+            }}
             isOpen={isOpen}
           />
         </div>

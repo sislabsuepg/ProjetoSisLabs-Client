@@ -109,7 +109,7 @@ export default function Login() {
       setUsuarioLogin(data.data.login);
       setUsuarioPermissao(data.data.permissaoUsuario);
       localStorage.setItem("LastLogin", formatDateTime(new Date()));
-      toast.success("teste!");
+      toast.success("Sucesso");
       console.log("testeee - ", data);
       router.push("/dashboard");
       // redirecionar para a pagina inicial

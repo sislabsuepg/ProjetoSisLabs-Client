@@ -19,6 +19,7 @@ interface Usuario {
   setUsuarioNome: (nome: string) => void;
   setUsuarioLogin: (login: string) => void;
   setUsuarioPermissao: (permissao: Permissao) => void;
+  resetUsuario: () => void;
 }
 
 interface Aluno {
@@ -32,6 +33,7 @@ interface Aluno {
   setAlunoEmail: (email: string) => void;
   setAlunoNumero: (numero: string) => void;
   setAlunoNomeCurso: (nomeCurso: string) => void;
+  resetAluno: () => void;
 }
 
 const usuarioStore = create<Usuario>()(
@@ -52,6 +54,20 @@ const usuarioStore = create<Usuario>()(
       setUsuarioNome: (nome: string) => set({ nome }),
       setUsuarioLogin: (login: string) => set({ login }),
       setUsuarioPermissao: (permissao: Permissao) => set({ permissao }),
+      resetUsuario: () =>
+        set({
+          id: 0,
+          nome: "",
+          login: "",
+          permissao: {
+            nomePermissao: "",
+            geral: false,
+            cadastro: false,
+            alteracao: false,
+            relatorio: false,
+            advertencia: false,
+          },
+        }),
     }),
     {
       name: "usuario-storage",
@@ -73,6 +89,14 @@ const alunoStore = create<Aluno>()(
       setAlunoEmail: (email: string) => set({ email }),
       setAlunoNumero: (numero: string) => set({ numero }),
       setAlunoNomeCurso: (nomeCurso: string) => set({ nomeCurso }),
+      resetAluno: () =>
+        set({
+          ra: "",
+          nome: "",
+          email: "",
+          numero: "",
+          nomeCurso: "",
+        }),
     }),
     {
       name: "aluno-storage",
