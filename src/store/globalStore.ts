@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 interface Permissao {
-  nome: string;
+  nomePermissao: string;
   geral: boolean;
   cadastro: boolean;
   alteracao: boolean;
@@ -41,7 +41,7 @@ const usuarioStore = create<Usuario>()(
       nome: "",
       login: "",
       permissao: {
-        nome: "",
+        nomePermissao: "",
         geral: false,
         cadastro: false,
         alteracao: false,

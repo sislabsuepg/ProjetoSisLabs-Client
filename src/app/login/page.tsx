@@ -19,6 +19,19 @@ interface CustomAxiosError {
   message: string;
 }
 
+function formatDateTime(date: Date): string {
+  const pad = (num: number) => String(num).padStart(2, "0");
+
+  const day = pad(date.getDate());
+  const month = pad(date.getMonth() + 1); // getMonth() is 0-indexed
+  const year = date.getFullYear();
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  const seconds = pad(date.getSeconds());
+
+  return `${day}/${month}/${year} - ${hours}:${minutes}:${seconds}`;
+}
+
 export default function Login() {
   const [form, setForm] = useState({ login: "", senha: "" });
   const [loading, setLoading] = useState(false);
@@ -36,13 +49,14 @@ export default function Login() {
     setUsuarioNome("");
     setUsuarioLogin("");
     setUsuarioPermissao({
-      nome: "",
+      nomePermissao: "",
       geral: false,
       cadastro: false,
       alteracao: false,
       relatorio: false,
       advertencia: false,
     });
+    localStorage.removeItem("LastLogin");
   }, [setUsuarioId, setUsuarioNome, setUsuarioLogin, setUsuarioPermissao]);
 
   // Não renderiza até que o componente esteja montado no cliente
@@ -72,7 +86,21 @@ export default function Login() {
 
     try {
       const callRoute = form.login.match(/^\d{1,13}$/) ? "aluno/" : "usuario/";
-      const data = await apiOnline.post(`/${callRoute}login`, {
+      const data: {
+        data: {
+          id: number;
+          nome: string;
+          login: string;
+          permissaoUsuario: {
+            nomePermissao: string;
+            geral: boolean;
+            cadastro: boolean;
+            alteracao: boolean;
+            relatorio: boolean;
+            advertencia: boolean;
+          };
+        };
+      } = await apiOnline.post(`/${callRoute}login`, {
         login: form.login,
         senha: form.senha,
       });
@@ -80,6 +108,7 @@ export default function Login() {
       setUsuarioNome(data.data.nome);
       setUsuarioLogin(data.data.login);
       setUsuarioPermissao(data.data.permissaoUsuario);
+      localStorage.setItem("LastLogin", formatDateTime(new Date()));
       toast.success("teste!");
       console.log("testeee - ", data);
       router.push("/dashboard");
@@ -203,7 +232,23 @@ export default function Login() {
           </form>
         </div>
 
-        <button onClick={() => router.push("/dashboard")}>
+        <button
+          onClick={() => {
+            setUsuarioId(0);
+            setUsuarioNome("Usuário Teste");
+            setUsuarioLogin("usuario.teste");
+            setUsuarioPermissao({
+              nomePermissao: "Permissão Teste",
+              geral: true,
+              cadastro: true,
+              alteracao: true,
+              relatorio: true,
+              advertencia: true,
+            });
+            localStorage.setItem("LastLogin", formatDateTime(new Date()));
+            router.push("/dashboard");
+          }}
+        >
           ir para a home (teste)
         </button>
       </div>

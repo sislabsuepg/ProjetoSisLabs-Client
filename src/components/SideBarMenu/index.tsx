@@ -1,11 +1,13 @@
-'use client';
-import { data_images } from '@/assets/data';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import PersonIcon from '@mui/icons-material/Person';
-import { useRouter } from 'next/navigation';
+"use client";
+import { data_images } from "@/assets/data";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import PersonIcon from "@mui/icons-material/Person";
+import { useRouter } from "next/navigation";
 
-import { useState } from 'react';
+import { useState } from "react";
+
+import { usuarioStore } from "@/store/globalStore";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -31,7 +33,7 @@ function SidebarItem({
     <li
       className={`relative flex items-center p-3 my-2 cursor-pointer
         rounded-[10px] transition-colors duration-200
-        ${active ? 'bg-theme-blue text-theme-white' : 'bg-[#4F6B98]'}
+        ${active ? "bg-theme-blue text-theme-white" : "bg-[#4F6B98]"}
       `}
       onClick={onClick}
     >
@@ -51,9 +53,9 @@ function SidebarItem({
 }
 
 export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
-  const [activeItem, setActiveItem] = useState('Início');
+  const [activeItem, setActiveItem] = useState("Início");
   const router = useRouter();
-
+  const { nome, permissao } = usuarioStore();
   return (
     <>
       {!isOpen && (
@@ -69,15 +71,15 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         className={`h-screen bg-theme-blue flex flex-col p-4 shadow-lg transition-transform duration-500 z-50
             fixed left-0 top-0
             ${
-              isOpen ? 'translate-x-0 w-[380px]' : '-translate-x-full w-[380px]'
+              isOpen ? "translate-x-0 w-[380px]" : "-translate-x-full w-[380px]"
             }
           `}
       >
         <div className="flex items-center justify-between gap-2 px-2 border-b border-theme-blue/70">
           <div
             onClick={() => {
-              setActiveItem('');
-              router.push('/dashboard/perfil');
+              setActiveItem("");
+              router.push("/dashboard/perfil");
             }}
             className="cursor-pointer flex items-center gap-2"
           >
@@ -86,10 +88,10 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             </div>
             <div className="flex flex-col text-theme-white">
               <span className="font-medium text-[0.9rem] text-theme-lightBlue leading-4">
-                João Ribeiro dos Santos
+                {nome}
               </span>
               <span className="text-sm font-medium text-[0.9rem] text-[#6481B0]">
-                Administrador Geral
+                {permissao.nomePermissao}
               </span>
             </div>
           </div>
@@ -105,80 +107,80 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           <SidebarItem
             icon={data_images?.icon_inicio}
             text="Início"
-            active={activeItem === 'Início'}
+            active={activeItem === "Início"}
             onClick={() => {
-              setActiveItem('Início');
-              router.push('/dashboard/');
+              setActiveItem("Início");
+              router.push("/dashboard/");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_cadastro}
             text="Cadastro"
-            active={activeItem === 'Cadastro'}
+            active={activeItem === "Cadastro"}
             onClick={() => {
-              setActiveItem('Cadastro');
-              router.push('/dashboard/cadastro');
+              setActiveItem("Cadastro");
+              router.push("/dashboard/cadastro");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_alterar_excluir}
             text="Alterar ou excluir"
-            active={activeItem === 'Alterar ou excluir'}
+            active={activeItem === "Alterar ou excluir"}
             onClick={() => {
-              setActiveItem('Alterar ou excluir');
-              router.push('/dashboard/alterar');
+              setActiveItem("Alterar ou excluir");
+              router.push("/dashboard/alterar");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_relatorio}
             text="Relatórios"
-            active={activeItem === 'Relatórios'}
+            active={activeItem === "Relatórios"}
             onClick={() => {
-              setActiveItem('Relatórios');
-              router.push('/dashboard/relatorios');
+              setActiveItem("Relatórios");
+              router.push("/dashboard/relatorios");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_advertencia}
             text="Emitir advertência"
-            active={activeItem === 'Emitir advertência'}
+            active={activeItem === "Emitir advertência"}
             onClick={() => {
-              setActiveItem('Emitir advertência');
-              router.push('/dashboard/advertencia');
+              setActiveItem("Emitir advertência");
+              router.push("/dashboard/advertencia");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_chave}
             text="Entrega de chave"
-            active={activeItem === 'Entrega de chave'}
+            active={activeItem === "Entrega de chave"}
             onClick={() => {
-              setActiveItem('Entrega de chave');
-              router.push('/dashboard/entrega');
+              setActiveItem("Entrega de chave");
+              router.push("/dashboard/entrega");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_pesquisa}
             text="Laboratório para pesquisa"
-            active={activeItem === 'Laboratório para pesquisa'}
+            active={activeItem === "Laboratório para pesquisa"}
             onClick={() => {
-              setActiveItem('Laboratório para pesquisa');
-              router.push('/dashboard/pesquisa');
+              setActiveItem("Laboratório para pesquisa");
+              router.push("/dashboard/pesquisa");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_aulas}
             text="Programação das aulas"
-            active={activeItem === 'Programação das aulas'}
+            active={activeItem === "Programação das aulas"}
             onClick={() => {
-              setActiveItem('Programação das aulas');
-              router.push('/dashboard/aulas');
+              setActiveItem("Programação das aulas");
+              router.push("/dashboard/aulas");
             }}
             isOpen={isOpen}
           />
