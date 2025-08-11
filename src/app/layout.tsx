@@ -2,7 +2,6 @@ import { Providers } from '@/context/providers';
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import React from 'react';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './globals.css';
 
@@ -25,21 +24,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${poppins.variable}`}>
       <body className={`antialiased`}>
-        <Providers>
-          {children}
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

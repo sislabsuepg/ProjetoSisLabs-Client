@@ -1,11 +1,21 @@
-"use client";
-import DefaultButton from "@/components/DefaultButton";
-import { usuarioStore } from "@/store/globalStore";
-import PersonIcon from "@mui/icons-material/Person";
+'use client';
+import DefaultButton from '@/components/DefaultButton';
+import { usuarioStore } from '@/store/globalStore';
+import PersonIcon from '@mui/icons-material/Person';
+import { useEffect, useState } from 'react';
 
 export default function Perfil() {
   const { nome, login, permissao } = usuarioStore();
-  const lastLogin: string = localStorage.getItem("LastLogin") || "";
+  const [lastLogin, setLastLogin] = useState('');
+  const store = usuarioStore();
+
+  useEffect(() => {
+    const stored = localStorage.getItem('LastLogin') || '';
+    setLastLogin(stored);
+  }, []);
+
+  console.log(store);
+
   return (
     <div className="h-full w-full flex flex-col items-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">Perfil</p>
@@ -15,7 +25,7 @@ export default function Perfil() {
             <div className="border bg-theme-white p-5 border-theme-blue rounded-full w-fit">
               <PersonIcon
                 className="text-theme-blue"
-                sx={{ fontSize: "5rem" }}
+                sx={{ fontSize: '5rem' }}
               />
             </div>
           </div>
@@ -66,7 +76,7 @@ export default function Perfil() {
             </form>
 
             <div className="w-full flex items-center justify-end mt-3">
-              <DefaultButton text={"Atualizar perfil"} disabled={false} />
+              <DefaultButton text={'Atualizar perfil'} disabled={false} />
             </div>
           </div>
 
@@ -104,7 +114,7 @@ export default function Perfil() {
             </form>
 
             <div className="w-full flex items-center justify-end mt-3">
-              <DefaultButton text={"Atualizar senha"} disabled={false} />
+              <DefaultButton text={'Atualizar senha'} disabled={false} />
             </div>
           </div>
         </div>
