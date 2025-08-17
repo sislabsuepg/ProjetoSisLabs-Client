@@ -4,7 +4,7 @@ import { apiOnline } from "@/services/services";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { usuarioStore } from "@/store/globalStore";
+import { useCookies } from "react-cookie";
 import styles from "./Login.module.scss";
 
 interface CustomAxiosError {
@@ -17,6 +17,21 @@ interface CustomAxiosError {
     statusText?: string;
   };
   message: string;
+}
+
+interface UserData {
+  id: number;
+  nome: string;
+  login: string;
+  permissao: {
+    nomePermissao: string;
+    geral: boolean;
+    cadastro: boolean;
+    alteracao: boolean;
+    relatorio: boolean;
+    advertencia: boolean;
+  };
+  lastLogin: string;
 }
 
 function formatDateTime(date: Date): string {
@@ -37,31 +52,41 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [mounted, setMounted] = useState(false);
+  const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
   const router = useRouter();
-  const { setUsuarioId, setUsuarioNome, setUsuarioLogin, setUsuarioPermissao } =
-    usuarioStore();
+  const [cookies, setCookie, removeCookie] = useCookies(["usuario"]);
 
-  // Previne hydration mismatch
+  // Previne hydration mismatch e verifica se usuário já está autenticado
   useEffect(() => {
     setMounted(true);
-    // Limpa o estado do usuário quando entra na página de login
-    setUsuarioId(0);
-    setUsuarioNome("");
-    setUsuarioLogin("");
-    setUsuarioPermissao({
-      nomePermissao: "",
-      geral: false,
-      cadastro: false,
-      alteracao: false,
-      relatorio: false,
-      advertencia: false,
-    });
-    localStorage.removeItem("LastLogin");
-  }, [setUsuarioId, setUsuarioNome, setUsuarioLogin, setUsuarioPermissao]);
+
+    // Só executa verificação uma vez
+    if (!hasCheckedAuth) {
+      setHasCheckedAuth(true);
+
+      // Se usuário já está autenticado, redireciona para dashboard
+      const user = cookies.usuario;
+      if (user && user.id && user.nome && user.id > 0) {
+        console.log("Usuário já autenticado, redirecionando para dashboard");
+        router.push("/dashboard");
+        return;
+      }
+
+      // Caso contrário, limpa cookie inválido se existir
+      if (user) {
+        removeCookie("usuario", { path: "/" });
+        console.log("Cookie inválido removido");
+      }
+    }
+  }, [hasCheckedAuth, cookies.usuario, router, removeCookie]);
 
   // Não renderiza até que o componente esteja montado no cliente
   if (!mounted) {
-    return null;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg">Carregando...</div>
+      </div>
+    );
   }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -104,14 +129,27 @@ export default function Login() {
         login: form.login,
         senha: form.senha,
       });
-      setUsuarioId(data.data.id);
-      setUsuarioNome(data.data.nome);
-      setUsuarioLogin(data.data.login);
-      setUsuarioPermissao(data.data.permissaoUsuario);
-      localStorage.setItem("LastLogin", formatDateTime(new Date()));
-      toast.success("Sucesso");
-      console.log("testeee - ", data);
-      router.push("/dashboard");
+      setCookie(
+        "usuario",
+        {
+          id: data.data.id,
+          nome: data.data.nome,
+          login: data.data.login,
+          permissao: data.data.permissaoUsuario,
+          lastLogin: formatDateTime(new Date()),
+        } as UserData,
+        {
+          path: "/",
+          expires: new Date(Date.now() + 10 * 60 * 1000), // Expira em 10 minutos
+        }
+      );
+      toast.success("Login realizado com sucesso!");
+      console.log("Login successful - ", data.data);
+
+      // Pequeno delay para garantir que o cookie foi salvo antes da navegação
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 100);
       // redirecionar para a pagina inicial
     } catch (err: unknown) {
       if (isCustomAxiosError(err)) {
@@ -230,27 +268,46 @@ export default function Login() {
               {loading ? "Entrando..." : "Entrar"}
             </button>
           </form>
-        </div>
 
-        <button
-          onClick={() => {
-            setUsuarioId(0);
-            setUsuarioNome("Usuário Teste");
-            setUsuarioLogin("usuario.teste");
-            setUsuarioPermissao({
-              nomePermissao: "Permissão Teste",
-              geral: true,
-              cadastro: true,
-              alteracao: true,
-              relatorio: true,
-              advertencia: true,
-            });
-            localStorage.setItem("LastLogin", formatDateTime(new Date()));
-            router.push("/dashboard");
-          }}
-        >
-          ir para a home (teste)
-        </button>
+          {/* Botão de teste - apenas para desenvolvimento */}
+          <div className="mt-4 pt-4 border-t border-gray-300">
+            <p className="text-center text-sm text-gray-500 mb-2">
+              Modo de teste (desenvolvimento)
+            </p>
+            <button
+              onClick={() => {
+                setCookie(
+                  "usuario",
+                  {
+                    id: 999,
+                    nome: "Usuário Teste",
+                    login: "usuario.teste",
+                    permissao: {
+                      nomePermissao: "Administrador",
+                      geral: true,
+                      cadastro: true,
+                      alteracao: true,
+                      relatorio: true,
+                      advertencia: true,
+                    },
+                    lastLogin: formatDateTime(new Date()),
+                  },
+                  {
+                    path: "/",
+                    expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Expira em 24 horas
+                  }
+                );
+                toast.success("Login de teste realizado!");
+                setTimeout(() => {
+                  router.push("/dashboard");
+                }, 100);
+              }}
+              className="w-full px-3 py-2 text-base font-normal rounded-md border border-gray-300 text-gray-700 text-[0.9rem] transition-colors duration-200 hover:bg-gray-50"
+            >
+              Entrar como usuário teste
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="w-full h-[300px] bg-[#263E66] rounded-t-[100%] flex lsm:hidden items-center justify-center mt-10">

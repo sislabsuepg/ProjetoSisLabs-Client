@@ -1,102 +1,104 @@
-'use client';
+"use client";
 
-import Pagination from '@/components/Pagination';
-import { useState } from 'react';
+import Pagination from "@/components/Pagination";
+import { useState } from "react";
+import { useCookies } from "react-cookie";
 
 export default function Inicio() {
   const itemsPerPage = 8;
   const [currentPage, setCurrentPage] = useState(1);
+  const [cookies] = useCookies(["usuario"]);
 
   const listaTeste = [
     {
       id: 1,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 2,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 3,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 4,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 5,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 6,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 7,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 8,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 9,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 10,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 11,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 12,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 13,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 14,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
     {
       id: 15,
-      lab: '108A',
-      usuario: 'Raissa Mayara Moreira',
-      horario: '17:40',
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
     },
   ];
 
@@ -115,14 +117,14 @@ export default function Inicio() {
           <div
             key={item?.id}
             className={`w-full flex items-center gap-2 ${
-              Number(item?.id) % 2 == 0 ? 'bg-transparent' : 'bg-[#F3F3F3]'
+              Number(item?.id) % 2 == 0 ? "bg-transparent" : "bg-[#F3F3F3]"
             } h-12 py-2 px-4 rounded-[10px]`}
           >
             <div className="h-2 w-2 bg-[#22FF00] rounded-full"></div>
             <p className="text-theme-text text-[0.9rem] font-normal">
               Laboratório <span className="font-semibold">{item?.lab}</span> -
-              Chave do Laboratório {item?.lab} foi emprestado pelo(a) aluno(a){' '}
-              <span className="font-semibold">{item?.usuario}</span> -{' '}
+              Chave do Laboratório {item?.lab} foi emprestado pelo(a) aluno(a){" "}
+              <span className="font-semibold">{item?.usuario}</span> -{" "}
               {item?.horario}
             </p>
           </div>

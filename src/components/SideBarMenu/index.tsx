@@ -4,10 +4,8 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import PersonIcon from "@mui/icons-material/Person";
 import { useRouter } from "next/navigation";
-
-import { useEffect, useState } from "react";
-
-import { usuarioStore } from "@/store/globalStore";
+import { useState } from "react";
+import { useCookies } from "react-cookie";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -55,20 +53,9 @@ function SidebarItem({
 export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const [activeItem, setActiveItem] = useState("Início");
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-  const { nome, permissao, resetUsuario } = usuarioStore();
-  let lastLogin: string = "";
-  useEffect(() => {
-    setMounted(true);
-    lastLogin = localStorage.getItem("LastLogin") || "";
-    if (!lastLogin || !nome || !permissao?.nomePermissao) {
-      router.push("/login");
-    }
-  }, [resetUsuario]);
+  const [cookies, , removeCookie] = useCookies(["usuario"]);
 
-  if (!mounted) {
-    return null;
-  }
+  const user = cookies.usuario;
 
   return (
     <>
@@ -102,10 +89,10 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             </div>
             <div className="flex flex-col text-theme-white">
               <span className="font-medium text-[0.9rem] text-theme-lightBlue leading-4">
-                {nome}
+                {user?.nome}
               </span>
               <span className="text-sm font-medium text-[0.9rem] text-[#6481B0]">
-                {permissao.nomePermissao}
+                {user?.permissao?.nomePermissao}
               </span>
             </div>
           </div>
@@ -212,8 +199,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             icon={data_images?.icon_sair}
             text="Sair"
             onClick={() => {
-              resetUsuario();
-              localStorage.removeItem("LastLogin");
+              removeCookie("usuario", { path: "/" });
               router.push("/login");
             }}
             isOpen={isOpen}
