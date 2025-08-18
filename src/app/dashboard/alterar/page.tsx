@@ -2,6 +2,7 @@
 
 import CustomModal from '@/components/CustomModal';
 import EditUserModal from '@/components/EditUser';
+import Pagination from '@/components/Pagination';
 import Popover from '@/components/Popover';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -59,17 +60,71 @@ export default function Alterar() {
         curso: 'Ciência da Computação',
         ano: 2,
       },
+      {
+        ra: '113452133',
+        nome: 'Maria Silva 3',
+        telefone: '(42) 9 8888-8888',
+        email: 'maria.silva@gmail.com',
+        curso: 'Ciência da Computação',
+        ano: 2,
+      },
+      {
+        ra: '110267133',
+        nome: 'Maria Silva 3',
+        telefone: '(42) 9 8888-8888',
+        email: 'maria.silva@gmail.com',
+        curso: 'Ciência da Computação',
+        ano: 2,
+      },
+      {
+        ra: '11024433',
+        nome: 'Maria Silva 3',
+        telefone: '(42) 9 8888-8888',
+        email: 'maria.silva@gmail.com',
+        curso: 'Ciência da Computação',
+        ano: 2,
+      },
+      {
+        ra: '110226533',
+        nome: 'Maria Silva 3',
+        telefone: '(42) 9 8888-8888',
+        email: 'maria.silva@gmail.com',
+        curso: 'Ciência da Computação',
+        ano: 2,
+      },
+      {
+        ra: '110221233',
+        nome: 'Maria Silva 3',
+        telefone: '(42) 9 8888-8888',
+        email: 'maria.silva@gmail.com',
+        curso: 'Ciência da Computação',
+        ano: 2,
+      },
+      {
+        ra: '11029833',
+        nome: 'Maria Silva 3',
+        telefone: '(42) 9 8888-8888',
+        email: 'maria.silva@gmail.com',
+        curso: 'Ciência da Computação',
+        ano: 2,
+      },
+      {
+        ra: '1102773',
+        nome: 'Maria Silva 000',
+        telefone: '(42) 9 8888-8888',
+        email: 'maria.silva@gmail.com',
+        curso: 'Ciência da Computação',
+        ano: 2,
+      },
     ];
     setDados(mockData);
   }, []);
 
-  // Filtra os dados com base no texto digitado
-  const dadosFiltrados = dados.filter(
-    (item) =>
-      item.nome.toLowerCase().includes(filtro.toLowerCase()) ||
-      item.ra.includes(filtro) ||
-      item.email.toLowerCase().includes(filtro.toLowerCase()),
-  );
+  const itemsPerPage = 8;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(dados.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentItems = dados.slice(startIndex, startIndex + itemsPerPage);
 
   const listButtons = [
     { id: 1, title: 'Acadêmico' },
@@ -127,8 +182,8 @@ export default function Alterar() {
                   </tr>
                 </thead>
                 <tbody>
-                  {dadosFiltrados?.length > 0 ? (
-                    dadosFiltrados.map((item, index) => (
+                  {currentItems?.length > 0 ? (
+                    currentItems.map((item, index) => (
                       <tr
                         key={item.ra}
                         className={
@@ -259,7 +314,14 @@ export default function Alterar() {
         ))}
       </div>
 
-      <div className="mt-5 w-full">{renderFormulario()}</div>
+      <div className="mt-5 w-full">
+        {renderFormulario()}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
 
       <CustomModal
         open={openExcluir?.status}
@@ -284,7 +346,6 @@ export default function Alterar() {
         open={openEditUser.status}
         onClose={() => setOpenEditUser({ status: false, id: '' })}
         onSave={() => {
-          // Atualiza os dados do usuário no array
           setDados((prev) =>
             prev.map((user) =>
               user.ra === openEditUser.id
