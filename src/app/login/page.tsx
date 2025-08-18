@@ -294,7 +294,7 @@ export default function Login() {
                   },
                   {
                     path: "/",
-                    expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Expira em 24 horas
+                    expires: new Date(Date.now() + 10 * 60 * 1000), // Expira em 10 minutos
                   }
                 );
                 toast.success("Login de teste realizado!");

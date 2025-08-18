@@ -1,20 +1,10 @@
-'use client';
-import DefaultButton from '@/components/DefaultButton';
-import { usuarioStore } from '@/store/globalStore';
-import PersonIcon from '@mui/icons-material/Person';
-import { useEffect, useState } from 'react';
+"use client";
+import DefaultButton from "@/components/DefaultButton";
+import PersonIcon from "@mui/icons-material/Person";
+import { useCookies } from "react-cookie";
 
 export default function Perfil() {
-  const { nome, login, permissao } = usuarioStore();
-  const [lastLogin, setLastLogin] = useState('');
-  const store = usuarioStore();
-
-  useEffect(() => {
-    const stored = localStorage.getItem('LastLogin') || '';
-    setLastLogin(stored);
-  }, []);
-
-  console.log(store);
+  const [cookies] = useCookies(["usuario"]);
 
   return (
     <div className="h-full w-full flex flex-col items-start">
@@ -25,15 +15,15 @@ export default function Perfil() {
             <div className="border bg-theme-white p-5 border-theme-blue rounded-full w-fit">
               <PersonIcon
                 className="text-theme-blue"
-                sx={{ fontSize: '5rem' }}
+                sx={{ fontSize: "5rem" }}
               />
             </div>
           </div>
 
           <div className="flex flex-col items-center gap-1 justify-center">
-            <p className="font-medium">{nome}</p>
+            <p className="font-medium">{cookies.usuario.nome}</p>
             <p className="text-theme-text font-normal text-[0.9rem]">
-              @{login}
+              @{cookies.usuario.login}
             </p>
             <p className="text-theme-text font-normal text-[0.9rem]">
               (42) 9 9999 - 9999
@@ -42,10 +32,10 @@ export default function Perfil() {
 
           <div className="flex flex-col items-center justify-center">
             <p className="bg-[#d1d1d1] text-theme-blue font-medium px-4 py-2 rounded-[5px]">
-              {permissao.nomePermissao}
+              {cookies.usuario.permissao.nomePermissao}
             </p>
             <p className="text-theme-text text-[0.9rem] font-medium mt-5">
-              Login: {lastLogin}
+              Login: {cookies.usuario.lastLogin}
             </p>
           </div>
         </div>
@@ -76,7 +66,7 @@ export default function Perfil() {
             </form>
 
             <div className="w-full flex items-center justify-end mt-3">
-              <DefaultButton text={'Atualizar perfil'} disabled={false} />
+              <DefaultButton text={"Atualizar perfil"} disabled={false} />
             </div>
           </div>
 
@@ -114,7 +104,7 @@ export default function Perfil() {
             </form>
 
             <div className="w-full flex items-center justify-end mt-3">
-              <DefaultButton text={'Atualizar senha'} disabled={false} />
+              <DefaultButton text={"Atualizar senha"} disabled={false} />
             </div>
           </div>
         </div>

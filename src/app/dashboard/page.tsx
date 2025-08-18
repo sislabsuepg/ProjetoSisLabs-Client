@@ -2,12 +2,12 @@
 
 import Pagination from "@/components/Pagination";
 import { useState } from "react";
-import { useCookies } from "react-cookie";
+//import { useCookies } from "react-cookie";
 
 export default function Inicio() {
   const itemsPerPage = 8;
   const [currentPage, setCurrentPage] = useState(1);
-  const [cookies] = useCookies(["usuario"]);
+  //const [cookies] = useCookies(["usuario"]);
 
   const listaTeste = [
     {

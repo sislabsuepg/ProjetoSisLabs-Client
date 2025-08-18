@@ -1,11 +1,7 @@
 import { redirect } from "next/navigation";
-import { useCookies } from "react-cookie";
 
 export default function Page() {
-  const [cookies] = useCookies(["usuario"]);
-  if (!cookies.usuario) {
-    redirect("/login");
-  } else {
-    redirect("/dashboard");
-  }
+  // Always redirect to login on server side
+  // Authentication logic should be handled in the login component
+  redirect("/login");
 }
