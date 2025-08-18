@@ -3,6 +3,8 @@
 import FormAcademico from '@/components/Form/FormAcademico';
 import FormCurso from '@/components/Form/FormCurso';
 import FormLaboratorio from '@/components/Form/FormLaboratorio';
+import FormOrientacao from '@/components/Form/FormOrientacao';
+import FormPermissao from '@/components/Form/FormPermissao';
 import FormProfessor from '@/components/Form/FormProfessor';
 import { useState } from 'react';
 
@@ -14,6 +16,8 @@ export default function Cadastro() {
     { id: 2, title: 'Professor', component: <FormProfessor /> },
     { id: 3, title: 'Laboratório', component: <FormLaboratorio /> },
     { id: 4, title: 'Curso', component: <FormCurso /> },
+    { id: 5, title: 'Orientação', component: <FormOrientacao /> },
+    { id: 6, title: 'Permissão', component: <FormPermissao /> },
   ];
 
   return (

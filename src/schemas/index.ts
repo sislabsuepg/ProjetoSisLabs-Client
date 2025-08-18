@@ -38,6 +38,12 @@ export const cadastro_laboratorio = Yup.object().shape(
   }),
 );
 
+export const cadastro_permissao = Yup.object().shape(
+  createNewSchema({
+    nome: Yup.string().required('O campo "Nome da permissão" é obrigatório'),
+  }),
+);
+
 export const cadastro_professor = Yup.object().shape(
   createNewSchema({
     nome: Yup.string()
@@ -48,6 +54,14 @@ export const cadastro_professor = Yup.object().shape(
       .required('O campo "E-mail" é obrigatório'),
   }),
 );
+
+export const cadastro_orientacao = Yup.object().shape({
+  data_inicio: Yup.string().required('O campo "Data de início" é obrigatório'),
+  data_fim: Yup.string().required('O campo "Data final" é obrigatório'),
+  aluno: Yup.string().required('O campo "Aluno" é obrigatório'),
+  professor: Yup.string().required('O campo "Professor" é obrigatório'),
+  laboratorio: Yup.string().required('O campo "Laboratório" é obrigatório'),
+});
 
 export const cadastro_curso = Yup.object().shape(
   createNewSchema({

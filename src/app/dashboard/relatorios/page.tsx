@@ -106,7 +106,7 @@ export default function Relatorios() {
               <div
                 className={`${
                   laboratorio !== '' && 'border border-green-500'
-                } relative rounded-[15px] bg-theme-container w-[280px] max-w-md`}
+                } relative rounded-[15px] bg-theme-container `}
               >
                 {laboratorio !== '' && (
                   <CheckCircleIcon className="absolute text-green-500 -top-3 -right-3" />
