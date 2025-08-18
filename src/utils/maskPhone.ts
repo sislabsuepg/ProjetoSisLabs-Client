@@ -5,18 +5,10 @@ import { nonDigitCharacters } from '@/constants/regex';
  * @param number - Número de celular para formatar
  * @returns número de celular formatado
  */
-export function maskPhone(number: string) {
-  let value = number;
+export function maskPhone(number?: string): string {
+  if (!number) return '';
 
-  if (typeof value !== 'string') {
-    return null;
-  }
-
-  if (!value) {
-    return null;
-  }
-
-  value = value.replace(nonDigitCharacters, '');
+  let value = number.replace(nonDigitCharacters, '');
   value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
   value = value.replace(/(\d)(\d{4})$/, '$1-$2');
 

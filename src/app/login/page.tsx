@@ -1,11 +1,11 @@
-"use client";
-import { data_images } from "@/assets/data";
-import { apiOnline } from "@/services/services";
-import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { useCookies } from "react-cookie";
-import styles from "./Login.module.scss";
+'use client';
+import { data_images } from '@/assets/data';
+import { apiOnline } from '@/services/services';
+import { useRouter } from 'next/navigation';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
+import { toast } from 'react-toastify';
+import styles from './Login.module.scss';
 
 interface CustomAxiosError {
   isAxiosError: boolean;
@@ -35,7 +35,7 @@ interface UserData {
 }
 
 function formatDateTime(date: Date): string {
-  const pad = (num: number) => String(num).padStart(2, "0");
+  const pad = (num: number) => String(num).padStart(2, '0');
 
   const day = pad(date.getDate());
   const month = pad(date.getMonth() + 1); // getMonth() is 0-indexed
@@ -48,13 +48,13 @@ function formatDateTime(date: Date): string {
 }
 
 export default function Login() {
-  const [form, setForm] = useState({ login: "", senha: "" });
+  const [form, setForm] = useState({ login: '', senha: '' });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [mounted, setMounted] = useState(false);
   const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
   const router = useRouter();
-  const [cookies, setCookie, removeCookie] = useCookies(["usuario"]);
+  const [cookies, setCookie, removeCookie] = useCookies(['usuario']);
 
   // Previne hydration mismatch e verifica se usuário já está autenticado
   useEffect(() => {
@@ -67,15 +67,15 @@ export default function Login() {
       // Se usuário já está autenticado, redireciona para dashboard
       const user = cookies.usuario;
       if (user && user.id && user.nome && user.id > 0) {
-        console.log("Usuário já autenticado, redirecionando para dashboard");
-        router.push("/dashboard");
+        console.log('Usuário já autenticado, redirecionando para dashboard');
+        router.push('/dashboard');
         return;
       }
 
       // Caso contrário, limpa cookie inválido se existir
       if (user) {
-        removeCookie("usuario", { path: "/" });
-        console.log("Cookie inválido removido");
+        removeCookie('usuario', { path: '/' });
+        console.log('Cookie inválido removido');
       }
     }
   }, [hasCheckedAuth, cookies.usuario, router, removeCookie]);
@@ -92,7 +92,7 @@ export default function Login() {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
-    setErrors((errs) => ({ ...errs, [name]: "" }));
+    setErrors((errs) => ({ ...errs, [name]: '' }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -100,8 +100,8 @@ export default function Login() {
     setErrors({});
 
     const newErrors: { [key: string]: string } = {};
-    if (!form.login) newErrors.login = "Por favor, preencha o login.";
-    if (!form.senha) newErrors.senha = "Por favor, preencha a senha.";
+    if (!form.login) newErrors.login = 'Por favor, preencha o login.';
+    if (!form.senha) newErrors.senha = 'Por favor, preencha a senha.';
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -110,7 +110,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const callRoute = form.login.match(/^\d{1,13}$/) ? "aluno/" : "usuario/";
+      const callRoute = form.login.match(/^\d{1,13}$/) ? 'aluno/' : 'usuario/';
       const data: {
         data: {
           id: number;
@@ -130,7 +130,7 @@ export default function Login() {
         senha: form.senha,
       });
       setCookie(
-        "usuario",
+        'usuario',
         {
           id: data.data.id,
           nome: data.data.nome,
@@ -139,16 +139,16 @@ export default function Login() {
           lastLogin: formatDateTime(new Date()),
         } as UserData,
         {
-          path: "/",
+          path: '/',
           expires: new Date(Date.now() + 10 * 60 * 1000), // Expira em 10 minutos
-        }
+        },
       );
-      toast.success("Login realizado com sucesso!");
-      console.log("Login successful - ", data.data);
+      toast.success('Login realizado com sucesso!');
+      console.log('Login successful - ', data.data);
 
       // Pequeno delay para garantir que o cookie foi salvo antes da navegação
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push('/dashboard');
       }, 100);
       // redirecionar para a pagina inicial
     } catch (err: unknown) {
@@ -166,13 +166,13 @@ export default function Login() {
           toast.error(`Erro de conexão: ${err.message}`);
         } else {
           toast.error(
-            "Ocorreu um erro desconhecido ao tentar conectar com o servidor."
+            'Ocorreu um erro desconhecido ao tentar conectar com o servidor.',
           );
         }
       } else if (err instanceof Error) {
         toast.error(`Ocorreu um erro inesperado: ${err.message}`);
       } else {
-        toast.error("Ocorreu um erro totalmente inesperado.");
+        toast.error('Ocorreu um erro totalmente inesperado.');
       }
     } finally {
       setLoading(false);
@@ -182,16 +182,23 @@ export default function Login() {
   // refina o tipo da variável em um escopo específico
   function isCustomAxiosError(error: unknown): error is CustomAxiosError {
     return (
-      typeof error === "object" &&
+      typeof error === 'object' &&
       error !== null &&
-      "isAxiosError" in error &&
+      'isAxiosError' in error &&
       (error as { isAxiosError: boolean }).isAxiosError === true
     );
   }
 
   const ErrorMessage = ({ field }: { field: string }) =>
     errors[field] ? (
-      <div style={{ color: "red", marginTop: 4 }}>{errors[field]}</div>
+      <div style={{ marginTop: 4 }}>
+        <p
+          style={{ color: 'red', marginTop: 4 }}
+          className="text-[0.8rem] font-normal"
+        >
+          {errors[field]}
+        </p>
+      </div>
     ) : null;
 
   return (
@@ -205,10 +212,10 @@ export default function Login() {
         <img
           className={`${styles.logoImg}`}
           src={data_images?.logo_uepg_desktop_white}
-          alt={"Logo UEPG DESKTOP"}
+          alt={'Logo UEPG DESKTOP'}
         />
         <p className="dlg:text-[1.1rem] text-[1rem] leading-6 font-normal">
-          A instituição que, diferentemente de uma ruptura com o passado,{" "}
+          A instituição que, diferentemente de uma ruptura com o passado,{' '}
           <strong>avança</strong> a partir de suas <strong>conquistas</strong>.
         </p>
       </div>
@@ -220,14 +227,14 @@ export default function Login() {
           <div className="relative mb-5 flex flex-col items-center">
             <img src={data_images?.user_login} alt="Login do usuário" />
             <p className="text-theme-text font-normal text-[0.9rem] text-center mt-2">
-              {" "}
+              {' '}
               Acesso ao controle dos laboratórios do DEINFO
             </p>
           </div>
 
           <form onSubmit={handleSubmit} noValidate className="w-full">
             <div className="mb-2">
-              {" "}
+              {' '}
               <input
                 type="text"
                 name="login"
@@ -241,7 +248,7 @@ export default function Login() {
             </div>
 
             <div className="mb-3">
-              {" "}
+              {' '}
               <input
                 type="password"
                 name="senha"
@@ -260,12 +267,12 @@ export default function Login() {
               className={`w-full px-3 py-2 text-base font-normal rounded-md border-none text-theme-white text-[0.9rem] transition-colors duration-200
               ${
                 loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-theme-blue cursor-pointer"
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-theme-blue cursor-pointer'
               }
             `}
             >
-              {loading ? "Entrando..." : "Entrar"}
+              {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
 
@@ -277,13 +284,13 @@ export default function Login() {
             <button
               onClick={() => {
                 setCookie(
-                  "usuario",
+                  'usuario',
                   {
                     id: 999,
-                    nome: "Usuário Teste",
-                    login: "usuario.teste",
+                    nome: 'Usuário Teste',
+                    login: 'usuario.teste',
                     permissao: {
-                      nomePermissao: "Administrador",
+                      nomePermissao: 'Administrador',
                       geral: true,
                       cadastro: true,
                       alteracao: true,
@@ -293,13 +300,13 @@ export default function Login() {
                     lastLogin: formatDateTime(new Date()),
                   },
                   {
-                    path: "/",
+                    path: '/',
                     expires: new Date(Date.now() + 10 * 60 * 1000), // Expira em 10 minutos
-                  }
+                  },
                 );
-                toast.success("Login de teste realizado!");
+                toast.success('Login de teste realizado!');
                 setTimeout(() => {
-                  router.push("/dashboard");
+                  router.push('/dashboard');
                 }, 100);
               }}
               className="w-full px-3 py-2 text-base font-normal rounded-md border border-gray-300 text-gray-700 text-[0.9rem] transition-colors duration-200 hover:bg-gray-50"
@@ -313,7 +320,7 @@ export default function Login() {
       <div className="w-full h-[300px] bg-[#263E66] rounded-t-[100%] flex lsm:hidden items-center justify-center mt-10">
         <img
           src={data_images?.logo_uepg_mobile}
-          alt={"Logo UEPG MOBILE"}
+          alt={'Logo UEPG MOBILE'}
           className="w-full max-w-[250px]"
         />
       </div>
