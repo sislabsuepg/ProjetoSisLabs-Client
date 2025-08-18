@@ -21,6 +21,7 @@ export default {
         'theme-inputBg': '#EAE9E9',
         'theme-container': '#ECECEC',
         'theme-red': '#FF6666',
+        'theme-green': '#42AD32',
       },
     },
     screens: {

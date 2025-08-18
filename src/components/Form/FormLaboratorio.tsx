@@ -120,7 +120,9 @@ export default function FormLaboratorio() {
 
         <div className="w-full flex items-center gap-4">
           <label className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-700">Restrito</span>
+            <span className="text-sm font-medium text-gray-700">
+              O laboratório é restrito?
+            </span>
             <CustomSwitch
               checked={form.restrito}
               onChange={(e) =>

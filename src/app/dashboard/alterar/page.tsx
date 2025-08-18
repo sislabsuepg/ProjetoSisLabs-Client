@@ -1,9 +1,12 @@
 'use client';
 
+import CustomModal from '@/components/CustomModal';
+import EditUserModal from '@/components/EditUser';
 import Popover from '@/components/Popover';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 interface IData {
   ra: string;
@@ -18,6 +21,16 @@ export default function Alterar() {
   const [activeId, setActiveId] = useState(1);
   const [dados, setDados] = useState([] as IData[]);
   const [filtro, setFiltro] = useState('');
+  const [openExcluir, setOpenExcluir] = useState({ status: false, id: '' });
+  const [openEditUser, setOpenEditUser] = useState({ status: false, id: '' });
+  const [formData, setFormData] = useState({
+    nome: '',
+    matricula: '',
+    email: '',
+    telefone: '',
+    curso: '',
+    periodo: '',
+  });
 
   useEffect(() => {
     // Simulação de busca na API
@@ -64,18 +77,6 @@ export default function Alterar() {
     { id: 3, title: 'Laboratório' },
     { id: 4, title: 'Orientação/Mestrado' },
   ];
-
-  const handleEditar = (ra: string) => {
-    alert(`Editar registro com RA: ${ra}`);
-    // aqui você pode abrir modal, formulário, etc.
-  };
-
-  const handleExcluir = (ra: string) => {
-    if (confirm(`Deseja realmente excluir o registro com RA: ${ra}?`)) {
-      // Exclua logicamente, por exemplo:
-      setDados((prevDados) => prevDados.filter((item) => item.ra !== ra));
-    }
-  };
 
   const renderFormulario = () => {
     switch (activeId) {
@@ -125,15 +126,14 @@ export default function Alterar() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-transparent space-y-3">
+                <tbody>
                   {dadosFiltrados?.length > 0 ? (
-                    dadosFiltrados?.map((item, index) => (
+                    dadosFiltrados.map((item, index) => (
                       <tr
                         key={item.ra}
-                        className={`${
-                          index % 2 == 1 ? '' : 'bg-[#F5F5F5]'
-                        } bg-white rounded-lg shadow-sm flex flex-row mt-1`}
-                        style={{ display: 'table-row' }}
+                        className={
+                          index % 2 === 0 ? 'bg-[#F5F5F5]' : 'bg-white'
+                        }
                       >
                         <td className="px-4 py-3 text-[0.8rem] text-theme-text font-medium max-w-[100px]">
                           <Popover title={item.ra}>{item.ra}</Popover>
@@ -153,25 +153,46 @@ export default function Alterar() {
                           <Popover title={item.curso}>{item.curso}</Popover>
                         </td>
                         <td className="px-4 py-3 text-[0.8rem] text-theme-text font-medium max-w-[80px]">
-                          <Popover title={String(item.ano)}>
-                            {String(item.ano)}
-                          </Popover>
+                          <Popover title={String(item.ano)}>{item.ano}</Popover>
                         </td>
                         <td className="px-4 py-3 text-[0.8rem] text-theme-text font-medium flex gap-2">
                           <Popover title="Editar">
-                            <button onClick={() => handleEditar(item.ra)}>
+                            <button
+                              onClick={() => {
+                                const user = dados.find(
+                                  (d) => d.ra === item.ra,
+                                );
+                                if (user) {
+                                  setFormData({
+                                    nome: user.nome,
+                                    matricula: user.ra, // supondo que RA é matrícula
+                                    email: user.email,
+                                    telefone: user.telefone,
+                                    curso: user.curso,
+                                    periodo: String(user.ano), // ou outro campo
+                                  });
+                                  setOpenEditUser({
+                                    status: true,
+                                    id: item.ra,
+                                  });
+                                }
+                              }}
+                            >
                               <BorderColorIcon
                                 className="text-theme-blue"
-                                sx={{ width: '20px', height: '20px' }}
+                                sx={{ width: 20, height: 20 }}
                               />
                             </button>
                           </Popover>
-
                           <Popover title="Excluir">
-                            <button onClick={() => handleExcluir(item.ra)}>
+                            <button
+                              onClick={() => {
+                                setOpenExcluir({ status: true, id: item?.ra });
+                              }}
+                            >
                               <DeleteIcon
                                 className="text-theme-red"
-                                sx={{ width: '20px', height: '20px' }}
+                                sx={{ width: 20, height: 20 }}
                               />
                             </button>
                           </Popover>
@@ -239,6 +260,53 @@ export default function Alterar() {
       </div>
 
       <div className="mt-5 w-full">{renderFormulario()}</div>
+
+      <CustomModal
+        open={openExcluir?.status}
+        onClose={() => setOpenExcluir({ status: false, id: '' })}
+        title="Atenção"
+        message="Deseja, realmente, excluir o usuário?"
+        onCancel={() => {
+          setOpenExcluir({ status: false, id: '' });
+        }}
+        onConfirm={() => {
+          setDados((prevDados) =>
+            prevDados.filter((el) => el.ra !== openExcluir?.id),
+          );
+          setOpenExcluir({ status: false, id: '' });
+          toast.success('Usuário removido com sucesso!');
+        }}
+        cancelText="Cancelar"
+        confirmText="Excluir"
+      />
+
+      <EditUserModal
+        open={openEditUser.status}
+        onClose={() => setOpenEditUser({ status: false, id: '' })}
+        onSave={() => {
+          // Atualiza os dados do usuário no array
+          setDados((prev) =>
+            prev.map((user) =>
+              user.ra === openEditUser.id
+                ? {
+                    ...user,
+                    nome: formData.nome,
+                    email: formData.email,
+                    telefone: formData.telefone,
+                    curso: formData.curso,
+                    ano: Number(formData.periodo),
+                  }
+                : user,
+            ),
+          );
+          setOpenEditUser({ status: false, id: '' });
+          toast.success('Usuário atualizado com sucesso!');
+        }}
+        formData={formData}
+        onChange={(field, value) =>
+          setFormData((prev) => ({ ...prev, [field]: value }))
+        }
+      />
     </div>
   );
 }
