@@ -53,7 +53,12 @@ export default function FormAcademico() {
     }
   };
 
-  const isFormValid = Object.values(form).every((value) => value.trim() !== '');
+  const isFormValid = Object.entries(form).every(([key, value]) => {
+  if (key === 'email' || key === 'telefone') {
+    return true; 
+  }
+  return value.trim() !== '';
+});
 
   return (
     <div className="w-full h-full flex flex-col justify-between">
@@ -81,7 +86,7 @@ export default function FormAcademico() {
             name="ra"
             placeholder="RA"
             value={removeLetters(form.ra)}
-            maxLength={8}
+            maxLength={13}
             onChange={handleChange}
             className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
           />
@@ -128,9 +133,9 @@ export default function FormAcademico() {
           <input
             type="text"
             name="ano"
-            placeholder="Ano"
+            placeholder="Ano/Série"
             value={removeLetters(form.ano)}
-            maxLength={4}
+            maxLength={1}
             onChange={handleChange}
             className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
           />

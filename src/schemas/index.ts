@@ -10,24 +10,29 @@ export const cadastro_academico = Yup.object().shape(
 
     ra: Yup.string()
       .min(8, 'RA inválido')
-      .max(8, 'RA inválido')
+      .max(13, 'RA inválido')
       .required('O campo "RA" é obrigatório')
       .matches(/^\d+$/, 'O RA deve conter apenas números'),
 
     email: Yup.string()
-      .email('E-mail inválido')
-      .required('O campo "E-mail" é obrigatório'),
+      .optional()
+      .email('E-mail inválido'),
 
     telefone: Yup.string()
-      .min(11, 'Telefone inválido')
-      .required('O campo "Telefone" é obrigatório'),
-
+      .optional()
+      .test(
+        'valid-telefone',
+        'O telefone deve ter no mínimo 11 dígitos',
+        (value) => {
+          if (!value || value.trim() === '') return true;
+          return value.length >= 11;
+        }
+      ),
     curso: Yup.string().required('O campo "Curso" é obrigatório'),
 
     ano: Yup.string()
-
-      .matches(/^\d{4}$/, 'O campo "Ano" deve conter 4 dígitos')
-      .required('O campo "Ano" é obrigatório'),
+      .matches(/^\d{1}$/, 'O campo "Ano/Série" deve conter 1 dígito')
+      .required('O campo "Ano/Série" é obrigatório'),
   }),
 );
 
