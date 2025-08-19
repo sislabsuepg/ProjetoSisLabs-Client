@@ -46,7 +46,7 @@ export default function FormCurso() {
   return (
     <div className="w-full h-full flex flex-col justify-between">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        Cadastro do professor
+        Cadastro do curso
       </p>
 
       <form
@@ -70,7 +70,7 @@ export default function FormCurso() {
             placeholder="Quantos anos tem o curso?"
             value={form.anos ? removeLetters(form.anos) : ''}
             onChange={handleChange}
-            maxLength={2}
+            maxLength={1}
             className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
           />
         </div>
