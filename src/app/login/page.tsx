@@ -140,7 +140,7 @@ export default function Login() {
         } as UserData,
         {
           path: '/',
-          expires: new Date(Date.now() + 10 * 60 * 1000), // Expira em 10 minutos
+          expires: new Date(Date.now() + 4 * 60 * 60 * 1000), // Expira em 4 horas
         },
       );
       toast.success('Login realizado com sucesso!');
@@ -301,7 +301,7 @@ export default function Login() {
                   },
                   {
                     path: '/',
-                    expires: new Date(Date.now() + 10 * 60 * 1000), // Expira em 10 minutos
+                    expires: new Date(Date.now() + 4 * 60 * 60 * 1000), // Expira em 4 horas
                   },
                 );
                 toast.success('Login de teste realizado!');
