@@ -21,7 +21,7 @@ export default function FormPermissao() {
     e.preventDefault();
     try {
       await cadastro_permissao.validate(form);
-      toast.success('Cadastro da orientação realizado com sucesso!');
+      toast.success('Cadastro da permissao realizado com sucesso!');
       console.log('✅ Dados válidos:', form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
@@ -32,7 +32,7 @@ export default function FormPermissao() {
     }
   };
 
-  const isFormValid = Object.values(form).every((value) => value.trim() !== '');
+  const isFormValid = form.nome.trim() !== '';
 
   return (
     <div className="w-full h-full flex flex-col justify-between">
