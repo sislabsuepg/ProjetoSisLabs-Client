@@ -21,7 +21,6 @@ export const cadastro_academico = Yup.object().shape(
     telefone: Yup.string()
       .optional()
       .test(
-        'valid-telefone',
         'O telefone deve ter no mínimo 11 dígitos',
         (value) => {
           if (!value || value.trim() === '') return true;
