@@ -88,7 +88,7 @@ export default function FormLaboratorio() {
   );
 
   return (
-    <div className="w-full h-full flex flex-col justify-between">
+    <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
         Cadastro do laboratório
       </p>
@@ -96,41 +96,43 @@ export default function FormLaboratorio() {
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="mt-4 space-y-4 w-full"
+        className="mt-4 space-y-4 flex flex-col justify-between w-full h-full"
       >
-        <div className="w-full flex items-center gap-4">
-          <input
-            type="text"
-            name="nome"
-            placeholder="Nome do laboratório"
-            value={form.nome ? form.nome : ''}
-            onChange={handleChange}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          />
-
-          <input
-            type="text"
-            name="numero"
-            placeholder="Número"
-            value={removeLetters(form.numero)}
-            onChange={handleChange}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          />
-        </div>
-
-        <div className="w-full flex items-center gap-4">
-          <label className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-700">
-              O laboratório é restrito?
-            </span>
-            <CustomSwitch
-              checked={form.restrito}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, restrito: e.target.checked }))
-              }
-              name="restrito"
+        <div className="space-y-4">
+          <div className="w-full flex items-center gap-4">
+            <input
+              type="text"
+              name="nome"
+              placeholder="Nome do laboratório"
+              value={form.nome ? form.nome : ''}
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             />
-          </label>
+
+            <input
+              type="text"
+              name="numero"
+              placeholder="Número"
+              value={removeLetters(form.numero)}
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+            />
+          </div>
+
+          <div className="w-full flex items-center gap-4">
+            <label className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">
+                O laboratório é restrito?
+              </span>
+              <CustomSwitch
+                checked={form.restrito}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, restrito: e.target.checked }))
+                }
+                name="restrito"
+              />
+            </label>
+          </div>
         </div>
 
         <div className="w-full flex items-center justify-end">

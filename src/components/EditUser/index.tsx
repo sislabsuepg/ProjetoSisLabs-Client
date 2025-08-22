@@ -1,28 +1,20 @@
 import { Modal } from '@mui/material';
-import React from 'react';
 
-interface EditUserModalProps {
+interface EditUserModalProps<T extends object> {
   open: boolean;
   onClose: () => void;
   onSave: () => void;
-  formData: {
-    nome: string;
-    matricula: string;
-    email: string;
-    telefone: string;
-    curso: string;
-    periodo: string;
-  };
-  onChange: (field: string, value: string) => void;
+  formData: T;
+  onChange: <K extends keyof T>(field: K, value: T[K]) => void;
 }
 
-const EditUserModal: React.FC<EditUserModalProps> = ({
+function EditUserModal<T extends object>({
   open,
   onClose,
   onSave,
   formData,
   onChange,
-}) => {
+}: EditUserModalProps<T>) {
   return (
     <Modal open={open} onClose={onClose}>
       <div
@@ -52,48 +44,32 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
           }}
           className="font-normal"
         >
-          <input
-            type="text"
-            placeholder="Nome"
-            value={formData.nome}
-            onChange={(e) => onChange('nome', e.target.value)}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          />
-          <input
-            type="text"
-            placeholder="Matrícula"
-            value={formData.matricula}
-            onChange={(e) => onChange('matricula', e.target.value)}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={(e) => onChange('email', e.target.value)}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          />
-          <input
-            type="text"
-            placeholder="Telefone"
-            value={formData.telefone}
-            onChange={(e) => onChange('telefone', e.target.value)}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          />
-          <input
-            type="text"
-            placeholder="Curso"
-            value={formData.curso}
-            onChange={(e) => onChange('curso', e.target.value)}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          />
-          <input
-            type="text"
-            placeholder="Período"
-            value={formData.periodo}
-            onChange={(e) => onChange('periodo', e.target.value)}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          />
+          {Object.keys(formData).map((key) => {
+            const value = formData[key as keyof T];
+            return typeof value === 'boolean' ? (
+              <label key={key}>
+                {key}
+                <input
+                  type="checkbox"
+                  checked={value as boolean}
+                  onChange={(e) =>
+                    onChange(key as keyof T, e.target.checked as T[keyof T])
+                  }
+                />
+              </label>
+            ) : (
+              <input
+                key={key}
+                type={key.includes('email') ? 'email' : 'text'}
+                placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                value={value as string}
+                onChange={(e) =>
+                  onChange(key as keyof T, e.target.value as T[keyof T])
+                }
+                className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+              />
+            );
+          })}
         </div>
 
         <div className="flex items-center justify-between w-full gap-4">
@@ -114,6 +90,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       </div>
     </Modal>
   );
-};
+}
 
 export default EditUserModal;

@@ -27,9 +27,11 @@ export default function Perfil() {
             <p className="text-theme-text font-normal text-[0.9rem]">
               @{cookies?.usuario?.login}
             </p>
-            <p className="text-theme-text font-normal text-[0.9rem]">
-              (42) 9 9999 - 9999
-            </p>
+            {cookies?.usuario?.celular && (
+              <p className="text-theme-text font-normal text-[0.9rem]">
+                {cookies?.usuario?.celular}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col items-center justify-center">

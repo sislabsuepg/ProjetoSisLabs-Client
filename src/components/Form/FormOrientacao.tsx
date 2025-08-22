@@ -46,7 +46,7 @@ export default function FormOrientacao() {
   const isFormValid = Object.values(form).every((value) => value.trim() !== '');
 
   return (
-    <div className="w-full h-full flex flex-col justify-between">
+    <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
         Cadastro da orientação
       </p>
@@ -54,78 +54,80 @@ export default function FormOrientacao() {
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="mt-4 space-y-4 w-full"
+        className="mt-4 space-y-4 flex flex-col justify-between w-full h-full"
       >
-        <div className="w-full flex items-center gap-4">
-          <input
-            type="text"
-            placeholder="Data de início"
-            name="data_inicio"
-            value={maskDate(form.data_inicio)}
-            onChange={handleChange}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          />
+        <div className="space-y-4">
+          <div className="w-full flex items-center gap-4">
+            <input
+              type="text"
+              placeholder="Data de início"
+              name="data_inicio"
+              value={maskDate(form.data_inicio)}
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+            />
 
-          <input
-            type="text"
-            placeholder="Data final"
-            name="data_fim"
-            value={maskDate(form.data_fim)}
-            onChange={handleChange}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          />
-        </div>
+            <input
+              type="text"
+              placeholder="Data final"
+              name="data_fim"
+              value={maskDate(form.data_fim)}
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+            />
+          </div>
 
-        <div className="w-full flex items-center gap-4">
-          <select
-            name="aluno"
-            value={form.aluno}
-            onChange={handleChange}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          >
-            <option value="" disabled>
-              Selecione o aluno
-            </option>
-            {listAlunos.map((aluno) => (
-              <option key={aluno} value={aluno}>
-                {aluno}
+          <div className="w-full flex items-center gap-4">
+            <select
+              name="aluno"
+              value={form.aluno}
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+            >
+              <option value="" disabled>
+                Selecione o aluno
               </option>
-            ))}
-          </select>
+              {listAlunos.map((aluno) => (
+                <option key={aluno} value={aluno}>
+                  {aluno}
+                </option>
+              ))}
+            </select>
 
-          <select
-            name="professor"
-            value={form.professor}
-            onChange={handleChange}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          >
-            <option value="" disabled>
-              Selecione o professor
-            </option>
-            {listProfessores.map((professor) => (
-              <option key={professor} value={professor}>
-                {professor}
+            <select
+              name="professor"
+              value={form.professor}
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+            >
+              <option value="" disabled>
+                Selecione o professor
               </option>
-            ))}
-          </select>
-        </div>
+              {listProfessores.map((professor) => (
+                <option key={professor} value={professor}>
+                  {professor}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className="w-full flex items-center gap-4">
-          <select
-            name="laboratorio"
-            value={form.laboratorio}
-            onChange={handleChange}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          >
-            <option value="" disabled>
-              Selecione o laboratório
-            </option>
-            {listLaboratorios.map((lab) => (
-              <option key={lab} value={lab}>
-                {lab}
+          <div className="w-full flex items-center gap-4">
+            <select
+              name="laboratorio"
+              value={form.laboratorio}
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+            >
+              <option value="" disabled>
+                Selecione o laboratório
               </option>
-            ))}
-          </select>
+              {listLaboratorios.map((lab) => (
+                <option key={lab} value={lab}>
+                  {lab}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="w-full flex items-center justify-end">

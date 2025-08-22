@@ -1,0 +1,247 @@
+import {
+  FormAcademico,
+  FormLaboratorio,
+  FormOrientacao,
+  FormProfessor,
+  IData,
+} from './types';
+
+export const placeholderMap: Record<number, string> = {
+  1: 'Pesquisar acadêmico',
+  2: 'Pesquisar professor',
+  3: 'Pesquisar laboratório',
+  4: 'Pesquisar orientação/mestrado',
+};
+
+export const formMap: Record<number, IData> = {
+  1: {
+    id: '',
+    ra: '',
+    nome: '',
+    telefone: '',
+    email: '',
+    curso: '',
+    ano: '',
+  }, // Acadêmico
+  2: { id: '', nome: '', email: '' }, // Professor
+  3: { id: '', nome: '', numero: '', restrito: false }, // Laboratório
+  4: {
+    id: '',
+    aluno: '',
+    professor: '',
+    laboratorio: '',
+    data_inicio: '',
+    data_fim: '',
+  }, // Orientação/Mestrado
+};
+
+//Mock de cada tipo de lista
+export const mockAcademicos: FormAcademico[] = [
+  {
+    ra: '11022126',
+    nome: 'Gabriel',
+    telefone: '42988764533',
+    email: 'teste123teste@gmail.com',
+    curso: 'Engenharia',
+    ano: '3',
+    id: '1',
+  },
+  {
+    ra: '11022127',
+    nome: 'Gabriel1',
+    telefone: '42988764533',
+    email: 'teste123teste@gmail.com',
+    curso: 'Engenharia',
+    ano: '3',
+    id: '2',
+  },
+  {
+    ra: '11022128',
+    nome: 'Gabriel2',
+    telefone: '42988764533',
+    email: 'teste123teste@gmail.com',
+    curso: 'Engenharia',
+    ano: '3',
+    id: '3',
+  },
+  {
+    ra: '11022129',
+    nome: 'Gabriel3',
+    telefone: '42988764533',
+    email: 'teste123teste@gmail.com',
+    curso: 'Engenharia',
+    ano: '3',
+    id: '4',
+  },
+  {
+    ra: '11022121',
+    nome: 'Gabriel4',
+    telefone: '42988764533',
+    email: 'teste123teste@gmail.com',
+    curso: 'Engenharia',
+    ano: '3',
+    id: '5',
+  },
+  {
+    ra: '11022122',
+    nome: 'Gabriel5',
+    telefone: '42988764533',
+    email: 'teste123teste@gmail.com',
+    curso: 'Engenharia',
+    ano: '3',
+    id: '6',
+  },
+  {
+    ra: '11022123',
+    nome: 'Gabriel6',
+    telefone: '42988764533',
+    email: 'teste123teste@gmail.com',
+    curso: 'Engenharia',
+    ano: '3',
+    id: '7',
+  },
+  {
+    ra: '11022124',
+    nome: 'Gabriel7',
+    telefone: '42988764533',
+    email: 'teste123teste@gmail.com',
+    curso: 'Engenharia',
+    ano: '3',
+    id: '8',
+  },
+  {
+    ra: '11022125',
+    nome: 'Gabriel8',
+    telefone: '42988764533',
+    email: 'teste123teste@gmail.com',
+    curso: 'Engenharia',
+    ano: '3',
+    id: '9',
+  },
+  {
+    ra: '11022155',
+    nome: 'Gabriel9',
+    telefone: '42988764533',
+    email: 'teste123teste@gmail.com',
+    curso: 'Engenharia',
+    ano: '3',
+    id: '10',
+  },
+];
+
+export const mockProfessores: FormProfessor[] = [
+  { id: '1', nome: 'Dr. Silva', email: 'silva@gmail.com' },
+  { id: '2', nome: 'Dr. Silva1', email: 'silva@gmail.com' },
+  { id: '3', nome: 'Dr. Silva2', email: 'silva@gmail.com' },
+  { id: '4', nome: 'Dr. Silva3', email: 'silva@gmail.com' },
+  { id: '5', nome: 'Dr. Silva4', email: 'silva@gmail.com' },
+  { id: '6', nome: 'Dr. Silva5', email: 'silva@gmail.com' },
+  { id: '7', nome: 'Dr. Silva6', email: 'silva@gmail.com' },
+  { id: '8', nome: 'Dr. Silva7', email: 'silva@gmail.com' },
+  { id: '9', nome: 'Dr. Silva8', email: 'silva@gmail.com' },
+  { id: '10', nome: 'Dr. Silva9', email: 'silva@gmail.com' },
+  { id: '11', nome: 'Dr. Silva10', email: 'silva@gmail.com' },
+];
+
+export const mockLaboratorios: FormLaboratorio[] = [
+  { id: '1', nome: 'Lab 1', numero: '101B', restrito: true },
+  { id: '2', nome: 'Lab 2', numero: '101B', restrito: true },
+  { id: '3', nome: 'Lab 3', numero: '101B', restrito: true },
+  { id: '4', nome: 'Lab 4', numero: '101B', restrito: true },
+  { id: '5', nome: 'Lab 5', numero: '101B', restrito: true },
+  { id: '6', nome: 'Lab 6', numero: '101B', restrito: true },
+  { id: '7', nome: 'Lab 7', numero: '101B', restrito: true },
+  { id: '8', nome: 'Lab 8', numero: '101B', restrito: true },
+  { id: '9', nome: 'Lab 9', numero: '101B', restrito: true },
+];
+
+export const mockOrientacoes: FormOrientacao[] = [
+  {
+    id: '1',
+    aluno: 'Maria',
+    professor: 'Dr. Silva',
+    laboratorio: 'Lab 1',
+    data_inicio: '2025-01-01',
+    data_fim: '2025-06-01',
+  },
+  {
+    id: '2',
+    aluno: 'Maria2',
+    professor: 'Dr. Silva',
+    laboratorio: 'Lab 1',
+    data_inicio: '2025-01-01',
+    data_fim: '2025-06-01',
+  },
+  {
+    id: '3',
+    aluno: 'Maria3',
+    professor: 'Dr. Silva',
+    laboratorio: 'Lab 1',
+    data_inicio: '2025-01-01',
+    data_fim: '2025-06-01',
+  },
+  {
+    id: '4',
+    aluno: 'Maria4',
+    professor: 'Dr. Silva',
+    laboratorio: 'Lab 1',
+    data_inicio: '2025-01-01',
+    data_fim: '2025-06-01',
+  },
+  {
+    id: '5',
+    aluno: 'Maria5',
+    professor: 'Dr. Silva',
+    laboratorio: 'Lab 1',
+    data_inicio: '2025-01-01',
+    data_fim: '2025-06-01',
+  },
+  {
+    id: '6',
+    aluno: 'Maria6',
+    professor: 'Dr. Silva',
+    laboratorio: 'Lab 1',
+    data_inicio: '2025-01-01',
+    data_fim: '2025-06-01',
+  },
+  {
+    id: '7',
+    aluno: 'Maria7',
+    professor: 'Dr. Silva',
+    laboratorio: 'Lab 1',
+    data_inicio: '2025-01-01',
+    data_fim: '2025-06-01',
+  },
+  {
+    id: '8',
+    aluno: 'Maria8',
+    professor: 'Dr. Silva',
+    laboratorio: 'Lab 1',
+    data_inicio: '2025-01-01',
+    data_fim: '2025-06-01',
+  },
+  {
+    id: '9',
+    aluno: 'Maria9',
+    professor: 'Dr. Silva',
+    laboratorio: 'Lab 1',
+    data_inicio: '2025-01-01',
+    data_fim: '2025-06-01',
+  },
+  {
+    id: '10',
+    aluno: 'Maria10',
+    professor: 'Dr. Silva',
+    laboratorio: 'Lab 1',
+    data_inicio: '2025-01-01',
+    data_fim: '2025-06-01',
+  },
+  {
+    id: '11',
+    aluno: 'Maria11',
+    professor: 'Dr. Silva',
+    laboratorio: 'Lab 1',
+    data_inicio: '2025-01-01',
+    data_fim: '2025-06-01',
+  },
+];

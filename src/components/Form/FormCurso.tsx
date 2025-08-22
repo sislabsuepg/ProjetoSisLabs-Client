@@ -44,7 +44,7 @@ export default function FormCurso() {
   const isFormValid = Object.values(form).every((value) => value.trim() !== '');
 
   return (
-    <div className="w-full h-full flex flex-col justify-between">
+    <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
         Cadastro do curso
       </p>
@@ -52,27 +52,29 @@ export default function FormCurso() {
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="mt-4 space-y-4 w-full"
+        className="mt-4 space-y-4 flex flex-col justify-between w-full h-full"
       >
-        <div className="w-full flex items-center gap-4">
-          <input
-            type="text"
-            name="nome"
-            placeholder="Nome do curso"
-            value={form.nome ? form.nome : ''}
-            onChange={handleChange}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          />
+        <div className="space-y-4">
+          <div className="w-full flex items-center gap-4">
+            <input
+              type="text"
+              name="nome"
+              placeholder="Nome do curso"
+              value={form.nome ? form.nome : ''}
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+            />
 
-          <input
-            type="text"
-            name="anos"
-            placeholder="Quantos anos tem o curso?"
-            value={form.anos ? removeLetters(form.anos) : ''}
-            onChange={handleChange}
-            maxLength={1}
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-          />
+            <input
+              type="text"
+              name="anos"
+              placeholder="Quantos anos tem o curso?"
+              value={form.anos ? removeLetters(form.anos) : ''}
+              onChange={handleChange}
+              maxLength={1}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+            />
+          </div>
         </div>
 
         <div className="w-full flex items-center justify-end">

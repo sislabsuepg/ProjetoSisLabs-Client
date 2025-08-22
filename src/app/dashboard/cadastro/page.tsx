@@ -21,7 +21,7 @@ export default function Cadastro() {
   ];
 
   return (
-    <div className="w-full flex flex-col items-start">
+    <div className="h-full w-full flex flex-col items-start">
       <div className="w-full flex items-center justify-center gap-2">
         {listButtons.map((item) => (
           <button
@@ -36,7 +36,7 @@ export default function Cadastro() {
         ))}
       </div>
 
-      <div className="mt-10 w-full">
+      <div className="h-full mt-10 w-full">
         {listButtons.find((b) => b.id === activeId)?.component}
       </div>
     </div>
