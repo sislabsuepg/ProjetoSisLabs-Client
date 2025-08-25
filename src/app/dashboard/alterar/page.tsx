@@ -11,6 +11,8 @@ import {
   placeholderMap,
 } from '@/components/Lists/data';
 import ListAcademico from '@/components/Lists/ListAcademico';
+import ListLaboratorio from '@/components/Lists/ListLaboratorio';
+import ListOrientacao from '@/components/Lists/ListOrientacao';
 import ListProfessor from '@/components/Lists/ListProfessor';
 import {
   FormAcademico,
@@ -180,6 +182,24 @@ export default function Alterar() {
           <ListProfessor
             list={getCurrentList() as FormProfessor[]}
             dados={dados as FormProfessor[]}
+            setFormData={setFormData}
+            setOpenEditUser={setOpenEditUser}
+            setOpenExcluir={setOpenExcluir}
+          />
+        )}
+        {activeId === 3 && (
+          <ListLaboratorio
+            list={getCurrentList() as FormLaboratorio[]}
+            dados={dados as FormLaboratorio[]}
+            setFormData={setFormData}
+            setOpenEditUser={setOpenEditUser}
+            setOpenExcluir={setOpenExcluir}
+          />
+        )}
+        {activeId === 4 && (
+          <ListOrientacao
+            list={getCurrentList() as FormOrientacao[]}
+            dados={dados as FormOrientacao[]}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}

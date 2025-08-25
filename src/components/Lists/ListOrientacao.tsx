@@ -1,19 +1,20 @@
 'use client';
 
 import Popover from '@/components/Popover';
+import { maskDate } from '@/utils/maskDate';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
-import { FormLaboratorio } from './types';
+import { FormOrientacao } from './types';
 
 interface Props {
-  list: FormLaboratorio[];
-  dados: FormLaboratorio[];
-  setFormData: (data: FormLaboratorio) => void;
+  list: FormOrientacao[];
+  dados: FormOrientacao[];
+  setFormData: (data: FormOrientacao) => void;
   setOpenEditUser: (state: { status: boolean; id: string }) => void;
   setOpenExcluir: (state: { status: boolean; id: string }) => void;
 }
 
-export default function ListLaboratorio({
+export default function ListOrientacao({
   list,
   dados,
   setFormData,
@@ -26,16 +27,22 @@ export default function ListLaboratorio({
         <table className="h-full min-w-full">
           <thead>
             <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium text-theme-blue uppercase">
-                Nome
+              <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
+                Aluno
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-theme-blue uppercase">
-                Número
+              <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
+                Professor
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-theme-blue uppercase">
-                Restrito
+              <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
+                Laboratório
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-theme-blue uppercase">
+              <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
+                Data início
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
+                Data fim
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
                 Editar
               </th>
             </tr>
@@ -45,22 +52,30 @@ export default function ListLaboratorio({
               list.map((item, index) => (
                 <tr
                   key={item.id}
-                  className={`${
-                    index % 2 === 0 ? 'bg-[#F5F5F5]' : 'bg-white'
-                  } border-b last:border-0`}
+                  className={index % 2 === 0 ? 'bg-[#F5F5F5]' : 'bg-white'}
                 >
-                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.nome}>{item.nome}</Popover>
+                  <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[100px] text-theme-text">
+                    <Popover title={item.aluno}>{item.aluno}</Popover>
                   </td>
-                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.numero}>{item.numero}</Popover>
+                  <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
+                    <Popover title={item.professor}>{item.professor}</Popover>
                   </td>
-                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.restrito ? 'Sim' : 'Não'}>
-                      {item.restrito ? 'Sim' : 'Não'}
+                  <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
+                    <Popover title={item.laboratorio}>
+                      {item.laboratorio}
                     </Popover>
                   </td>
-                  <td className="px-4 py-3 text-[0.8rem] font-medium w-[100px]">
+                  <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
+                    <Popover title={maskDate(item.data_inicio)}>
+                      {maskDate(item.data_inicio)}
+                    </Popover>
+                  </td>
+                  <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[80px] text-theme-text">
+                    <Popover title={maskDate(item.data_fim)}>
+                      {maskDate(item.data_fim)}
+                    </Popover>
+                  </td>
+                  <td className="px-4 py-3 text-[0.8rem] font-medium flex gap-2">
                     <div className="flex items-center justify-center gap-3">
                       <Popover title="Editar">
                         <button
@@ -97,8 +112,8 @@ export default function ListLaboratorio({
             ) : (
               <tr>
                 <td
-                  colSpan={3}
-                  className="px-4 py-2 text-center text-sm text-theme-blue font-normal"
+                  colSpan={7}
+                  className="px-4 py-3 text-center text-sm text-theme-blue font-normal"
                 >
                   Nenhum registro encontrado
                 </td>

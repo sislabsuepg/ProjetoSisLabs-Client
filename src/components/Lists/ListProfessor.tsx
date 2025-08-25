@@ -3,12 +3,12 @@
 import Popover from '@/components/Popover';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
-import { FormProfessor, IData } from './types';
+import { FormProfessor } from './types';
 
 interface Props {
   list: FormProfessor[];
   dados: FormProfessor[];
-  setFormData: (data: IData) => void;
+  setFormData: (data: FormProfessor) => void;
   setOpenEditUser: (state: { status: boolean; id: string }) => void;
   setOpenExcluir: (state: { status: boolean; id: string }) => void;
 }
@@ -42,43 +42,47 @@ export default function ListProfessor({
               list.map((item, index) => (
                 <tr
                   key={item.id}
-                  className={index % 2 === 0 ? 'bg-[#F5F5F5]' : 'bg-white'}
+                  className={`${
+                    index % 2 === 0 ? 'bg-[#F5F5F5]' : 'bg-white'
+                  } border-b last:border-0`}
                 >
-                  <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[100px] text-theme-text">
+                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/2">
                     <Popover title={item.nome}>{item.nome}</Popover>
                   </td>
-                  <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[100px] text-theme-text">
+                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/2">
                     <Popover title={item.email}>{item.email}</Popover>
                   </td>
-                  <td className="px-4 py-3 text-[0.8rem] font-medium flex gap-2">
-                    <Popover title="Editar">
-                      <button
-                        onClick={() => {
-                          const user = dados.find((d) => d.id === item.id);
-                          if (user) {
-                            setFormData({ ...user });
-                            setOpenEditUser({ status: true, id: item.id });
+                  <td className="px-4 py-3 text-[0.8rem] font-medium w-[100px]">
+                    <div className="flex items-center justify-center gap-3">
+                      <Popover title="Editar">
+                        <button
+                          onClick={() => {
+                            const user = dados.find((d) => d.id === item.id);
+                            if (user) {
+                              setFormData({ ...user });
+                              setOpenEditUser({ status: true, id: item.id });
+                            }
+                          }}
+                        >
+                          <BorderColorIcon
+                            className="text-theme-blue"
+                            sx={{ width: 20, height: 20 }}
+                          />
+                        </button>
+                      </Popover>
+                      <Popover title="Excluir">
+                        <button
+                          onClick={() =>
+                            setOpenExcluir({ status: true, id: item.id })
                           }
-                        }}
-                      >
-                        <BorderColorIcon
-                          className="text-theme-blue"
-                          sx={{ width: 20, height: 20 }}
-                        />
-                      </button>
-                    </Popover>
-                    <Popover title="Excluir">
-                      <button
-                        onClick={() =>
-                          setOpenExcluir({ status: true, id: item.id })
-                        }
-                      >
-                        <PersonRemoveIcon
-                          className="text-theme-blue"
-                          sx={{ width: 22, height: 22 }}
-                        />
-                      </button>
-                    </Popover>
+                        >
+                          <PersonRemoveIcon
+                            className="text-theme-blue"
+                            sx={{ width: 22, height: 22 }}
+                          />
+                        </button>
+                      </Popover>
+                    </div>
                   </td>
                 </tr>
               ))
