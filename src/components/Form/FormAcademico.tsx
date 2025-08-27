@@ -1,37 +1,53 @@
-'use client';
+"use client";
 
-import { cadastro_academico } from '@/schemas';
-import { ChangeEvent, useState } from 'react';
-import { toast } from 'react-toastify';
-import * as Yup from 'yup';
+import { cadastro_academico } from "@/schemas";
+import { ChangeEvent, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { apiOnline } from "@/services/services";
+import * as Yup from "yup";
+import { ICurso } from "@/interfaces/interfaces";
+import { maskPhone } from "@/utils/maskPhone";
+import { removeLetters } from "@/utils/removeLetters";
+import { capitalize } from "@mui/material";
 
-import { maskPhone } from '@/utils/maskPhone';
-import { removeLetters } from '@/utils/removeLetters';
-import { capitalize } from '@mui/material';
+interface ApiResponse {
+  data?: ICurso[];
+  erros?: string[];
+}
 
 export default function FormAcademico() {
   const [form, setForm] = useState({
-    nome: '',
-    ra: '',
-    email: '',
-    telefone: '',
-    curso: '',
-    ano: '',
+    nome: "",
+    ra: "",
+    email: "",
+    telefone: "",
+    idCurso: 0,
+    anoCurso: 0,
+    senha: "",
+    repetirSenha: "",
   });
 
-  const listCursos = [
-    { id: 1, title: 'Engenharia de Software' },
-    { id: 2, title: 'Engenharia de Computação' },
-  ];
+  const [cursos, setCursos] = useState<ICurso[]>([]);
+
+  const [loading, setLoading] = useState(true);
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
 
-    let newValue = value;
-    if (name === 'ra' || name === 'ano' || name === 'telefone') {
-      newValue = removeLetters(value);
+    let newValue: string | number = value;
+
+    if (name === "ra" || name === "telefone") {
+      if (!value) {
+        newValue = "";
+      } else {
+        newValue = removeLetters(value);
+      }
+    } else if (name === "idCurso") {
+      newValue = parseInt(value) || 0;
+    } else if (name === "anoCurso") {
+      newValue = parseInt(removeLetters(value)) || 0;
     }
 
     setForm((f) => ({ ...f, [name]: newValue }));
@@ -39,26 +55,71 @@ export default function FormAcademico() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('✅ Dados válidos:', form);
+    console.log("✅ Dados válidos:", form);
     try {
-      await cadastro_academico.validate(form);
-      toast.success('Cadastro acadêmico realizado com sucesso!');
-      console.log('✅ Dados válidos:', form);
+      await cadastro_academico.validate({
+        nome: form.nome,
+        ra: form.ra,
+        email: form.email,
+        telefone: form.telefone,
+        idCurso: form.idCurso,
+        anoCurso: form.anoCurso,
+        senha: form.senha,
+      });
+      await apiOnline.post("/aluno", form);
+      toast.success("Cadastro acadêmico realizado com sucesso!");
+      console.log("✅ Dados válidos:", form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
       } else {
-        toast.error('Erro inesperado. Tente novamente.');
+        if (err.response.data.erros) {
+          err.response.data.erros.forEach((error: string) => {
+            toast.error(error);
+          });
+        } else {
+          toast.error("Erro inesperado. Tente novamente.");
+        }
       }
     }
   };
 
   const isFormValid = Object.entries(form).every(([key, value]) => {
-    if (key === 'email' || key === 'telefone') {
+    if (key === "email" || key === "telefone") {
       return true;
     }
-    return value.trim() !== '';
+    if (key === "idCurso" || key === "anoCurso") {
+      return value !== 0;
+    }
+    if (key === "repetirSenha") {
+      return value === form.senha && value !== "";
+    }
+    return typeof value === "string" && value.trim() !== "";
   });
+
+  useEffect(() => {
+    const fetchCursos = async () => {
+      try {
+        const response = await apiOnline.get("/curso");
+        const data: ICurso[] = Array.isArray(response)
+          ? response
+          : (response as ApiResponse).data || [];
+        setCursos(data);
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
+      } catch (error) {
+        console.error("Erro ao buscar cursos:", error);
+        toast.error("Erro ao buscar cursos. Tente novamente.");
+        setLoading(false);
+      }
+    };
+    fetchCursos();
+  }, []);
+
+  if (loading) {
+    return;
+  }
 
   return (
     <div className="w-full h-full flex flex-col justify-start">
@@ -77,7 +138,7 @@ export default function FormAcademico() {
               type="text"
               name="nome"
               placeholder="Nome completo"
-              value={form.nome ? capitalize(form.nome) : ''}
+              value={form.nome ? capitalize(form.nome) : ""}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             />
@@ -107,7 +168,7 @@ export default function FormAcademico() {
               type="text"
               name="telefone"
               placeholder="Telefone"
-              value={form.telefone ? maskPhone(form.telefone) : ''}
+              value={form.telefone ? maskPhone(form.telefone) : ""}
               maxLength={15}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
@@ -116,27 +177,52 @@ export default function FormAcademico() {
 
           <div className="w-full flex items-center gap-4">
             <select
-              name="curso"
-              value={form.curso}
+              name="idCurso"
+              value={form.idCurso}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             >
-              <option value="" disabled>
+              <option value={0} disabled>
                 Selecione o curso
               </option>
-              {listCursos.map((curso) => (
-                <option key={curso.id} value={curso.title}>
-                  {curso.title}
+              {cursos.map((curso) => (
+                <option key={curso.id} value={curso.id}>
+                  {curso.nome}
                 </option>
               ))}
             </select>
 
             <input
-              type="text"
-              name="ano"
+              type="number"
+              name="anoCurso"
               placeholder="Ano/Série"
-              value={removeLetters(form.ano)}
-              maxLength={1}
+              value={form.anoCurso}
+              max={
+                cursos.find((c) => c.id === Number(form.idCurso))?.anosMaximo ||
+                ""
+              }
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+            />
+          </div>
+          <div className="w-full flex items-center gap-4">
+            <input
+              type="password"
+              name="senha"
+              id="senha"
+              maxLength={6}
+              placeholder="Senha"
+              value={removeLetters(form.senha)}
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+            />
+            <input
+              type="password"
+              name="repetirSenha"
+              id="repetirSenha"
+              maxLength={6}
+              placeholder="Repetir Senha"
+              value={removeLetters(form.repetirSenha)}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             />
@@ -148,7 +234,7 @@ export default function FormAcademico() {
             type="submit"
             disabled={!isFormValid}
             className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] 
-              ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+              ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             Cadastrar
           </button>
