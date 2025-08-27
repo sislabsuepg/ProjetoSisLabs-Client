@@ -26,4 +26,21 @@ export const apiOnline = {
     );
     return response.data;
   },
+
+  async put<T = unknown, B = unknown>(
+    endpoint: string,
+    body?: B,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
+    const response: AxiosResponse<T> = await api.put<T>(endpoint, body, config);
+    return response.data;
+  },
+
+  async delete<T = unknown>(
+    endpoint: string,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
+    const response: AxiosResponse<T> = await api.delete<T>(endpoint, config);
+    return response.data;
+  },
 };
