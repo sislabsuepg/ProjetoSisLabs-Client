@@ -76,8 +76,8 @@ export const cadastro_orientacao = Yup.object().shape({
 export const cadastro_curso = Yup.object().shape(
   createNewSchema({
     nome: Yup.string().required('O campo "Nome do curso" é obrigatório'),
-    anos: Yup.string().required(
-      'O campo "Quantos anos tem o curso?" é obrigatório'
-    ),
+    anosMaximo: Yup.number()
+      .required('O campo "Quantos anos tem o curso?" é obrigatório')
+      .min(1, 'O campo "Quantos anos tem o curso?" deve ser um número válido'),
   })
 );

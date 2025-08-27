@@ -1,10 +1,11 @@
 export interface ICurso {
-  id: number;
+  id?: number;
   nome: string;
   anosMaximo: number;
 }
 
 export interface IAcademico {
+  id?: number;
   nome: string;
   ra: string;
   email?: string;
@@ -12,4 +13,45 @@ export interface IAcademico {
   idCurso: number;
   anoCurso: number;
   senha: string;
+}
+
+export interface IProfessor {
+  id?: number;
+  nome: string;
+  email: string;
+}
+
+export interface ILaboratorio {
+  id?: number;
+  nome: string;
+  numero: string;
+  restrito: boolean;
+}
+
+export interface IPermissao {
+  id?: number;
+  nome: string;
+  geral?: boolean;
+  cadastro?: boolean;
+  alteracao?: boolean;
+  advertencia?: boolean;
+  relatorio?: boolean;
+}
+
+export interface IOrientacao {
+  id?: number;
+  idAluno: number;
+  idProfessor: number;
+  idLaboratorio: number;
+  dataInicio: Date;
+  dataFim: Date;
+}
+
+export interface IUsuario {
+  id?: number;
+  nome: string;
+  login: string;
+  senha?: string;
+  ativo?: boolean;
+  permissaoUsuario?: IPermissao;
 }

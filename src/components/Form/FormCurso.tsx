@@ -1,47 +1,62 @@
-'use client';
+"use client";
 
-import { ChangeEvent, useState } from 'react';
-import { toast } from 'react-toastify';
-import * as Yup from 'yup';
+import { ChangeEvent, useState } from "react";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
 
-import { cadastro_curso } from '@/schemas';
-import { removeLetters } from '@/utils/removeLetters';
+import { cadastro_curso } from "@/schemas";
+import { removeLetters } from "@/utils/removeLetters";
+import { apiOnline } from "@/services/services";
 
 export default function FormCurso() {
   const [form, setForm] = useState({
-    nome: '',
-    anos: '',
+    nome: "",
+    anosMaximo: 0,
   });
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
 
-    let newValue = value;
-    if (name === 'anos') {
-      newValue = removeLetters(value);
+    if (name === "anosMaximo") {
+      setForm((f) => ({ ...f, [name]: Number(value) }));
+    } else {
+      setForm((f) => ({ ...f, [name]: value.trim() }));
     }
-
-    setForm((f) => ({ ...f, [name]: newValue }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await cadastro_curso.validate(form);
-      toast.success('Cadastro do professor realizado com sucesso!');
-      console.log('✅ Dados válidos:', form);
+      await apiOnline.post("/curso", {
+        nome: form.nome,
+        anosMax: form.anosMaximo,
+      });
+      toast.success("Cadastro do curso realizado com sucesso!");
+      console.log("✅ Dados válidos:", form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
       } else {
-        toast.error('Erro inesperado. Tente novamente.');
+        if (err.response.data.erros) {
+          err.response.data.erros.forEach((error: string) => {
+            toast.error(error);
+          });
+        }
+        toast.error("Erro inesperado. Tente novamente.");
       }
     }
   };
 
-  const isFormValid = Object.values(form).every((value) => value.trim() !== '');
+  const isFormValid = Object.entries(form).every(([key, value]) => {
+    if (key === "anosMaximo" && typeof value === "number") {
+      return value > 0;
+    } else {
+      return String(value).trim() !== "";
+    }
+  });
 
   return (
     <div className="w-full h-full flex flex-col justify-start">
@@ -60,19 +75,20 @@ export default function FormCurso() {
               type="text"
               name="nome"
               placeholder="Nome do curso"
-              value={form.nome ? form.nome : ''}
+              value={form.nome ? form.nome : ""}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             />
 
             <input
-              type="text"
-              name="anos"
+              type="number"
+              name="anosMaximo"
               placeholder="Quantos anos tem o curso?"
-              value={form.anos ? removeLetters(form.anos) : ''}
+              value={form.anosMaximo > 0 ? form.anosMaximo : 1}
               onChange={handleChange}
-              maxLength={1}
+              min={1}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+              onClick={(e) => e.target.select()}
             />
           </div>
         </div>
@@ -82,7 +98,7 @@ export default function FormCurso() {
             type="submit"
             disabled={!isFormValid}
             className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] 
-              ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+              ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             Cadastrar
           </button>
