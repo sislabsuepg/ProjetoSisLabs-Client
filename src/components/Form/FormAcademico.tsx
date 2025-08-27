@@ -5,15 +5,10 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { apiOnline } from "@/services/services";
 import * as Yup from "yup";
-import { ICurso } from "@/interfaces/interfaces";
+import { ICurso, ApiResponse } from "@/interfaces/interfaces";
 import { maskPhone } from "@/utils/maskPhone";
 import { removeLetters } from "@/utils/removeLetters";
 import { capitalize } from "@mui/material";
-
-interface ApiResponse {
-  data?: ICurso[];
-  erros?: string[];
-}
 
 export default function FormAcademico() {
   const [form, setForm] = useState({
@@ -68,6 +63,16 @@ export default function FormAcademico() {
       });
       await apiOnline.post("/aluno", form);
       toast.success("Cadastro acadêmico realizado com sucesso!");
+      setForm({
+        nome: "",
+        ra: "",
+        email: "",
+        telefone: "",
+        idCurso: 0,
+        anoCurso: 0,
+        senha: "",
+        repetirSenha: "",
+      });
       console.log("✅ Dados válidos:", form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
@@ -199,7 +204,7 @@ export default function FormAcademico() {
               value={form.anoCurso}
               max={
                 cursos.find((c) => c.id === Number(form.idCurso))?.anosMaximo ||
-                ""
+                0
               }
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"

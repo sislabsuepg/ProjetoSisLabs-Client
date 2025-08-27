@@ -5,9 +5,11 @@ import Switch from '@mui/material/Switch';
 import { ChangeEvent, useState } from 'react';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
+import { apiOnline } from '@/services/services';
 
 import { removeLetters } from '@/utils/removeLetters';
 import { styled } from '@mui/material';
+import { capitalize } from '@/utils/capitalize';
 
 export default function FormLaboratorio() {
   const [form, setForm] = useState({
@@ -59,10 +61,9 @@ export default function FormLaboratorio() {
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-
-    let newValue = value;
-    if (name === 'numero') {
-      newValue = removeLetters(value);
+    let newValue: string | boolean = value;
+    if(name === "nome" || name === "numero") {
+      newValue = capitalize(value);
     }
 
     setForm((f) => ({ ...f, [name]: newValue }));
@@ -72,13 +73,25 @@ export default function FormLaboratorio() {
     e.preventDefault();
     try {
       await cadastro_laboratorio.validate(form);
+      await apiOnline.post('/laboratorio', form);
       toast.success('Cadastro do laboratório realizado com sucesso!');
+      setForm({
+        nome: '',
+        numero: '',
+        restrito: false,
+      });
       console.log('✅ Dados válidos:', form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
       } else {
-        toast.error('Erro inesperado. Tente novamente.');
+        if (err.response?.data?.erros) {
+          err.response.data.erros.forEach((error: string) => {
+            toast.error(error);
+          });
+        } else {
+          toast.error('Erro inesperado. Tente novamente.');
+        }
       }
     }
   };
@@ -104,7 +117,7 @@ export default function FormLaboratorio() {
               type="text"
               name="nome"
               placeholder="Nome do laboratório"
-              value={form.nome ? form.nome : ''}
+              value={form.nome ? capitalize(form.nome) : ''}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             />
@@ -113,7 +126,7 @@ export default function FormLaboratorio() {
               type="text"
               name="numero"
               placeholder="Número"
-              value={removeLetters(form.numero)}
+              value={form.numero}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             />

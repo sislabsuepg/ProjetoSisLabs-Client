@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 
 import { cadastro_professor } from '@/schemas';
 import { capitalize } from '@mui/material';
+import { apiOnline } from '@/services/services';
 
 export default function FormAcademico() {
   const [form, setForm] = useState({
@@ -24,13 +25,24 @@ export default function FormAcademico() {
     e.preventDefault();
     try {
       await cadastro_professor.validate(form);
+      await apiOnline.post('/professor', form);
       toast.success('Cadastro do professor realizado com sucesso!');
+      setForm({
+        nome: '',
+        email: '',
+      });
       console.log('✅ Dados válidos:', form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
       } else {
-        toast.error('Erro inesperado. Tente novamente.');
+        if (err.response?.data?.erros) {
+          err.response.data.erros.forEach((error: string) => {
+            toast.error(error);
+          });
+        } else {
+          toast.error('Erro inesperado. Tente novamente.');
+        }
       }
     }
   };

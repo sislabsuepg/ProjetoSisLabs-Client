@@ -50,7 +50,7 @@ export const cadastro_laboratorio = Yup.object().shape(
 
 export const cadastro_permissao = Yup.object().shape(
   createNewSchema({
-    nome: Yup.string().required('O campo "Nome da permissão" é obrigatório'),
+    nomePermissao: Yup.string().required('O campo "Nome da permissão" é obrigatório'),
   })
 );
 

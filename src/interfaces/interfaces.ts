@@ -55,3 +55,8 @@ export interface IUsuario {
   ativo?: boolean;
   permissaoUsuario?: IPermissao;
 }
+
+export interface ApiResponse {
+  data?: ICurso[];
+  erros?: string[];
+}

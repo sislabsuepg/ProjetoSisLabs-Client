@@ -1,6 +1,7 @@
 'use client';
 
 import { cadastro_permissao } from '@/schemas';
+import { apiOnline } from '@/services/services';
 import { capitalize } from '@/utils/capitalize';
 import { styled } from '@mui/material';
 import Switch from '@mui/material/Switch';
@@ -10,7 +11,7 @@ import * as Yup from 'yup';
 
 export default function FormPermissao() {
   const [form, setForm] = useState({
-    nome: '',
+    nomePermissao: '',
     geral: false,
     cadastro: false,
     alteracao: false,
@@ -22,18 +23,35 @@ export default function FormPermissao() {
     e.preventDefault();
     try {
       await cadastro_permissao.validate(form);
+
+      await apiOnline.post('/permissao', form);
+
       toast.success('Cadastro da permissao realizado com sucesso!');
+      setForm({
+        nomePermissao: '',
+        geral: false,
+        cadastro: false,
+        alteracao: false,
+        relatorio: false,
+        advertencia: false,
+      });
       console.log('✅ Dados válidos:', form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
       } else {
-        toast.error('Erro inesperado. Tente novamente.');
+        if (err.response?.data?.erros) {
+          err.response.data.erros.forEach((error: string) => {
+            toast.error(error);
+          });
+        } else {
+          toast.error('Erro inesperado. Tente novamente.');
+        }
       }
     }
   };
 
-  const isFormValid = form.nome.trim() !== '';
+  const isFormValid = form.nomePermissao.trim() !== '';
 
   const CustomSwitch = styled(Switch)(({ theme }) => ({
     width: 42,
@@ -90,10 +108,10 @@ export default function FormPermissao() {
             <input
               type="text"
               placeholder="Nome da permissão"
-              name="nome"
-              value={form.nome ? capitalize(form.nome) : ''}
+              name="nomePermissao"
+              value={form.nomePermissao ? capitalize(form.nomePermissao) : ''}
               onChange={(e) =>
-                setForm((prev) => ({ ...prev, nome: e.target.value }))
+                setForm((prev) => ({ ...prev, nomePermissao: capitalize(e.target.value) }))
               }
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             />
