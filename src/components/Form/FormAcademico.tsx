@@ -110,9 +110,8 @@ export default function FormAcademico() {
           ? response
           : (response as ApiResponse).data || [];
         setCursos(data);
-        setTimeout(() => {
-          setLoading(false);
-        }, 1000);
+        setLoading(false);
+        
       } catch (error) {
         console.error("Erro ao buscar cursos:", error);
         toast.error("Erro ao buscar cursos. Tente novamente.");

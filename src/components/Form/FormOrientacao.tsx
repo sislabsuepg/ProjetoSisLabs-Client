@@ -6,24 +6,39 @@ import * as Yup from 'yup';
 
 import { cadastro_orientacao } from '@/schemas';
 import { maskDate } from '@/utils/maskDate';
+import { IAcademico, ILaboratorio, IProfessor } from '@/interfaces/interfaces';
+import { apiOnline } from '@/services/services';
+import { maskDateUS } from '@/utils/maskDateUS';
 
 export default function FormOrientacao() {
   const [form, setForm] = useState({
-    data_inicio: '',
-    data_fim: '',
-    aluno: '',
-    professor: '',
-    laboratorio: '',
+    data_inicio: null,
+    data_fim: null,
+    idAluno: 0,
+    idProfessor: 0,
+    idLaboratorio: 0,
   });
 
-  const listAlunos = ['João Silva', 'Maria Souza'];
-  const listProfessores = ['Prof. Carlos', 'Profa. Ana'];
-  const listLaboratorios = ['Lab. IA', 'Lab. Redes'];
+  const [ra, setRa] = useState("");
+  const [professores, setProfessores] = useState<IProfessor[]>([]);
+  const [laboratorios, setLaboratorios] = useState<ILaboratorio[]>([]);
+
+  const [loading, setLoading] = useState(true);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
+
+    console.log(name, value);
+    if(name==='ra'){
+      setRa(value);
+      return
+    }
+    if(name === 'idProfessor' || name === 'idLaboratorio'){
+      setForm((f) => ({ ...f, [name]: Number(value) }));
+      return
+    }
 
     setForm((f) => ({ ...f, [name]: value }));
   };
@@ -43,7 +58,37 @@ export default function FormOrientacao() {
     }
   };
 
-  const isFormValid = Object.values(form).every((value) => value.trim() !== '');
+  const isFormValid = Object.values(form).every((value) => value !== 0 && value !== null);
+
+  useState(() => {
+    const fetchData = async () => {
+      try {
+        const [professoresResponse, laboratoriosResponse] = await Promise.all([
+          apiOnline.get('/professor').then((x)=>x.data),
+          apiOnline.get('/laboratorio').then((x)=>x.data),
+        ]);
+
+        setProfessores(professoresResponse);
+        setLaboratorios(laboratoriosResponse);
+        console.log('Professores:', professoresResponse);
+        console.log('Laboratórios:', laboratoriosResponse);
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+        toast.error('Erro ao buscar dados. Tente novamente.');
+      }
+    };
+
+    fetchData();
+    setLoading(false);
+  }, []);
+
+  if(loading){
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full h-full flex flex-col justify-start">
@@ -59,53 +104,48 @@ export default function FormOrientacao() {
         <div className="space-y-4">
           <div className="w-full flex items-center gap-4">
             <input
-              type="text"
+              type="date"
               placeholder="Data de início"
               name="data_inicio"
-              value={maskDate(form.data_inicio)}
+              value={form.data_inicio || ""}
+              min={Date.now()}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             />
 
             <input
-              type="text"
+              type="date"
               placeholder="Data final"
               name="data_fim"
-              value={maskDate(form.data_fim)}
+              value={form.data_fim || ""}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             />
           </div>
 
           <div className="w-full flex items-center gap-4">
-            <select
-              name="aluno"
-              value={form.aluno}
+            <input
+              type="text"
+              placeholder="RA do aluno"
+              name="ra"
+              value={ra}
+              maxLength={13}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-            >
-              <option value="" disabled>
-                Selecione o aluno
-              </option>
-              {listAlunos.map((aluno) => (
-                <option key={aluno} value={aluno}>
-                  {aluno}
-                </option>
-              ))}
-            </select>
+            />
 
             <select
-              name="professor"
-              value={form.professor}
+              name="idProfessor"
+              value={form.idProfessor}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             >
-              <option value="" disabled>
+              <option value={0} disabled>
                 Selecione o professor
               </option>
-              {listProfessores.map((professor) => (
-                <option key={professor} value={professor}>
-                  {professor}
+              {professores.map((professor) => (
+                <option key={professor.id} value={Number(professor.id)}>
+                  {professor.nome}
                 </option>
               ))}
             </select>
@@ -113,17 +153,17 @@ export default function FormOrientacao() {
 
           <div className="w-full flex items-center gap-4">
             <select
-              name="laboratorio"
-              value={form.laboratorio}
+              name="idLaboratorio"
+              value={form.idLaboratorio}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             >
-              <option value="" disabled>
+              <option value={0} disabled>
                 Selecione o laboratório
               </option>
-              {listLaboratorios.map((lab) => (
-                <option key={lab} value={lab}>
-                  {lab}
+              {laboratorios.map((lab) => (
+                <option key={lab.id} value={Number(lab.id)}>
+                  {lab.nome}
                 </option>
               ))}
             </select>
