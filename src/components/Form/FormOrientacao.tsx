@@ -125,6 +125,7 @@ export default function FormOrientacao() {
               placeholder="Data de início"
               name="dataInicio"
               value={form.dataInicio || ""}
+              min={new Date().toISOString().split("T")[0]}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             />
@@ -134,6 +135,7 @@ export default function FormOrientacao() {
               placeholder="Data final"
               name="dataFim"
               value={form.dataFim || ""}
+              min={new Date(new Date(form.dataInicio).getTime() + 86400000).toISOString().split("T")[0]}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             />

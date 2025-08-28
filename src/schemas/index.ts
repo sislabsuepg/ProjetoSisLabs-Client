@@ -78,8 +78,23 @@ export const cadastro_professor = Yup.object().shape(
 );
 
 export const cadastro_orientacao = Yup.object().shape({
-  dataInicio: Yup.string().required('O campo "Data de início" é obrigatório'),
-  dataFim: Yup.string().required('O campo "Data final" é obrigatório'),
+  dataInicio: Yup.string()
+    .test("Data de início deve ser uma data válida", (value) => {
+      const date = new Date(String(value));
+      return !isNaN(date.getTime());
+    })
+    .test("data-inicio", "Data de inicio deve ser anterior a data de fim", (value, context) => {
+      const dataInicio = new Date(String(value));
+      const dataFim = new Date(String(context.parent.dataFim));
+      return dataInicio < dataFim;
+    })
+    .required('O campo "Data de início" é obrigatório'),
+  dataFim: Yup.string()
+    .test("data-fim", "Data final deve ser uma data válida", (value) => {
+      const date = new Date(String(value));
+      return !isNaN(date.getTime());
+    })
+    .required('O campo "Data final" é obrigatório'),
   idAluno: Yup.number()
     .min(1, "O campo 'Aluno' deve ser um número válido")
     .required('O campo "Aluno" é obrigatório'),
