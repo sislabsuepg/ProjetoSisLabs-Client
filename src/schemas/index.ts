@@ -50,7 +50,9 @@ export const cadastro_laboratorio = Yup.object().shape(
 
 export const cadastro_permissao = Yup.object().shape(
   createNewSchema({
-    nomePermissao: Yup.string().required('O campo "Nome da permissão" é obrigatório'),
+    nomePermissao: Yup.string().required(
+      'O campo "Nome da permissão" é obrigatório'
+    ),
   })
 );
 
@@ -66,11 +68,17 @@ export const cadastro_professor = Yup.object().shape(
 );
 
 export const cadastro_orientacao = Yup.object().shape({
-  data_inicio: Yup.string().required('O campo "Data de início" é obrigatório'),
-  data_fim: Yup.string().required('O campo "Data final" é obrigatório'),
-  aluno: Yup.string().required('O campo "Aluno" é obrigatório'),
-  professor: Yup.string().required('O campo "Professor" é obrigatório'),
-  laboratorio: Yup.string().required('O campo "Laboratório" é obrigatório'),
+  dataInicio: Yup.string().required('O campo "Data de início" é obrigatório'),
+  dataFim: Yup.string().required('O campo "Data final" é obrigatório'),
+  idAluno: Yup.number()
+    .min(1, "O campo 'Aluno' deve ser um número válido")
+    .required('O campo "Aluno" é obrigatório'),
+  idProfessor: Yup.number()
+    .min(1, "O campo 'Professor' deve ser um número válido")
+    .required('O campo "Professor" é obrigatório'),
+  idLaboratorio: Yup.number()
+    .min(1, "O campo 'Laboratório' deve ser um número válido")
+    .required('O campo "Laboratório" é obrigatório'),
 });
 
 export const cadastro_curso = Yup.object().shape(
