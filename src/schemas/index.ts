@@ -6,6 +6,7 @@ export const cadastro_academico = Yup.object().shape(
   createNewSchema({
     nome: Yup.string()
       .required('O campo "Nome" é obrigatório')
+      .max(40, 'O campo "Nome" deve ter no máximo 40 caracteres')
       .matches(fullNameRegex, 'O campo "Nome" deve conter nome e sobrenome'),
 
     ra: Yup.string()
@@ -14,7 +15,10 @@ export const cadastro_academico = Yup.object().shape(
       .required('O campo "RA" é obrigatório')
       .matches(/^\d+$/, "O RA deve conter apenas números"),
 
-    email: Yup.string().optional().email("E-mail inválido"),
+    email: Yup.string()
+      .optional()
+      .max(40, "O campo 'E-mail' deve ter no máximo 40 caracteres")
+      .email("E-mail inválido"),
 
     telefone: Yup.string()
       .optional()
@@ -43,8 +47,12 @@ export const cadastro_academico = Yup.object().shape(
 
 export const cadastro_laboratorio = Yup.object().shape(
   createNewSchema({
-    nome: Yup.string().required('O campo "Nome" é obrigatório'),
-    numero: Yup.string().required('O campo "Número" é obrigatório'),
+    nome: Yup.string()
+      .max(60, 'O campo "Nome" deve ter no máximo 60 caracteres')
+      .required('O campo "Nome" é obrigatório'),
+    numero: Yup.string()
+      .max(8, 'O campo "Número" deve ter no máximo 8 caracteres')
+      .required('O campo "Número" é obrigatório'),
   })
 );
 
@@ -59,9 +67,11 @@ export const cadastro_permissao = Yup.object().shape(
 export const cadastro_professor = Yup.object().shape(
   createNewSchema({
     nome: Yup.string()
+      .max(40, 'O campo "Nome" deve ter no máximo 40 caracteres')
       .required('O campo "Nome" é obrigatório')
       .matches(fullNameRegex, 'O campo "Nome" deve conter nome e sobrenome'),
     email: Yup.string()
+      .max(40, "O campo 'E-mail' deve ter no máximo 40 caracteres")
       .email("E-mail inválido")
       .required('O campo "E-mail" é obrigatório'),
   })
@@ -83,9 +93,18 @@ export const cadastro_orientacao = Yup.object().shape({
 
 export const cadastro_curso = Yup.object().shape(
   createNewSchema({
-    nome: Yup.string().required('O campo "Nome do curso" é obrigatório'),
+    nome: Yup.string()
+      .max(35, 'O campo "Nome do curso" deve ter no máximo 35 caracteres')
+      .required('O campo "Nome do curso" é obrigatório'),
     anosMaximo: Yup.number()
       .required('O campo "Quantos anos tem o curso?" é obrigatório')
-      .min(1, 'O campo "Quantos anos tem o curso?" deve ser um número válido'),
+      .min(
+        1,
+        'O campo "Quantos anos tem o curso?" deve ser um número maior que 0'
+      )
+      .max(
+        8,
+        'O campo "Quantos anos tem o curso?" deve ser um número menor que 9'
+      ),
   })
 );
