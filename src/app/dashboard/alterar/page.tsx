@@ -10,6 +10,8 @@ import {
   mockProfessores,
   placeholderMap,
 } from '@/components/Lists/data';
+import { ApiResponse, IAcademico, IProfessor, ILaboratorio, IOrientacao } from '@/interfaces/interfaces';
+import { apiOnline } from '@/services/services';
 import ListAcademico from '@/components/Lists/ListAcademico';
 import ListLaboratorio from '@/components/Lists/ListLaboratorio';
 import ListOrientacao from '@/components/Lists/ListOrientacao';
@@ -37,6 +39,7 @@ export default function Alterar() {
   const totalPages = Math.ceil(dados.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = dados.slice(startIndex, startIndex + itemsPerPage);
+  const [loading, setLoading] = useState(true);
 
   const listButtons = [
     {
@@ -99,28 +102,42 @@ export default function Alterar() {
     }
   };
 
-  useEffect(() => {
-    switch (activeId) {
+  const getDados = async (id: number) => {
+    switch (id) {
       case 1:
-        setDados(mockAcademicos);
-        break;
+        try {
+          const response = await apiOnline.get(`/aluno`);
+          return response.data;
+        } catch (error) {
+          console.error("Erro ao buscar dados:", error);
+          return [];
+        }
+
       case 2:
-        setDados(mockProfessores);
-        break;
-      case 3:
-        setDados(mockLaboratorios);
-        break;
-      case 4:
-        setDados(mockOrientacoes);
-        break;
-    }
+        try {
+          const response = await apiOnline.get(`/professor`);
+          return response.data;
+        } catch (error) {
+          console.error("Erro ao buscar dados:", error);
+          return [];
+        }
+    };
+  }
+  useEffect(() => {
+    setLoading(true);
+    getDados(activeId).then((data) => setDados(data));
     setCurrentPage(1);
     setFormData(formMap[activeId]);
+    setLoading(false);
   }, [activeId]);
 
   useEffect(() => {
     setFormData(formMap[activeId]);
   }, [activeId]);
+
+  if(loading){
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="w-full flex flex-col items-start">

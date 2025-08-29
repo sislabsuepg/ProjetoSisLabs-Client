@@ -15,15 +15,19 @@ export const placeholderMap: Record<number, string> = {
 
 export const formMap: Record<number, IData> = {
   1: {
-    id: '',
+    id: 0,
     ra: '',
     nome: '',
     telefone: '',
     email: '',
-    curso: '',
-    ano: '',
+    curso: {
+      id: 0,
+      nome: '',
+      anosMax: 0,
+    },
+    anoCurso: 0,
   }, // Acadêmico
-  2: { id: '', nome: '', email: '' }, // Professor
+  2: { id: 0, nome: '', email: '' }, // Professor
   3: { id: '', nome: '', numero: '', restrito: false }, // Laboratório
   4: {
     id: '',

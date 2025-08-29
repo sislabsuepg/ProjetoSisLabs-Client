@@ -3,13 +3,13 @@ export interface FormAcademico {
   ra: string;
   nome: string;
   email: string;
-  telefone: string;
-  curso: string;
-  ano: string;
+  telefone?: string;
+  curso: FormCurso;
+  anoCurso: number;
 }
 
 export interface FormProfessor {
-  id: string;
+  id: number;
   nome: string;
   email: string;
 }
@@ -30,8 +30,15 @@ export interface FormOrientacao {
   data_fim: string;
 }
 
+export interface FormCurso{
+  id: number;
+  nome: string;
+  anosMax: number;
+}
+
 export type IData =
   | FormAcademico
   | FormProfessor
   | FormLaboratorio
   | FormOrientacao;
+

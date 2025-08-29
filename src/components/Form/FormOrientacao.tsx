@@ -37,6 +37,9 @@ export default function FormOrientacao() {
       setForm((f) => ({ ...f, [name]: Number(value) }));
       return;
     }
+    if (name === "dataInicio" && value > form.dataFim){
+      setForm((f) => ({ ...f, dataFim: new Date(new Date(value).getTime() + 86400000).toISOString().split("T")[0] }));
+    }
 
     setForm((f) => ({ ...f, [name]: value }));
   };
@@ -135,7 +138,17 @@ export default function FormOrientacao() {
               placeholder="Data final"
               name="dataFim"
               value={form.dataFim || ""}
-              min={new Date(new Date(form.dataInicio).getTime() + 86400000).toISOString().split("T")[0]}
+              min={
+                form.dataInicio
+                  ? new Date(new Date(form.dataInicio).getTime() + 86400000)
+                      .toISOString()
+                      .split("T")[0]
+                  : (() => {
+                      const tomorrow = new Date();
+                      tomorrow.setDate(tomorrow.getDate() + 1);
+                      return tomorrow.toISOString().split("T")[0];
+                    })()
+              }
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
             />
