@@ -12,7 +12,7 @@ export interface IAcademico {
   telefone?: string;
   idCurso: number;
   anoCurso: number;
-  senha: string;
+  senha?: string;
 }
 
 export interface IProfessor {
@@ -54,6 +54,13 @@ export interface IUsuario {
   senha?: string;
   ativo?: boolean;
   permissaoUsuario?: IPermissao;
+}
+
+export interface IEmprestimo {
+  id?: number;
+  aluno: IAcademico;
+  laboratorio: ILaboratorio;
+  dataHoraEntrada: Date;
 }
 
 export interface ApiResponse {

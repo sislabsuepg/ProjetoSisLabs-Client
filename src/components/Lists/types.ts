@@ -36,6 +36,25 @@ export interface FormCurso{
   anosMax: number;
 }
 
+export interface FormPermissao{
+  id: number;
+  nomePermissao: string;
+  geral?: boolean;
+  cadastro?: boolean;
+  alteracao?: boolean;
+  relatorio?: boolean;
+  advertencia?: boolean;
+}
+
+export interface FormUsuario{
+  id: number;
+  nome: string;
+  login: string;
+  senha: string;
+  ativo?: boolean;
+  idPermissao: number;
+}
+
 export type IData =
   | FormAcademico
   | FormProfessor

@@ -41,7 +41,8 @@ export default function FormAcademico() {
     } else if (name === "idCurso") {
       newValue = parseInt(value) || 0;
     } else if (name === "anoCurso") {
-      newValue = parseInt(removeLetters(value)) || 0;
+      const anoMax = cursos.find((c) => c.id === Number(form.idCurso))?.anosMaximo || 0;
+      newValue = Math.min(parseInt(value) || 0, anoMax);
     }
 
     setForm((f) => ({ ...f, [name]: newValue }));
@@ -182,11 +183,12 @@ export default function FormAcademico() {
               </Select>
             </FormControl>
 
-            <TextField id="filled-basic" label="Ano/Série" variant="filled" type="text"
+            <TextField id="filled-basic" label="Ano/Série" variant="filled" type="number"
               name="anoCurso"
               value={form.anoCurso}
               inputProps={{
-                maxLength: cursos.find((c) => c.id === Number(form.idCurso))?.anosMaximo || undefined
+                max: cursos.find((c) => c.id === Number(form.idCurso))?.anosMaximo || 0,
+                min: 1
               }}
 
               onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />

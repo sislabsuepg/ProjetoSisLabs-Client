@@ -77,7 +77,7 @@ export default function FormCurso() {
             <TextField id="filled-basic" label="Quantos anos tem o curso?" variant="filled" type="number"
               name="anosMaximo"
               value={form.anosMaximo > 0 ? form.anosMaximo : 1}
-              inputProps={{ min: 1 }}
+              inputProps={{ min: 1, max:8 }}
               onClick={(e) => (e.target as HTMLInputElement).select()}
               onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
           </div>

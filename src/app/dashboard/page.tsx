@@ -1,141 +1,47 @@
 "use client";
 
 import Pagination from "@/components/Pagination";
-import { useState } from "react";
+import {ApiResponse, IEmprestimo} from "@/interfaces/interfaces";
+import { useEffect, useState } from "react";
 //import { useCookies } from "react-cookie";
+import { apiOnline } from "@/services/services";
+import { CircularProgress } from "@mui/material";
 
 export default function Inicio() {
+  const [loading, setLoading] = useState(true);
   const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   //const [cookies] = useCookies(["usuario"]);
+  const [data, setData] = useState<IEmprestimo[]>([]);
+  useEffect(() => {
+    async function fetchData() {
+      try{
+        const countResponse = await apiOnline.get<{count: number}>("/emprestimo/count");
+        const count = countResponse?.count ?? 0;
+        const response = await apiOnline.get(`/emprestimo?page=${currentPage}&items=${itemsPerPage}`);
+        const data: IEmprestimo[] = Array.isArray(response)
+        ? response
+        : (response as ApiResponse).data || [];
+      setTotalPages(Math.ceil(count / itemsPerPage));
+      setData(data);
+    }catch(e){
+      console.error(e);
+    }finally{
+      setLoading(false);
+    }
+  }
+    fetchData();
+  }, [currentPage])
 
-  const listaTeste = [
-    {
-      id: 1,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 2,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 3,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 4,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 5,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 6,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 7,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 8,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 9,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 10,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 11,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 12,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 13,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 14,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 15,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 16,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 17,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 18,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 19,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-    {
-      id: 20,
-      lab: "108A",
-      usuario: "Raissa Mayara Moreira",
-      horario: "17:40",
-    },
-  ];
-
-  const totalPages = Math.ceil(listaTeste.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = listaTeste.slice(startIndex, startIndex + itemsPerPage);
-
+  if (loading) {
+      return (
+        <div className="w-full h-full flex items-center justify-center">
+          <CircularProgress size={40} />
+        </div>
+      )
+    }
+  
   return (
     <div className="w-full flex flex-col h-full items-start">
       <p className="text-theme-blue font-semibold text-[1.2rem] w-full text-start">
@@ -143,7 +49,7 @@ export default function Inicio() {
       </p>
 
       <div className="w-full flex flex-col h-full mt-5">
-        {currentItems?.map((item) => (
+        {data?.map((item) => (
           <div
             key={item?.id}
             className={`w-full flex items-center gap-2 ${
@@ -152,10 +58,10 @@ export default function Inicio() {
           >
             <div className="h-2 w-2 bg-[#22FF00] rounded-full"></div>
             <p className="text-theme-text text-[0.9rem] font-normal">
-              Laboratório <span className="font-semibold">{item?.lab}</span> -
-              Chave do Laboratório {item?.lab} foi emprestado pelo(a) aluno(a){" "}
-              <span className="font-semibold">{item?.usuario}</span> -{" "}
-              {item?.horario}
+              Laboratório <span className="font-semibold">{item?.laboratorio.nome}</span> -
+              Chave do Laboratório {item?.laboratorio.nome} foi emprestado pelo(a) aluno(a){" "}
+              <span className="font-semibold">{item?.aluno.nome}</span> -{" "}
+              {item?.dataHoraEntrada ? new Date(item.dataHoraEntrada).toLocaleString():""}
             </p>
           </div>
         ))}
