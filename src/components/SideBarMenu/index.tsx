@@ -30,7 +30,7 @@ function SidebarItem({
   return (
     <li
       className={`relative flex items-center p-3 my-2 cursor-pointer
-        rounded-[10px] transition-colors duration-200
+        rounded-[10px] transition-colors duration-200 hover:bg-[#5679b1]
         ${active ? 'bg-theme-blue text-theme-white' : 'bg-[#4F6B98]'}
       `}
       onClick={onClick}

@@ -5,7 +5,7 @@ import { useState } from "react";
 //import { useCookies } from "react-cookie";
 
 export default function Inicio() {
-  const itemsPerPage = 8;
+  const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   //const [cookies] = useCookies(["usuario"]);
 
@@ -100,6 +100,36 @@ export default function Inicio() {
       usuario: "Raissa Mayara Moreira",
       horario: "17:40",
     },
+    {
+      id: 16,
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
+    },
+    {
+      id: 17,
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
+    },
+    {
+      id: 18,
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
+    },
+    {
+      id: 19,
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
+    },
+    {
+      id: 20,
+      lab: "108A",
+      usuario: "Raissa Mayara Moreira",
+      horario: "17:40",
+    },
   ];
 
   const totalPages = Math.ceil(listaTeste.length / itemsPerPage);
@@ -112,7 +142,7 @@ export default function Inicio() {
         Laboratórios em uso
       </p>
 
-      <div className="w-full flex flex-col justify-between h-full gap-2 mt-5">
+      <div className="w-full flex flex-col h-full mt-5">
         {currentItems?.map((item) => (
           <div
             key={item?.id}

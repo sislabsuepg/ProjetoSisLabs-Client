@@ -1,5 +1,6 @@
 'use client';
 import Sidebar from '@/components/SideBarMenu';
+import { CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
@@ -30,8 +31,9 @@ export default function DashboardLayout({
 
   if (!mounted) {
     return (
-      <div className="flex items-center justify-center h-screen  font-normal">
-        <div className="text-lg">Carregando...</div>
+      <div className="w-full h-screen flex-col gap-2 flex items-center justify-center">
+        <p className='font-normal'>Carregando...</p>
+        <CircularProgress size={40} />
       </div>
     );
   }
@@ -39,8 +41,9 @@ export default function DashboardLayout({
   const user = cookies.usuario;
   if (!user || !user.id || !user.nome || user.id <= 0) {
     return (
-      <div className="flex items-center justify-center h-screen font-normal">
-        <div className="text-lg">Redirecionando...</div>
+      <div className="w-full h-screen flex flex-col gap-2 items-center justify-center">
+        <p className='font-normal'>Redirecionando...</p>
+        <CircularProgress size={40} />
       </div>
     );
   }
@@ -49,9 +52,8 @@ export default function DashboardLayout({
     <div className="w-full flex items-start">
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
       <section
-        className={`transition-all duration-500 flex-1 m-5 border-4 p-5 border-[#F3F3F3] rounded-[20px] box-border ${
-          isOpen ? 'ml-0 md:ml-[400px]' : 'ml-0 md:ml-[60px]'
-        }`}
+        className={`transition-all duration-500 flex-1 m-5 border-4 p-5 border-[#F3F3F3] rounded-[20px] box-border ${isOpen ? 'ml-0 md:ml-[400px]' : 'ml-0 md:ml-[60px]'
+          }`}
         style={{ height: 'calc(100vh - 2.5rem)' }}
       >
         {children}

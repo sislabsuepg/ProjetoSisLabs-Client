@@ -1,6 +1,7 @@
 'use client';
 import DefaultButton from '@/components/DefaultButton';
 import PersonIcon from '@mui/icons-material/Person';
+import { TextField } from '@mui/material';
 import { useCookies } from 'react-cookie';
 
 export default function Perfil() {
@@ -51,22 +52,16 @@ export default function Perfil() {
             </p>
 
             <form noValidate className="flex flex-col gap-2">
-              <input
-                type="text"
+              <TextField id="filled-basic" label="E-Mail" variant="filled" type="text"
                 name="email"
-                placeholder="E-Mail"
                 // value={form.email}
-                // onChange={handleChange}
-                className="w-full p-3 text-[0.9rem] font-normal rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
-              />
-              <input
-                type="text"
+                // onChange={handleChange} 
+                className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              <TextField id="filled-basic" label="Telefone" variant="filled" type="text"
                 name="telefone"
-                placeholder="Telefone"
                 // value={form.telefone}
-                // onChange={handleChange}
-                className="w-full p-3 text-[0.9rem] font-normal rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
-              />
+                // onChange={handleChange} 
+                className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
             </form>
 
             <div className="w-full flex items-center justify-end mt-3">
@@ -80,31 +75,23 @@ export default function Perfil() {
             </p>
 
             <form noValidate className="flex flex-col gap-2">
-              <input
-                type="text"
+              <TextField id="filled-basic" label="Senha atual" variant="filled" type="password"
                 name="senha_atual"
-                placeholder="Senha atual"
-                // value={form.email}
-                // onChange={handleChange}
-                className="w-full p-3 text-[0.9rem] font-normal rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
-              />
-              <input
-                type="text"
-                name="nova_senha"
-                placeholder="Nova senha"
-                // value={form.telefone}
-                // onChange={handleChange}
-                className="w-full p-3 text-[0.9rem] font-normal rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
-              />
+                // value={form.senha_atual}
+                // onChange={handleChange} 
+                className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
 
-              <input
-                type="text"
-                name="confirmar_ova_senha"
-                placeholder="Confirmar nova senha"
-                // value={form.telefone}
-                // onChange={handleChange}
-                className="w-full p-3 text-[0.9rem] font-normal rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
-              />
+              <TextField id="filled-basic" label="Nova senha" variant="filled" type="password"
+                name="nova_senha"
+                // value={form.nova_senha}
+                // onChange={handleChange} 
+                className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+
+              <TextField id="filled-basic" label="Confirmar nova senha" variant="filled" type="password"
+                name="confirmar_nova_senha"
+                // value={form.confirmar_nova_senha}
+                // onChange={handleChange} 
+                className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
             </form>
 
             <div className="w-full flex items-center justify-end mt-3">
