@@ -6,10 +6,9 @@ import { ChangeEvent, useState } from 'react';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import { apiOnline } from '@/services/services';
-
-import { removeLetters } from '@/utils/removeLetters';
-import { styled } from '@mui/material';
+import { styled, TextField } from '@mui/material';
 import { capitalize } from '@/utils/capitalize';
+import { ApiError } from '@/utils/tipos';
 
 export default function FormLaboratorio() {
   const [form, setForm] = useState({
@@ -57,12 +56,10 @@ export default function FormLaboratorio() {
     },
   }));
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     let newValue: string | boolean = value;
-    if(name === "nome" || name === "numero") {
+    if (name === "nome" || name === "numero") {
       newValue = capitalize(value);
     }
 
@@ -85,12 +82,11 @@ export default function FormLaboratorio() {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
       } else {
-        if (err.response?.data?.erros) {
-          err.response.data.erros.forEach((error: string) => {
-            toast.error(error);
-          });
+        const error = err as ApiError;
+        if (error.response?.data?.erros) {
+          error.response.data.erros.forEach((e) => toast.error(e));
         } else {
-          toast.error('Erro inesperado. Tente novamente.');
+          toast.error(error.message || "Erro inesperado. Tente novamente.");
         }
       }
     }
@@ -113,23 +109,15 @@ export default function FormLaboratorio() {
       >
         <div className="space-y-4">
           <div className="w-full flex items-center gap-4">
-            <input
-              type="text"
+            <TextField id="filled-basic" label="Nome do laboratório" variant="filled" type="text"
               name="nome"
-              placeholder="Nome do laboratório"
               value={form.nome ? capitalize(form.nome) : ''}
-              onChange={handleChange}
-              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-            />
+              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
 
-            <input
-              type="text"
+            <TextField id="filled-basic" label="Número" variant="filled" type="text"
               name="numero"
-              placeholder="Número"
               value={form.numero}
-              onChange={handleChange}
-              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-            />
+              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
           </div>
 
           <div className="w-full flex items-center gap-4">

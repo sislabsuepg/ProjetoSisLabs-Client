@@ -5,8 +5,9 @@ import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 
 import { cadastro_professor } from '@/schemas';
-import { capitalize } from '@mui/material';
+import { capitalize, TextField } from '@mui/material';
 import { apiOnline } from '@/services/services';
+import { ApiError } from '@/utils/tipos';
 
 export default function FormAcademico() {
   const [form, setForm] = useState({
@@ -14,12 +15,10 @@ export default function FormAcademico() {
     email: '',
   });
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
+const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const { name, value } = e.target;
+  setForm((f) => ({ ...f, [name]: value }));
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,12 +35,11 @@ export default function FormAcademico() {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
       } else {
-        if (err.response?.data?.erros) {
-          err.response.data.erros.forEach((error: string) => {
-            toast.error(error);
-          });
+        const error = err as ApiError;
+        if (error.response?.data?.erros) {
+          error.response.data.erros.forEach((e) => toast.error(e));
         } else {
-          toast.error('Erro inesperado. Tente novamente.');
+          toast.error(error.message || "Erro inesperado. Tente novamente.");
         }
       }
     }
@@ -62,23 +60,15 @@ export default function FormAcademico() {
       >
         <div className="space-y-4">
           <div className="w-full flex items-center gap-4">
-            <input
-              type="text"
+            <TextField id="filled-basic" label="Nome completo" variant="filled" type="text"
               name="nome"
-              placeholder="Nome completo"
               value={form.nome ? capitalize(form.nome) : ''}
-              onChange={handleChange}
-              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-            />
+              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
 
-            <input
-              type="text"
+            <TextField id="filled-basic" label="E-Mail" variant="filled" type="text"
               name="email"
-              placeholder="E-Mail"
               value={form.email}
-              onChange={handleChange}
-              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-            />
+              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
           </div>
         </div>
 

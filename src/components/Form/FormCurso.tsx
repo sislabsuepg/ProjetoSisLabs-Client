@@ -3,10 +3,10 @@
 import { ChangeEvent, useState } from "react";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-
 import { cadastro_curso } from "@/schemas";
-import { removeLetters } from "@/utils/removeLetters";
 import { apiOnline } from "@/services/services";
+import { ApiError } from "@/utils/tipos";
+import { TextField } from "@mui/material";
 
 export default function FormCurso() {
   const [form, setForm] = useState({
@@ -14,9 +14,7 @@ export default function FormCurso() {
     anosMaximo: 0,
   });
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
     if (name === "anosMaximo") {
@@ -40,12 +38,12 @@ export default function FormCurso() {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
       } else {
-        if (err.response.data.erros) {
-          err.response.data.erros.forEach((error: string) => {
-            toast.error(error);
-          });
+        const error = err as ApiError;
+        if (error.response?.data?.erros) {
+          error.response.data.erros.forEach((e) => toast.error(e));
+        } else {
+          toast.error(error.message || "Erro inesperado. Tente novamente.");
         }
-        toast.error("Erro inesperado. Tente novamente.");
       }
     }
   };
@@ -71,25 +69,17 @@ export default function FormCurso() {
       >
         <div className="space-y-4">
           <div className="w-full flex items-center gap-4">
-            <input
-              type="text"
+            <TextField id="filled-basic" label="Nome do curso" variant="filled" type="text"
               name="nome"
-              placeholder="Nome do curso"
               value={form.nome ? form.nome : ""}
-              onChange={handleChange}
-              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-            />
+              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
 
-            <input
-              type="number"
+            <TextField id="filled-basic" label="Quantos anos tem o curso?" variant="filled" type="number"
               name="anosMaximo"
-              placeholder="Quantos anos tem o curso?"
               value={form.anosMaximo > 0 ? form.anosMaximo : 1}
-              onChange={handleChange}
-              min={1}
-              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-              onClick={(e) => e.target.select()}
-            />
+              inputProps={{ min: 1 }}
+              onClick={(e) => (e.target as HTMLInputElement).select()}
+              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
           </div>
         </div>
 

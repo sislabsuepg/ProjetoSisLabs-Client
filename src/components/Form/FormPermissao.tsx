@@ -3,7 +3,8 @@
 import { cadastro_permissao } from '@/schemas';
 import { apiOnline } from '@/services/services';
 import { capitalize } from '@/utils/capitalize';
-import { styled } from '@mui/material';
+import { ApiError } from '@/utils/tipos';
+import { styled, TextField } from '@mui/material';
 import Switch from '@mui/material/Switch';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -40,12 +41,11 @@ export default function FormPermissao() {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
       } else {
-        if (err.response?.data?.erros) {
-          err.response.data.erros.forEach((error: string) => {
-            toast.error(error);
-          });
+        const error = err as ApiError;
+        if (error.response?.data?.erros) {
+          error.response.data.erros.forEach((e) => toast.error(e));
         } else {
-          toast.error('Erro inesperado. Tente novamente.');
+          toast.error(error.message || "Erro inesperado. Tente novamente.");
         }
       }
     }
@@ -105,16 +105,12 @@ export default function FormPermissao() {
       >
         <div className="space-y-4">
           <div className="w-full flex items-center gap-4">
-            <input
-              type="text"
-              placeholder="Nome da permissão"
+            <TextField id="filled-basic" label="Nome da permissão" variant="filled" type="text"
               name="nomePermissao"
               value={form.nomePermissao ? capitalize(form.nomePermissao) : ''}
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, nomePermissao: capitalize(e.target.value) }))
-              }
-              className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
-            />
+              } className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
           </div>
 
           <div className="wrapper grid grid-cols-5 gap-4 mt-2">
