@@ -3,13 +3,21 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { cadastro_orientacao } from "@/schemas";
 import { ILaboratorio, IProfessor } from "@/interfaces/interfaces";
 import { apiOnline } from "@/services/services";
-import { CircularProgress, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import {
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+} from "@mui/material";
 
 export default function FormOrientacao() {
   const [form, setForm] = useState<{
@@ -57,7 +65,8 @@ export default function FormOrientacao() {
       toast.success("Cadastro da orientação realizado com sucesso!");
     } catch (err: any) {
       if (err instanceof Yup.ValidationError) toast.error(err.message);
-      else if (err.response?.data?.erros) err.response.data.erros.forEach((e: string) => toast.error(e));
+      else if (err.response?.data?.erros)
+        err.response.data.erros.forEach((e: string) => toast.error(e));
       else toast.error("Erro inesperado. Tente novamente.");
     }
   };
@@ -70,27 +79,26 @@ export default function FormOrientacao() {
     ra.trim() !== "";
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const [professoresResponse, laboratoriosResponse] = await Promise.all([
-        apiOnline.get("/professor").then((res) => res.data),
-        apiOnline.get("/laboratorio").then((res) => res.data),
-      ]);
-      setProfessores(professoresResponse);
-      setLaboratorios(laboratoriosResponse);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(`Erro ao buscar dados: ${err.message}`);
-      } else {
-        toast.error("Erro ao buscar dados. Tente novamente.");
+    const fetchData = async () => {
+      try {
+        const [professoresResponse, laboratoriosResponse] = await Promise.all([
+          apiOnline.get("/professor").then((res) => res.data),
+          apiOnline.get("/laboratorio?restrito=true").then((res) => res.data),
+        ]);
+        setProfessores(professoresResponse);
+        setLaboratorios(laboratoriosResponse);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          toast.error(`Erro ao buscar dados: ${err.message}`);
+        } else {
+          toast.error("Erro ao buscar dados. Tente novamente.");
+        }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchData();
-}, []);
-
+    };
+    fetchData();
+  }, []);
 
   if (loading) {
     return (
@@ -102,9 +110,15 @@ export default function FormOrientacao() {
 
   return (
     <div className="w-full h-full flex flex-col justify-start">
-      <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">Cadastro da orientação</p>
+      <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
+        Cadastro da orientação
+      </p>
 
-      <form onSubmit={handleSubmit} noValidate className="mt-4 space-y-4 flex flex-col w-full justify-between h-full">
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        className="mt-4 space-y-4 flex flex-col w-full justify-between h-full"
+      >
         <div className="space-y-4">
           <div className="w-full flex items-center gap-4">
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -122,15 +136,33 @@ export default function FormOrientacao() {
                         : f.dataFim,
                   }))
                 }
-                slotProps={{ textField: { fullWidth: true, variant: "filled", className: "p-3 rounded-md" } }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    variant: "filled",
+                    className: "p-3 rounded-md",
+                  },
+                }}
               />
 
               <DatePicker
                 label="Data final"
                 value={form.dataFim}
-                minDate={form.dataInicio ? form.dataInicio.add(1, "day") : dayjs().add(1, "day")}
-                onChange={(newValue) => setForm((f) => ({ ...f, dataFim: newValue }))}
-                slotProps={{ textField: { fullWidth: true, variant: "filled", className: "p-3 rounded-md" } }}
+                minDate={
+                  form.dataInicio
+                    ? form.dataInicio.add(1, "day")
+                    : dayjs().add(1, "day")
+                }
+                onChange={(newValue) =>
+                  setForm((f) => ({ ...f, dataFim: newValue }))
+                }
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    variant: "filled",
+                    className: "p-3 rounded-md",
+                  },
+                }}
               />
             </LocalizationProvider>
           </div>
@@ -148,7 +180,11 @@ export default function FormOrientacao() {
 
             <FormControl className="w-full" variant="filled">
               <InputLabel>Professor</InputLabel>
-              <Select name="idProfessor" value={form.idProfessor} onChange={handleSelectChange}>
+              <Select
+                name="idProfessor"
+                value={form.idProfessor}
+                onChange={handleSelectChange}
+              >
                 <MenuItem value={0}>-- Selecione uma opção --</MenuItem>
                 {professores.map((p) => (
                   <MenuItem key={p.id} value={p.id}>
@@ -162,7 +198,11 @@ export default function FormOrientacao() {
           <div className="w-full flex items-center gap-4">
             <FormControl className="w-full" variant="filled">
               <InputLabel>Laboratório</InputLabel>
-              <Select name="idLaboratorio" value={form.idLaboratorio} onChange={handleSelectChange}>
+              <Select
+                name="idLaboratorio"
+                value={form.idLaboratorio}
+                onChange={handleSelectChange}
+              >
                 <MenuItem value={0}>-- Selecione uma opção --</MenuItem>
                 {laboratorios.map((l) => (
                   <MenuItem key={l.id} value={l.id}>

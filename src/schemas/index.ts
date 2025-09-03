@@ -83,11 +83,15 @@ export const cadastro_orientacao = Yup.object().shape({
       const date = new Date(String(value));
       return !isNaN(date.getTime());
     })
-    .test("data-inicio", "Data de inicio deve ser anterior a data de fim", (value, context) => {
-      const dataInicio = new Date(String(value));
-      const dataFim = new Date(String(context.parent.dataFim));
-      return dataInicio < dataFim;
-    })
+    .test(
+      "data-inicio",
+      "Data de inicio deve ser anterior a data de fim",
+      (value, context) => {
+        const dataInicio = new Date(String(value));
+        const dataFim = new Date(String(context.parent.dataFim));
+        return dataInicio < dataFim;
+      }
+    )
     .required('O campo "Data de início" é obrigatório'),
   dataFim: Yup.string()
     .test("data-fim", "Data final deve ser uma data válida", (value) => {
@@ -121,5 +125,24 @@ export const cadastro_curso = Yup.object().shape(
         8,
         'O campo "Quantos anos tem o curso?" deve ser um número menor que 9'
       ),
+  })
+);
+
+export const cadastro_usuario = Yup.object().shape(
+  createNewSchema({
+    nome: Yup.string()
+      .max(40, 'O campo "Nome" deve ter no máximo 40 caracteres')
+      .required('O campo "Nome" é obrigatório')
+      .matches(fullNameRegex, 'O campo "Nome" deve conter nome e sobrenome'),
+    login: Yup.string()
+      .max(20, 'O campo "Login" deve ter no máximo 20 caracteres')
+      .required('O campo "Login" é obrigatório'),
+    senha: Yup.string()
+      .required('O campo "Senha" é obrigatório')
+      .min(6, "A senha deve ter pelo menos 6 caracteres")
+      .max(12, "A senha deve ter no máximo 12 caracteres"),
+    idPermissao: Yup.number()
+      .required('O campo "Permissão" é obrigatório')
+      .min(1, 'O campo "Permissão" deve ser um número válido'),
   })
 );

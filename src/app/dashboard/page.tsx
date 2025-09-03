@@ -1,7 +1,7 @@
 "use client";
 
 import Pagination from "@/components/Pagination";
-import {ApiResponse, IEmprestimo} from "@/interfaces/interfaces";
+import { ApiResponse, IEmprestimo } from "@/interfaces/interfaces";
 import { useEffect, useState } from "react";
 //import { useCookies } from "react-cookie";
 import { apiOnline } from "@/services/services";
@@ -16,32 +16,36 @@ export default function Inicio() {
   const [data, setData] = useState<IEmprestimo[]>([]);
   useEffect(() => {
     async function fetchData() {
-      try{
-        const countResponse = await apiOnline.get<{count: number}>("/emprestimo/count");
+      try {
+        const countResponse = await apiOnline.get<{ count: number }>(
+          "/emprestimo/count"
+        );
         const count = countResponse?.count ?? 0;
-        const response = await apiOnline.get(`/emprestimo?page=${currentPage}&items=${itemsPerPage}`);
+        const response = await apiOnline.get(
+          `/emprestimo?page=${currentPage}&items=${itemsPerPage}`
+        );
         const data: IEmprestimo[] = Array.isArray(response)
-        ? response
-        : (response as ApiResponse).data || [];
-      setTotalPages(Math.ceil(count / itemsPerPage));
-      setData(data);
-    }catch(e){
-      console.error(e);
-    }finally{
-      setLoading(false);
+          ? response
+          : (response as ApiResponse).data || [];
+        setTotalPages(Math.ceil(count / itemsPerPage));
+        setData(data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
     fetchData();
-  }, [currentPage])
+  }, [currentPage]);
 
   if (loading) {
-      return (
-        <div className="w-full h-full flex items-center justify-center">
-          <CircularProgress size={40} />
-        </div>
-      )
-    }
-  
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <CircularProgress size={40} />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full flex flex-col h-full items-start">
       <p className="text-theme-blue font-semibold text-[1.2rem] w-full text-start">
@@ -49,22 +53,53 @@ export default function Inicio() {
       </p>
 
       <div className="w-full flex flex-col h-full mt-5">
-        {data?.map((item) => (
-          <div
-            key={item?.id}
-            className={`w-full flex items-center gap-2 ${
-              Number(item?.id) % 2 == 0 ? "bg-transparent" : "bg-[#F3F3F3]"
-            } h-12 py-2 px-4 rounded-[10px]`}
-          >
-            <div className="h-2 w-2 bg-[#22FF00] rounded-full"></div>
-            <p className="text-theme-text text-[0.9rem] font-normal">
-              Laboratório <span className="font-semibold">{item?.laboratorio.nome}</span> -
-              Chave do Laboratório {item?.laboratorio.nome} foi emprestado pelo(a) aluno(a){" "}
-              <span className="font-semibold">{item?.aluno.nome}</span> -{" "}
-              {item?.dataHoraEntrada ? new Date(item.dataHoraEntrada).toLocaleString():""}
-            </p>
-          </div>
-        ))}
+        {data.length > 0 ? (
+          data?.map((item) => (
+            <div
+              key={item?.id}
+              className={`w-full flex items-center gap-2 ${
+                Number(item?.id) % 2 == 0 ? "bg-transparent" : "bg-[#F3F3F3]"
+              } h-12 py-2 px-4 rounded-[10px]`}
+            >
+              <div className="h-2 w-2 bg-[#22FF00] rounded-full"></div>
+              <p className="text-theme-text text-[0.9rem] font-normal">
+                {item.posseChave ? (
+                  <>
+                    Laboratório{" "}
+                    <span className="font-semibold">
+                      {item?.laboratorio.nome}
+                    </span>{" "}
+                    - Chave do Laboratório {item?.laboratorio.nome} foi
+                    emprestado pelo(a) aluno(a){" "}
+                    <span className="font-semibold">{item?.aluno.nome}</span> -{" "}
+                    {item?.dataHoraEntrada
+                      ? new Date(item.dataHoraEntrada).toLocaleString()
+                      : ""}
+                  </>
+                ) : (
+                  <>
+                    Laboratório{" "}
+                    <span className="font-semibold">
+                      Laboratório {item?.laboratorio.nome}
+                    </span>{" "}
+                    foi aberto pelo(a) aluno(a){" "}
+                    <span className="font-semibold">
+                      {item?.aluno.nome} para pesquisa
+                    </span>{" "}
+                    - :{" "}
+                    {item?.dataHoraEntrada
+                      ? new Date(item.dataHoraEntrada).toLocaleString()
+                      : ""}
+                  </>
+                )}
+              </p>
+            </div>
+          ))
+        ) : (
+          <p className="text-theme-text text-[0.9rem] font-normal">
+            Nenhum laboratório em uso no momento.
+          </p>
+        )}
 
         <Pagination
           currentPage={currentPage}

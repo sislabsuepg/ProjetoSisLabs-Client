@@ -30,7 +30,7 @@ export interface ILaboratorio {
 
 export interface IPermissao {
   id?: number;
-  nome: string;
+  nomePermissao: string;
   geral?: boolean;
   cadastro?: boolean;
   alteracao?: boolean;
@@ -59,6 +59,7 @@ export interface IUsuario {
 export interface IEmprestimo {
   id?: number;
   aluno: IAcademico;
+  posseChave: boolean;
   laboratorio: ILaboratorio;
   dataHoraEntrada: Date;
 }
