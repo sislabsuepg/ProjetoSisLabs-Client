@@ -124,6 +124,7 @@ export default function FormOrientacao() {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 label="Data de início"
+                format="DD/MM/YYYY"
                 value={form.dataInicio}
                 minDate={dayjs()}
                 onChange={(newValue) =>
@@ -147,6 +148,7 @@ export default function FormOrientacao() {
 
               <DatePicker
                 label="Data final"
+                format="DD/MM/YYYY"
                 value={form.dataFim}
                 minDate={
                   form.dataInicio

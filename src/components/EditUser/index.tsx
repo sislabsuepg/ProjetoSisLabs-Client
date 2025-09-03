@@ -1,4 +1,4 @@
-import { Modal, styled, Switch } from '@mui/material';
+import { Modal, styled, Switch } from "@mui/material";
 
 interface EditUserModalProps<T extends object> {
   open: boolean;
@@ -19,54 +19,71 @@ function EditUserModal<T extends object>({
     width: 42,
     height: 26,
     padding: 0,
-    '& .MuiSwitch-switchBase': {
+    "& .MuiSwitch-switchBase": {
       padding: 0,
       margin: 2,
-      transitionDuration: '300ms',
-      '&.Mui-checked': {
-        transform: 'translateX(16px)',
-        color: '#fff',
-        '& + .MuiSwitch-track': {
-          backgroundColor: '#65C466',
+      transitionDuration: "300ms",
+      "&.Mui-checked": {
+        transform: "translateX(16px)",
+        color: "#fff",
+        "& + .MuiSwitch-track": {
+          backgroundColor: "#65C466",
           opacity: 1,
           border: 0,
-          ...theme.applyStyles('dark', {
-            backgroundColor: '#2ECA45',
+          ...theme.applyStyles("dark", {
+            backgroundColor: "#2ECA45",
           }),
         },
       },
     },
-    '& .MuiSwitch-thumb': {
-      boxSizing: 'border-box',
+    "& .MuiSwitch-thumb": {
+      boxSizing: "border-box",
       width: 22,
       height: 22,
     },
-    '& .MuiSwitch-track': {
+    "& .MuiSwitch-track": {
       borderRadius: 26 / 2,
-      backgroundColor: '#E9E9EA',
+      backgroundColor: "#E9E9EA",
       opacity: 1,
-      transition: theme.transitions.create(['background-color'], {
+      transition: theme.transitions.create(["background-color"], {
         duration: 500,
       }),
-      ...theme.applyStyles('dark', {
-        backgroundColor: '#39393D',
+      ...theme.applyStyles("dark", {
+        backgroundColor: "#39393D",
       }),
     },
   }));
 
   // Função para decidir o tipo do input
   const getInputType = (key: string) => {
-    if (key.toLowerCase().includes('email')) return 'email';
-    if (key.toLowerCase().includes('data')) return 'date';
-    return 'text';
+    if (key.toLowerCase().includes("email")) return "email";
+    if (key.toLowerCase().includes("data")) return "date";
+    switch (key.toLowerCase()) {
+      case "idCurso":
+      case "idPermissao":
+      case "idProfessor":
+      case "idLaboratorio":
+        return "select";
+      case "senha":
+      case "repetirSenha":
+        return "password";
+      case "geral":
+      case "cadastro":
+      case "alteracao":
+      case "relatorio":
+      case "advertencia":
+        return "switch";
+      default:
+        return "text";
+    }
   };
 
   // Ajustar datas para o formato yyyy-MM-dd (aceito pelo input type="date")
   const formatDateForInput = (val: string) => {
-    if (!val) return '';
-    if (val.includes('/')) {
+    if (!val) return "";
+    if (val.includes("/")) {
       // dd/MM/yyyy → yyyy-MM-dd
-      const [d, m, y] = val.split('/');
+      const [d, m, y] = val.split("/");
       return `${y}-${m}-${d}`;
     }
     return val; // já está no formato ISO
@@ -74,10 +91,10 @@ function EditUserModal<T extends object>({
 
   // Ajustar datas ao salvar para dd/MM/yyyy se quiser manter padrão
   const formatDateForSave = (val: string) => {
-    if (!val) return '';
-    if (val.includes('-')) {
+    if (!val) return "";
+    if (val.includes("-")) {
       // yyyy-MM-dd → dd/MM/yyyy
-      const [y, m, d] = val.split('-');
+      const [y, m, d] = val.split("-");
       return `${d}/${m}/${y}`;
     }
     return val;
@@ -87,16 +104,16 @@ function EditUserModal<T extends object>({
     <Modal open={open} onClose={onClose}>
       <div
         style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'white',
-          borderRadius: '12px',
-          padding: '30px',
-          width: '80%',
-          maxWidth: '700px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          backgroundColor: "white",
+          borderRadius: "12px",
+          padding: "30px",
+          width: "80%",
+          maxWidth: "700px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
         }}
       >
         <h2 className="text-[1.1rem] mb-6 text-theme-blue font-semibold">
@@ -105,17 +122,17 @@ function EditUserModal<T extends object>({
 
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '10px',
-            marginBottom: '25px',
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "10px",
+            marginBottom: "25px",
           }}
           className="font-normal"
         >
           {Object.keys(formData).map((key) => {
             const value = formData[key as keyof T];
 
-            if (typeof value === 'boolean') {
+            if (typeof value === "boolean") {
               return (
                 <label className="flex items-center gap-4" key={key}>
                   {key}
@@ -135,16 +152,16 @@ function EditUserModal<T extends object>({
                 type={getInputType(key)}
                 placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
                 value={
-                  getInputType(key) === 'date'
+                  getInputType(key) === "date"
                     ? formatDateForInput(value as string)
                     : (value as string)
                 }
                 onChange={(e) =>
                   onChange(
                     key as keyof T,
-                    (getInputType(key) === 'date'
+                    (getInputType(key) === "date"
                       ? formatDateForSave(e.target.value)
-                      : e.target.value) as T[keyof T],
+                      : e.target.value) as T[keyof T]
                   )
                 }
                 className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
