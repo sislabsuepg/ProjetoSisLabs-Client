@@ -1,10 +1,10 @@
 export interface FormAcademico {
-  id: string;
+  id: number;
   ra: string;
   nome: string;
   email: string;
   telefone?: string;
-  curso: FormCurso;
+  idCurso: number;
   anoCurso: number;
 }
 
@@ -15,28 +15,28 @@ export interface FormProfessor {
 }
 
 export interface FormLaboratorio {
-  id: string;
+  id: number;
   nome: string;
   numero: string;
   restrito: boolean;
 }
 
 export interface FormOrientacao {
-  id: string;
-  aluno: string;
-  professor: string;
-  laboratorio: string;
+  id: number;
+  idAluno: number;
+  idProfessor: number;
+  idLaboratorio: number;
   data_inicio: string;
   data_fim: string;
 }
 
-export interface FormCurso{
+export interface FormCurso {
   id: number;
   nome: string;
   anosMax: number;
 }
 
-export interface FormPermissao{
+export interface FormPermissao {
   id: number;
   nomePermissao: string;
   geral?: boolean;
@@ -46,7 +46,7 @@ export interface FormPermissao{
   advertencia?: boolean;
 }
 
-export interface FormUsuario{
+export interface FormUsuario {
   id: number;
   nome: string;
   login: string;
@@ -59,5 +59,7 @@ export type IData =
   | FormAcademico
   | FormProfessor
   | FormLaboratorio
-  | FormOrientacao;
-
+  | FormOrientacao
+  | FormCurso
+  | FormPermissao
+  | FormUsuario;

@@ -1,61 +1,66 @@
-'use client';
+"use client";
 
-import CustomModal from '@/components/CustomModal';
-import EditUserModal from '@/components/EditUser';
+import CustomModal from "@/components/CustomModal";
+import EditUserModal from "@/components/EditUser";
+import { formMap, placeholderMap } from "@/components/Lists/data";
 import {
-  formMap,
-  mockAcademicos,
-  mockLaboratorios,
-  mockOrientacoes,
-  mockProfessores,
-  placeholderMap,
-} from '@/components/Lists/data';
-import { ApiResponse, IAcademico, IProfessor, ILaboratorio, IOrientacao } from '@/interfaces/interfaces';
-import { apiOnline } from '@/services/services';
-import ListAcademico from '@/components/Lists/ListAcademico';
-import ListLaboratorio from '@/components/Lists/ListLaboratorio';
-import ListOrientacao from '@/components/Lists/ListOrientacao';
-import ListProfessor from '@/components/Lists/ListProfessor';
+  ApiResponse,
+  IAcademico,
+  IProfessor,
+  ILaboratorio,
+  IOrientacao,
+  ICurso,
+} from "@/interfaces/interfaces";
+import { apiOnline } from "@/services/services";
+import ListAcademico from "@/components/Lists/ListAcademico";
+import ListLaboratorio from "@/components/Lists/ListLaboratorio";
+import ListOrientacao from "@/components/Lists/ListOrientacao";
+import ListProfessor from "@/components/Lists/ListProfessor";
 import {
   FormAcademico,
+  FormCurso,
   FormLaboratorio,
   FormOrientacao,
+  FormPermissao,
   FormProfessor,
+  FormUsuario,
   IData,
-} from '@/components/Lists/types';
-import Pagination from '@/components/Pagination';
-import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+} from "@/components/Lists/types";
+import Pagination from "@/components/Pagination";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { CircularProgress } from "@mui/material";
 
 export default function Alterar() {
   const [activeId, setActiveId] = useState(1);
-  const [dados, setDados] = useState([] as IData[]);
-  const [filtro, setFiltro] = useState('');
-  const [openExcluir, setOpenExcluir] = useState({ status: false, id: '' });
-  const [openEditUser, setOpenEditUser] = useState({ status: false, id: '' });
+  const [filtro, setFiltro] = useState("");
+  const [openExcluir, setOpenExcluir] = useState({ status: false, id: 0 });
+  const [openEditUser, setOpenEditUser] = useState({ status: false, id: 0 });
+  const [currentItems, setCurrentItems] = useState<IData[]>([]);
   const [formData, setFormData] = useState<IData>(formMap[activeId]);
-  const itemsPerPage = 7;
+  const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(dados.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = dados.slice(startIndex, startIndex + itemsPerPage);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
 
   const listButtons = [
     {
       id: 1,
-      title: 'Acadêmico',
+      title: "Acadêmico",
     },
     {
       id: 2,
-      title: 'Professor',
+      title: "Professor",
     },
-    { id: 3, title: 'Laboratório' },
-    { id: 4, title: 'Orientação/Mestrado' },
+    { id: 3, title: "Laboratório" },
+    { id: 4, title: "Orientação/Mestrado" },
+    { id: 5, title: "Curso" },
+    { id: 6, title: "Permissão" },
+    { id: 7, title: "Usuário" },
   ];
 
   const handleSaveEditUser = () => {
-    setDados((prev) =>
+    setCurrentItems((prev) =>
       prev.map((item) => {
         if (item.id === openEditUser.id) {
           switch (activeId) {
@@ -75,16 +80,28 @@ export default function Alterar() {
               const data = formData as FormOrientacao;
               return { ...item, ...data };
             }
+            case 5: {
+              const data = formData as FormCurso;
+              return { ...item, ...data };
+            }
+            case 6: {
+              const data = formData as FormPermissao;
+              return { ...item, ...data };
+            }
+            case 7: {
+              const data = formData as FormUsuario;
+              return { ...item, ...data };
+            }
             default:
               return item;
           }
         }
         return item;
-      }),
+      })
     );
 
-    setOpenEditUser({ status: false, id: '' });
-    toast.success('Dados atualizados com sucesso!');
+    setOpenEditUser({ status: false, id: 0 });
+    toast.success("Dados atualizados com sucesso!");
   };
 
   const getCurrentList = () => {
@@ -97,6 +114,12 @@ export default function Alterar() {
         return currentItems as FormLaboratorio[];
       case 4:
         return currentItems as FormOrientacao[];
+      case 5:
+        return currentItems as FormCurso[];
+      case 6:
+        return currentItems as FormPermissao[];
+      case 7:
+        return currentItems as FormUsuario[];
       default:
         return [];
     }
@@ -121,11 +144,11 @@ export default function Alterar() {
           console.error("Erro ao buscar dados:", error);
           return [];
         }
-    };
-  }
+    }
+  };
   useEffect(() => {
     setLoading(true);
-    getDados(activeId).then((data) => setDados(data));
+    getDados(activeId).then((data) => setCurrentItems(data));
     setCurrentPage(1);
     setFormData(formMap[activeId]);
     setLoading(false);
@@ -135,8 +158,12 @@ export default function Alterar() {
     setFormData(formMap[activeId]);
   }, [activeId]);
 
-  if(loading){
-    return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <CircularProgress size={40} />
+      </div>
+    );
   }
 
   return (
@@ -147,7 +174,7 @@ export default function Alterar() {
             key={item?.id}
             onClick={() => setActiveId(item.id)}
             className={`${
-              item?.id === activeId ? 'bg-theme-lightBlue' : 'bg-theme-blue'
+              item?.id === activeId ? "bg-theme-lightBlue" : "bg-theme-blue"
             } h-12 px-4 rounded-[10px] text-theme-white font-semibold`}
           >
             {item?.title}
@@ -157,10 +184,10 @@ export default function Alterar() {
 
       <div className="flex items-center justify-between w-full mt-10 mb-3">
         <p className="font-semibold text-[1.2rem] text-theme-blue">
-          {activeId === 1 && 'Lista dos Acadêmicos'}
-          {activeId === 2 && 'Lista dos Professores'}
-          {activeId === 3 && 'Lista dos Laboratórios'}
-          {activeId === 4 && 'Lista de Orientação/Mestrado'}
+          {activeId === 1 && "Lista dos Acadêmicos"}
+          {activeId === 2 && "Lista dos Professores"}
+          {activeId === 3 && "Lista dos Laboratórios"}
+          {activeId === 4 && "Lista de Orientação/Mestrado"}
         </p>
 
         <div className="flex items-center justify-end gap-2 w-full max-w-[500px]">
@@ -176,8 +203,8 @@ export default function Alterar() {
             disabled={!filtro.trim()}
             className={`${
               !filtro.trim()
-                ? 'bg-gray-200 cursor-not-allowed text-[#c0c0c0]'
-                : 'border border-theme-blue hover:bg-theme-blue text-theme-blue hover:text-theme-white'
+                ? "bg-gray-200 cursor-not-allowed text-[#c0c0c0]"
+                : "border border-theme-blue hover:bg-theme-blue text-theme-blue hover:text-theme-white"
             } font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] rounded-[10px]`}
           >
             Buscar
@@ -189,7 +216,7 @@ export default function Alterar() {
         {activeId === 1 && (
           <ListAcademico
             list={getCurrentList() as FormAcademico[]}
-            dados={dados as FormAcademico[]}
+            dados={currentItems as FormAcademico[]}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
@@ -198,7 +225,7 @@ export default function Alterar() {
         {activeId === 2 && (
           <ListProfessor
             list={getCurrentList() as FormProfessor[]}
-            dados={dados as FormProfessor[]}
+            dados={currentItems as FormProfessor[]}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
@@ -207,7 +234,7 @@ export default function Alterar() {
         {activeId === 3 && (
           <ListLaboratorio
             list={getCurrentList() as FormLaboratorio[]}
-            dados={dados as FormLaboratorio[]}
+            dados={currentItems as FormLaboratorio[]}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
@@ -216,7 +243,7 @@ export default function Alterar() {
         {activeId === 4 && (
           <ListOrientacao
             list={getCurrentList() as FormOrientacao[]}
-            dados={dados as FormOrientacao[]}
+            dados={currentItems as FormOrientacao[]}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
@@ -234,14 +261,16 @@ export default function Alterar() {
 
       <CustomModal
         open={openExcluir.status}
-        onClose={() => setOpenExcluir({ status: false, id: '' })}
+        onClose={() => setOpenExcluir({ status: false, id: "" })}
         title="Atenção"
         message="Deseja, realmente, excluir o usuário?"
-        onCancel={() => setOpenExcluir({ status: false, id: '' })}
+        onCancel={() => setOpenExcluir({ status: false, id: "" })}
         onConfirm={() => {
-          setDados((prev) => prev.filter((el) => el.id !== openExcluir.id));
-          setOpenExcluir({ status: false, id: '' });
-          toast.success('Usuário removido com sucesso!');
+          setCurrentItems((prev) =>
+            prev.filter((el) => el.id !== openExcluir.id)
+          );
+          setOpenExcluir({ status: false, id: "" });
+          toast.success("Usuário removido com sucesso!");
         }}
         cancelText="Cancelar"
         confirmText="Desativar usuário"
@@ -249,7 +278,7 @@ export default function Alterar() {
 
       <EditUserModal<typeof formData>
         open={openEditUser.status}
-        onClose={() => setOpenEditUser({ status: false, id: '' })}
+        onClose={() => setOpenEditUser({ status: false, id: "" })}
         onSave={handleSaveEditUser}
         formData={formData}
         onChange={(field, value) =>
