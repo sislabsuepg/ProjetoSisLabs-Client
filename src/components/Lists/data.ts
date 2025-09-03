@@ -37,8 +37,8 @@ export const formMap: Record<number, IData> = {
     idAluno: 0,
     idProfessor: 0,
     idLaboratorio: 0,
-    data_inicio: "",
-    data_fim: "",
+    dataInicio: "",
+    dataFim: "",
   }, // Orientação/Mestrado
   5: { id: 0, nome: "", anosMax: 0 }, // Curso
   6: {

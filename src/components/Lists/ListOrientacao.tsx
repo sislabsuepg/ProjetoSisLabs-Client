@@ -65,12 +65,12 @@ export default function ListOrientacao({
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
                     <Popover title={maskDate(item.dataInicio)}>
-                      {maskDate(item.dataInicio.split("T")[0])}
+                      {maskDate(item.dataInicio?.split("T")[0])}
                     </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[80px] text-theme-text">
                     <Popover title={maskDate(item.dataFim)}>
-                      {maskDate(item.dataFim.split("T")[0])}
+                      {maskDate(item.dataFim?.split("T")[0])}
                     </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium flex gap-2">
