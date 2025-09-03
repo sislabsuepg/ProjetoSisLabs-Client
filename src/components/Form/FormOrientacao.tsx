@@ -18,6 +18,7 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
+import { AxiosError } from "axios";
 
 export default function FormOrientacao() {
   const [form, setForm] = useState<{
@@ -83,13 +84,14 @@ export default function FormOrientacao() {
       try {
         const [professoresResponse, laboratoriosResponse] = await Promise.all([
           apiOnline.get("/professor").then((res) => res.data),
-          apiOnline.get("/laboratorio?restrito=true").then((res) => res.data),
+          apiOnline.get("/laboratorio?restrito=true").then((res) => {console.log(res);return res.data}),
         ]);
         setProfessores(professoresResponse);
         setLaboratorios(laboratoriosResponse);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          toast.error(`Erro ao buscar dados: ${err.message}`);
+      } catch (err: any) {
+        if (err?.response?.data?.erros?.length > 0) {
+          console.log(err);
+          err.response.data.erros.forEach((e: string) => toast.error(e));
         } else {
           toast.error("Erro ao buscar dados. Tente novamente.");
         }
