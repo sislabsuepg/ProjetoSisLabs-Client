@@ -26,8 +26,11 @@ export interface FormOrientacao {
   idAluno: number;
   idProfessor: number;
   idLaboratorio: number;
-  data_inicio: string;
-  data_fim: string;
+  dataInicio: string;
+  dataFim: string;
+  laboratorio?: FormLaboratorio;
+  aluno?: FormAcademico;
+  professor?: FormProfessor;
 }
 
 export interface FormCurso {

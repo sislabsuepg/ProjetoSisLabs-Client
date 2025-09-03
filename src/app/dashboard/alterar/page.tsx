@@ -130,7 +130,7 @@ export default function Alterar() {
       case 1:
         try {
           const response = await apiOnline.get(`/aluno`);
-          return response.data;
+          return response.data as FormAcademico[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -139,11 +139,53 @@ export default function Alterar() {
       case 2:
         try {
           const response = await apiOnline.get(`/professor`);
-          return response.data;
+          return response.data as FormProfessor[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
         }
+      case 3:
+        try {
+          const response = await apiOnline.get(`/laboratorio`);
+          return response.data as FormLaboratorio[];
+        } catch (error) {
+          console.error("Erro ao buscar dados:", error);
+          return [];
+        }
+      case 4:
+        try {
+          const response = await apiOnline.get(`/orientacao`);
+          return response.data as FormOrientacao[];
+        } catch (error) {
+          console.error("Erro ao buscar dados:", error);
+          return [];
+        }
+      case 5:
+        try {
+          const response = await apiOnline.get(`/curso`);
+          return response.data as FormCurso[];
+        } catch (error) {
+          console.error("Erro ao buscar dados:", error);
+          return [];
+        }
+      case 6:
+        try {
+          const response = await apiOnline.get(`/permissao`);
+          return response.data as FormPermissao[];
+        } catch (error) {
+          console.error("Erro ao buscar dados:", error);
+          return [];
+        }
+      case 7:
+        try {
+          const response = await apiOnline.get(`/usuario`);
+          return response.data as FormUsuario[];
+        } catch (error) {
+          console.error("Erro ao buscar dados:", error);
+          return [];
+        }
+      default:
+        return [];
     }
   };
   useEffect(() => {
@@ -165,6 +207,8 @@ export default function Alterar() {
       </div>
     );
   }
+
+  console.log(currentItems);
 
   return (
     <div className="w-full flex flex-col items-start">
@@ -188,6 +232,9 @@ export default function Alterar() {
           {activeId === 2 && "Lista dos Professores"}
           {activeId === 3 && "Lista dos Laboratórios"}
           {activeId === 4 && "Lista de Orientação/Mestrado"}
+          {activeId === 5 && "Lista dos Cursos"}
+          {activeId === 6 && "Lista das Permissões"}
+          {activeId === 7 && "Lista dos Usuários"}
         </p>
 
         <div className="flex items-center justify-end gap-2 w-full max-w-[500px]">

@@ -55,24 +55,22 @@ export default function ListOrientacao({
                   className={index % 2 === 0 ? 'bg-[#F5F5F5]' : 'bg-white'}
                 >
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[100px] text-theme-text">
-                    <Popover title={item.aluno}>{item.aluno}</Popover>
+                    <Popover title={item?.aluno?.nome}>{item?.aluno?.nome}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
-                    <Popover title={item.professor}>{item.professor}</Popover>
+                    <Popover title={item?.professor?.nome}>{item?.professor?.nome}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
-                    <Popover title={item.laboratorio}>
-                      {item.laboratorio}
-                    </Popover>
+                    <Popover title={item?.laboratorio?.numero}>{item?.laboratorio?.numero}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
-                    <Popover title={maskDate(item.data_inicio)}>
-                      {maskDate(item.data_inicio)}
+                    <Popover title={maskDate(item.dataInicio)}>
+                      {maskDate(item.dataInicio.split("T")[0])}
                     </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[80px] text-theme-text">
-                    <Popover title={maskDate(item.data_fim)}>
-                      {maskDate(item.data_fim)}
+                    <Popover title={maskDate(item.dataFim)}>
+                      {maskDate(item.dataFim.split("T")[0])}
                     </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium flex gap-2">
