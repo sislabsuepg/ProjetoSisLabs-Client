@@ -132,6 +132,8 @@ function EditUserModal<T extends object>({
           {Object.keys(formData).map((key) => {
             const value = formData[key as keyof T];
 
+            if(key.includes("id")) return null; // Não renderiza campos de id
+
             if (typeof value === "boolean") {
               return (
                 <label className="flex items-center gap-4" key={key}>
