@@ -9,8 +9,8 @@ interface Props {
   list: FormProfessor[];
   dados: FormProfessor[];
   setFormData: (data: FormProfessor) => void;
-  setOpenEditUser: (state: { status: boolean; id: string }) => void;
-  setOpenExcluir: (state: { status: boolean; id: string }) => void;
+  setOpenEditUser: (state: { status: boolean; id: number }) => void;
+  setOpenExcluir: (state: { status: boolean; id: number }) => void;
 }
 
 export default function ListProfessor({
