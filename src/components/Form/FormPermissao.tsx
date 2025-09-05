@@ -117,11 +117,30 @@ export default function FormPermissao() {
             <label className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-700">Geral</span>
               <CustomSwitch
-                checked={form.geral}
-                onChange={() =>
-                  setForm((prev) => ({ ...prev, geral: !prev.geral }))
+              checked={form.geral}
+              onChange={() => {
+                setForm((prev) => {
+                const newGeral = !prev.geral;
+                if (newGeral) {
+                  const nome = form.nomePermissao
+                  return {
+                    nomePermissao: nome,
+                    geral: true,
+                    cadastro: true,
+                    alteracao: true,
+                    relatorio: true,
+                    advertencia: true,
+                  };
+                } else {
+                  return {
+                    ...prev,
+                    geral: false,
+                    
+                  };
                 }
-                name="geral"
+                });
+              }}
+              name="geral"
               />
             </label>
 
