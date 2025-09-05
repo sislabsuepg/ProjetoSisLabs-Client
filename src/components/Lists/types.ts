@@ -6,6 +6,7 @@ export interface FormAcademico {
   telefone?: string;
   idCurso: number;
   anoCurso: number;
+  curso?: FormCurso; 
 }
 
 export interface FormProfessor {
@@ -36,7 +37,7 @@ export interface FormOrientacao {
 export interface FormCurso {
   id: number;
   nome: string;
-  anosMax: number;
+  anosMaximo: number;
 }
 
 export interface FormPermissao {
@@ -56,6 +57,7 @@ export interface FormUsuario {
   senha: string;
   ativo?: boolean;
   idPermissao: number;
+  permissaoUsuario?: FormPermissao;
 }
 
 export type IData =
