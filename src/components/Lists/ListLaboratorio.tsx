@@ -9,8 +9,8 @@ interface Props {
   list: FormLaboratorio[];
   dados: FormLaboratorio[];
   setFormData: (data: FormLaboratorio) => void;
-  setOpenEditUser: (state: { status: boolean; id: string }) => void;
-  setOpenExcluir: (state: { status: boolean; id: string }) => void;
+  setOpenEditUser: (state: { status: boolean; id: number }) => void;
+  setOpenExcluir: (state: { status: boolean; id: number }) => void;
 }
 
 export default function ListLaboratorio({

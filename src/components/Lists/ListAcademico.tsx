@@ -9,8 +9,8 @@ interface Props {
   list: FormAcademico[];
   dados: FormAcademico[];
   setFormData: (data: FormAcademico) => void;
-  setOpenEditUser: (state: { status: boolean; id: string }) => void;
-  setOpenExcluir: (state: { status: boolean; id: string }) => void;
+  setOpenEditUser: (state: { status: boolean; id: number }) => void;
+  setOpenExcluir: (state: { status: boolean; id: number }) => void;
 }
 
 export default function ListAcademico({
@@ -20,22 +20,7 @@ export default function ListAcademico({
   setOpenEditUser,
   setOpenExcluir,
 }: Props) {
-  console.warn(list, dados)
 
-  // Helpers para lidar com respostas diferentes da API sem quebrar a tipagem
-  const getCursoNome = (item: FormAcademico): string => {
-    if (item?.curso && typeof item.curso === 'object' && 'nome' in item.curso) {
-      return item.curso.nome || '—';
-    }
-    return '—';
-  };
-
-  const getAnoCurso = (item: FormAcademico): string | number => {
-    if (typeof item.anoCurso === 'number') return item.anoCurso;
-    // @ts-expect-error mocks podem usar \"ano\"
-    if (item.ano) return item.ano as string | number;
-    return '—';
-  };
   return (
     <div className="w-full h-full flex flex-col justify-between">
       <div className="h-full overflow-y-auto rounded-lg bg-theme-white mt-5">
@@ -79,16 +64,16 @@ export default function ListAcademico({
                     <Popover title={item.nome}>{item.nome}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
-                    <Popover title={item.telefone}>{item.telefone}</Popover>
+                    <Popover title={item.telefone|| "-"}>{item.telefone|| "-"}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
-                    <Popover title={item.email}>{item.email}</Popover>
+                    <Popover title={item.email|| "-"}>{item.email|| "-"}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
-                    <Popover title={getCursoNome(item)}>{getCursoNome(item)}</Popover>
+                    <Popover title={item.curso?.nome || "-"}>{item.curso?.nome || "-"}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[80px] text-theme-text">
-                    <Popover title={String(getAnoCurso(item))}>{getAnoCurso(item)}</Popover>
+                    <Popover title={String(item.anoCurso || "-")}>{item.anoCurso || "-"}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium flex gap-2">
                     <Popover title="Editar">

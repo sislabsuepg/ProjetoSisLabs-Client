@@ -10,8 +10,8 @@ interface Props {
   list: FormOrientacao[];
   dados: FormOrientacao[];
   setFormData: (data: FormOrientacao) => void;
-  setOpenEditUser: (state: { status: boolean; id: string }) => void;
-  setOpenExcluir: (state: { status: boolean; id: string }) => void;
+  setOpenEditUser: (state: { status: boolean; id: number }) => void;
+  setOpenExcluir: (state: { status: boolean; id: number }) => void;
 }
 
 export default function ListOrientacao({
