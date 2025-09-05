@@ -3,19 +3,14 @@
 import CustomModal from "@/components/CustomModal";
 import EditUserModal from "@/components/EditUser";
 import { formMap, placeholderMap } from "@/components/Lists/data";
-import {
-  ApiResponse,
-  IAcademico,
-  IProfessor,
-  ILaboratorio,
-  IOrientacao,
-  ICurso,
-} from "@/interfaces/interfaces";
 import { apiOnline } from "@/services/services";
 import ListAcademico from "@/components/Lists/ListAcademico";
 import ListLaboratorio from "@/components/Lists/ListLaboratorio";
 import ListOrientacao from "@/components/Lists/ListOrientacao";
 import ListProfessor from "@/components/Lists/ListProfessor";
+import ListCurso from "@/components/Lists/ListCurso";
+import ListPermissao from "@/components/Lists/ListPermissao";
+import ListUsuario from "@/components/Lists/ListUsuario";
 import {
   FormAcademico,
   FormCurso,
@@ -27,7 +22,7 @@ import {
   IData,
 } from "@/components/Lists/types";
 import Pagination from "@/components/Pagination";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { CircularProgress } from "@mui/material";
 
@@ -129,7 +124,12 @@ export default function Alterar() {
     switch (id) {
       case 1:
         try {
-          const response = await apiOnline.get(`/aluno`);
+          const countResponse = await apiOnline.get<{ count: number }>(
+          "/aluno/count"
+          );
+          const count = countResponse?.count ?? 0;
+          setTotalPages(Math.ceil(count / itemsPerPage));
+          const response = await apiOnline.get(`/aluno?page=${currentPage}&items=${itemsPerPage}`);
           return response.data as FormAcademico[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -138,7 +138,12 @@ export default function Alterar() {
 
       case 2:
         try {
-          const response = await apiOnline.get(`/professor`);
+          const countResponse = await apiOnline.get<{ count: number }>(
+            "/professor/count"
+          );
+          const count = countResponse?.count ?? 0;
+          setTotalPages(Math.ceil(count / itemsPerPage));
+          const response = await apiOnline.get(`/professor?page=${currentPage}&items=${itemsPerPage}`);
           return response.data as FormProfessor[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -146,15 +151,26 @@ export default function Alterar() {
         }
       case 3:
         try {
-          const response = await apiOnline.get(`/laboratorio`);
+          const countResponse = await apiOnline.get<{ count: number }>(
+            "/laboratorio/count"
+          );
+          const count = countResponse?.count ?? 0;
+          setTotalPages(Math.ceil(count / itemsPerPage));
+          const response = await apiOnline.get(`/laboratorio?page=${currentPage}&items=${itemsPerPage}`);
           return response.data as FormLaboratorio[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
         }
       case 4:
+
         try {
-          const response = await apiOnline.get(`/orientacao`);
+          const countResponse = await apiOnline.get<{ count: number }>(
+            "/orientacao/count"
+          );
+          const count = countResponse?.count ?? 0;
+          setTotalPages(Math.ceil(count / itemsPerPage));
+          const response = await apiOnline.get(`/orientacao?page=${currentPage}&items=${itemsPerPage}`);
           return response.data as FormOrientacao[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -162,7 +178,12 @@ export default function Alterar() {
         }
       case 5:
         try {
-          const response = await apiOnline.get(`/curso`);
+          const countResponse = await apiOnline.get<{ count: number }>(
+            "/curso/count"
+          );
+          const count = countResponse?.count ?? 0;
+          setTotalPages(Math.ceil(count / itemsPerPage));
+          const response = await apiOnline.get(`/curso?page=${currentPage}&items=${itemsPerPage}`);
           return response.data as FormCurso[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -170,7 +191,12 @@ export default function Alterar() {
         }
       case 6:
         try {
-          const response = await apiOnline.get(`/permissao`);
+          const countResponse = await apiOnline.get<{ count: number }>(
+            "/permissao/count"
+          );
+          const count = countResponse?.count ?? 0;
+          setTotalPages(Math.ceil(count / itemsPerPage));
+          const response = await apiOnline.get(`/permissao?page=${currentPage}&items=${itemsPerPage}`);
           return response.data as FormPermissao[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -178,7 +204,12 @@ export default function Alterar() {
         }
       case 7:
         try {
-          const response = await apiOnline.get(`/usuario`);
+          const countResponse = await apiOnline.get<{ count: number }>(
+            "/usuario/count"
+          );
+          const count = countResponse?.count ?? 0;
+          setTotalPages(Math.ceil(count / itemsPerPage));
+          const response = await apiOnline.get(`/usuario?page=${currentPage}&items=${itemsPerPage}`);
           return response.data as FormUsuario[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -199,6 +230,13 @@ export default function Alterar() {
   useEffect(() => {
     setFormData(formMap[activeId]);
   }, [activeId]);
+
+  useEffect(() => {
+setLoading(true);
+    getDados(activeId).then((data) => setCurrentItems(data));
+    setFormData(formMap[activeId]);
+    setLoading(false);
+  }, [currentPage]);
 
   if (loading) {
     return (
@@ -296,7 +334,33 @@ export default function Alterar() {
             setOpenExcluir={setOpenExcluir}
           />
         )}
-
+        {activeId === 5 && (
+          <ListCurso
+            list={getCurrentList() as FormCurso[]}
+            dados={currentItems as FormCurso[]}
+            setFormData={setFormData}
+            setOpenEditUser={setOpenEditUser}
+            setOpenExcluir={setOpenExcluir}
+          />
+        )}
+        {activeId === 6 && (
+          <ListPermissao
+            list={getCurrentList() as FormPermissao[]}
+            dados={currentItems as FormPermissao[]}
+            setFormData={setFormData}
+            setOpenEditUser={setOpenEditUser}
+            setOpenExcluir={setOpenExcluir}
+          />
+        )}
+        {activeId === 7 && (
+          <ListUsuario
+            list={getCurrentList() as FormUsuario[]}
+            dados={currentItems as FormUsuario[]}
+            setFormData={setFormData}
+            setOpenEditUser={setOpenEditUser}
+            setOpenExcluir={setOpenExcluir}
+          />
+        )}
         {getCurrentList()?.length > 0 && (
           <Pagination
             currentPage={currentPage}
@@ -308,15 +372,15 @@ export default function Alterar() {
 
       <CustomModal
         open={openExcluir.status}
-        onClose={() => setOpenExcluir({ status: false, id: "" })}
+        onClose={() => setOpenExcluir({ status: false, id: 0 })}
         title="Atenção"
         message="Deseja, realmente, excluir o usuário?"
-        onCancel={() => setOpenExcluir({ status: false, id: "" })}
+        onCancel={() => setOpenExcluir({ status: false, id: 0 })}
         onConfirm={() => {
           setCurrentItems((prev) =>
             prev.filter((el) => el.id !== openExcluir.id)
           );
-          setOpenExcluir({ status: false, id: "" });
+          setOpenExcluir({ status: false, id: 0 });
           toast.success("Usuário removido com sucesso!");
         }}
         cancelText="Cancelar"
@@ -325,7 +389,7 @@ export default function Alterar() {
 
       <EditUserModal<typeof formData>
         open={openEditUser.status}
-        onClose={() => setOpenEditUser({ status: false, id: "" })}
+        onClose={() => setOpenEditUser({ status: false, id: 0 })}
         onSave={handleSaveEditUser}
         formData={formData}
         onChange={(field, value) =>
