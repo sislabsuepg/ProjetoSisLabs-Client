@@ -29,6 +29,7 @@ export const formMap: Record<number, IData> = {
     email: "",
     idCurso: 0,
     anoCurso: 0,
+    curso: undefined,
   }, // Acadêmico
   2: { id: 0, nome: "", email: "" }, // Professor
   3: { id: 0, nome: "", numero: "", restrito: false }, // Laboratório
@@ -39,8 +40,11 @@ export const formMap: Record<number, IData> = {
     idLaboratorio: 0,
     dataInicio: "",
     dataFim: "",
+    laboratorio: undefined,
+    aluno: undefined,
+    professor: undefined,
   }, // Orientação/Mestrado
-  5: { id: 0, nome: "", anosMax: 0 }, // Curso
+  5: { id: 0, nome: "", anosMaximo: 0 }, // Curso
   6: {
     id: 0,
     nomePermissao: "",
@@ -57,5 +61,6 @@ export const formMap: Record<number, IData> = {
     senha: "",
     ativo: false,
     idPermissao: 0,
+    permissaoUsuario: undefined,
   }, // Usuário
 };

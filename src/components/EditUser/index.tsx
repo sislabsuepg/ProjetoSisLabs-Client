@@ -59,11 +59,6 @@ function EditUserModal<T extends object>({
     if (key.toLowerCase().includes("email")) return "email";
     if (key.toLowerCase().includes("data")) return "date";
     switch (key.toLowerCase()) {
-      case "idCurso":
-      case "idPermissao":
-      case "idProfessor":
-      case "idLaboratorio":
-        return "select";
       case "senha":
       case "repetirSenha":
         return "password";
@@ -131,15 +126,6 @@ function EditUserModal<T extends object>({
         >
           {Object.keys(formData).map((key) => {
             const value = formData[key as keyof T];
-
-            if(key === "id" || typeof value === "object") return null; // Não renderiza campos de id
-
-            if(key.includes("id")){
-              return <select key={key} value={value as string} onChange={(e) => onChange(key as keyof T, e.target.value as T[keyof T])}>
-                <option value="">Selecione</option>
-                {/* Renderizar opções com base nos dados disponíveis */}
-              </select>;
-            }
 
             if (typeof value === "boolean") {
               return (
