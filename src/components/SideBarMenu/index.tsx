@@ -177,11 +177,11 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           />
           <SidebarItem
             icon={data_images?.icon_aulas}
-            text="Programação das aulas"
-            active={activeItem === 'Programação das aulas'}
+            text="Cronograma de aulas"
+            active={activeItem === 'Cronograma de aulas'}
             onClick={() => {
-              setActiveItem('Programação das aulas');
-              router.push('/dashboard/aulas');
+              setActiveItem('Cronograma de aulas');
+              router.push('/dashboard/cronograma');
             }}
             isOpen={isOpen}
           />

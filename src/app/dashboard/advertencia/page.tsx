@@ -79,7 +79,7 @@ export default function Advertencia() {
     return (
         <div className="w-full flex flex-col h-full items-start">
             <p className="text-theme-blue font-semibold text-[1.2rem] w-full text-start">
-                Laboratórios em uso
+            ⚠️ Emitir advertência
             </p>
 
             <p className="text-[0.9rem] italic font-medium mb-10 text-theme-red">
@@ -139,7 +139,8 @@ export default function Advertencia() {
                         </div>
 
                         {form?.ra && <p className="font-normal">
-                            {'Email: ' + (listaEmails.find(e => e.ra === form.ra)?.email ?? '')}
+                            <span className="font-medium mb-10 text-theme-blue">E-mail a ser enviado a advertência: </span>
+                            <span className="text-theme-red">{listaEmails.find(e => e.ra === form.ra)?.email ?? ''}</span>
                         </p>}
                     </div>
 

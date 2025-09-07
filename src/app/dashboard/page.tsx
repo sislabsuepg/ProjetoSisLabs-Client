@@ -49,7 +49,7 @@ export default function Inicio() {
   return (
     <div className="w-full flex flex-col h-full items-start">
       <p className="text-theme-blue font-semibold text-[1.2rem] w-full text-start">
-        Laboratórios em uso
+        ✅ Laboratórios em uso
       </p>
 
       <div className="w-full flex flex-col h-full mt-5">
@@ -57,9 +57,8 @@ export default function Inicio() {
           data?.map((item) => (
             <div
               key={item?.id}
-              className={`w-full flex items-center gap-2 ${
-                Number(item?.id) % 2 == 0 ? "bg-transparent" : "bg-[#F3F3F3]"
-              } h-12 py-2 px-4 rounded-[10px]`}
+              className={`w-full flex items-center gap-2 ${Number(item?.id) % 2 == 0 ? "bg-transparent" : "bg-[#F3F3F3]"
+                } h-12 py-2 px-4 rounded-[10px]`}
             >
               <div className="h-2 w-2 bg-[#22FF00] rounded-full"></div>
               <p className="text-theme-text text-[0.9rem] font-normal">
@@ -96,9 +95,11 @@ export default function Inicio() {
             </div>
           ))
         ) : (
-          <p className="text-theme-text text-[0.9rem] font-normal">
-            Nenhum laboratório em uso no momento.
-          </p>
+          <div className="h-full flex items-center justify-center">
+            <p className="text-theme-text text-[0.9rem] font-normal">
+              Nenhum laboratório em uso no momento.
+            </p>
+          </div>
         )}
 
         <Pagination

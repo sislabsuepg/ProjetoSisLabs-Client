@@ -22,7 +22,7 @@ import {
   IData,
 } from "@/components/Lists/types";
 import Pagination from "@/components/Pagination";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { CircularProgress } from "@mui/material";
 

@@ -50,7 +50,7 @@ const isFormValid = Object.values(form).every((value) => value !== "" && value !
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        Gerar relatório por curso
+       📊 Gerar relatório por curso
       </p>
 
       <form

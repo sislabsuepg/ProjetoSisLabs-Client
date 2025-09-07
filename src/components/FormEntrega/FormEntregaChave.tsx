@@ -52,7 +52,7 @@ export default function FormEntregaChave() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        Entrega de chave
+       🔑 Entrega de chave
       </p>
 
       <form onSubmit={handleSubmit} noValidate className="mt-4 space-y-4 flex flex-col justify-between w-full h-full">

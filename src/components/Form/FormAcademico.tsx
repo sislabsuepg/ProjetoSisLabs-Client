@@ -127,7 +127,7 @@ export default function FormAcademico() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        Cadastro do acadêmico
+       📝 Cadastro do acadêmico
       </p>
 
       <form

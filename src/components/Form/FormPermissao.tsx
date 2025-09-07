@@ -95,7 +95,7 @@ export default function FormPermissao() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        Cadastro de permissão de usuário
+       📝 Cadastro de permissão de usuário
       </p>
 
       <form

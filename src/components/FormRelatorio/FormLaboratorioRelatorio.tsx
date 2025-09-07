@@ -48,7 +48,7 @@ export default function FormAcademicoRelatorio() {
   return (
     <div className="w-full flex flex-col h-full">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        Gerar relatório - Laboratório
+       📊 Gerar relatório - Laboratório
       </p>
 
       <form onSubmit={handleSubmit} className="h-full space-y-6 w-full flex flex-col justify-between">

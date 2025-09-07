@@ -11,7 +11,7 @@ export default function Perfil() {
 
   return (
     <div className="h-full w-full flex flex-col items-start">
-      <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">Perfil</p>
+      <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">👤 Perfil</p>
       <div className="flex h-full w-full px-10">
         <div className="bg-theme-container flex flex-col justify-between items-center w-[40%] px-5 pt-8 pb-5 h-full rounded-[15px]">
           <div className="flex items-center justify-center">
