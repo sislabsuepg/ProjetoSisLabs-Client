@@ -59,7 +59,7 @@ export default function Cronograma() {
   const isTabelaVazia = tabelaAtiva.every(linha => linha.every(celula => celula === ""));
 
   return (
-    <div className="w-full h-full flex flex-col justify-between p-4">
+    <div className="w-full h-full flex flex-col justify-between">
       <div className="w-full flex items-center justify-center gap-2 mb-4">
         {listlABS.map((item) => (
           <button
