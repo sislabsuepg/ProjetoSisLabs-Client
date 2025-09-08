@@ -54,7 +54,69 @@ export default function Alterar() {
     { id: 7, title: "Usuário" },
   ];
 
-  const handleSaveEditUser = () => {
+  const mapRoutes: Record<number, string> = {
+    1: "aluno",
+    2: "professor",
+    3: "laboratorio",
+    4: "orientacao",
+    5: "curso",
+    6: "permissao",
+    7: "usuario",
+  };
+
+  const handleSaveEditUser = async () => {
+    const id = openEditUser.id;
+    if (id === 0) return;
+    if (!formData) return;
+    if (!("id" in formData)) return;
+    if (formData.id !== id) {
+      toast.error("ID do formulário não corresponde ao ID do usuário.");
+      return;
+    }
+
+    const updatedItem = currentItems.find((item) => item.id === id);
+    if (!updatedItem) {
+      toast.error(`${listButtons.find((btn) => btn.id === activeId)?.title} não encontrado.`);
+      return;
+    }
+    
+    // Preparar dados para envio - garantir que idPermissao está correto e telefone sem máscara
+    let dataToSend = { ...formData };
+    
+    // Se estivermos editando um usuário e há permissaoUsuario definido, garantir que idPermissao está correto
+    if (activeId === 7 && "permissaoUsuario" in formData && formData.permissaoUsuario) {
+      const permissao = formData.permissaoUsuario as any;
+      if (permissao.id) {
+        dataToSend = { ...dataToSend, idPermissao: permissao.id };
+      }
+    }
+    
+    // Se estivermos editando um acadêmico e há telefone, garantir que seja enviado sem máscara
+    if (activeId === 1 && "telefone" in formData && formData.telefone) {
+      // O telefone já deve estar sem máscara pois é tratado no EditUserModal
+      // mas vamos garantir removendo qualquer máscara restante
+      const telefone = formData.telefone as string;
+      dataToSend = { ...dataToSend, telefone: telefone.replace(/\D/g, '') };
+    }
+    
+    // Log para debug: verificar os dados que estão sendo enviados
+    console.log("Dados sendo enviados para o backend:", dataToSend);
+    console.log("Rota:", `/${mapRoutes[activeId]}/${id}`);
+    
+    try{
+      await apiOnline.put(`/${mapRoutes[activeId]}/${id}`, dataToSend);
+    }catch(err){
+      const error = err as any;
+      console.error("Erro ao atualizar no backend:", error);
+      if(error.response?.data?.erros){
+        error.response.data.erros.forEach((e: string) => toast.error(e));
+      }else{
+        toast.error("Erro ao atualizar os dados. Tente novamente.");
+      }
+      return;
+    }
+
+
     setCurrentItems((prev) =>
       prev.map((item) => {
         if (item.id === openEditUser.id) {
@@ -395,6 +457,7 @@ setLoading(true);
         onChange={(field, value) =>
           setFormData((prev) => ({ ...prev, [field]: value }))
         }
+        title={listButtons.find((btn) => btn.id === activeId)?.title || ""}
       />
     </div>
   );

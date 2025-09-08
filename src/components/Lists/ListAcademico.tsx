@@ -4,6 +4,7 @@ import Popover from '@/components/Popover';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import { FormAcademico } from './types';
+import {maskPhone} from '@/utils/maskPhone';
 
 interface Props {
   list: FormAcademico[];
@@ -64,7 +65,7 @@ export default function ListAcademico({
                     <Popover title={item.nome}>{item.nome}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
-                    <Popover title={item.telefone|| "-"}>{item.telefone|| "-"}</Popover>
+                    <Popover title={item.telefone|| "-"}>{maskPhone(item.telefone)|| "-"}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
                     <Popover title={item.email|| "-"}>{item.email|| "-"}</Popover>

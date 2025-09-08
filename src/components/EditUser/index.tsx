@@ -1,5 +1,7 @@
 import { IPermissao } from "@/interfaces/interfaces";
 import { apiOnline } from "@/services/services";
+import { maskPhone } from "@/utils/maskPhone";
+import { removeMaskPhone } from "@/utils/removeMaskPhone";
 import { Modal, styled, Switch } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 
@@ -9,6 +11,7 @@ interface EditUserModalProps<T extends object> {
   onSave: () => void;
   formData: T;
   onChange: <K extends keyof T>(field: K, value: T[K]) => void;
+  title: string;
 }
 
 function EditUserModal<T extends object>({
@@ -17,6 +20,7 @@ function EditUserModal<T extends object>({
   onSave,
   formData,
   onChange,
+  title,
 }: EditUserModalProps<T>) {
   const [options, setOptions] = useState<IPermissao[]>([]);
 
@@ -91,6 +95,7 @@ function EditUserModal<T extends object>({
   const getInputType = (key: string) => {
     if (key.toLowerCase().includes("email")) return "email";
     if (key.toLowerCase().includes("data")) return "date";
+    if (key.toLowerCase().includes("telefone")) return "phone";
     switch (key.toLowerCase()) {
       case "curso":
       case "laboratorio":
@@ -98,6 +103,7 @@ function EditUserModal<T extends object>({
       case "aluno":
         return "disabledtext";
       case "permissaousuario":
+      case "idpermissao":
         return "select";
       case "ra":
       case "login":
@@ -119,11 +125,20 @@ function EditUserModal<T extends object>({
   // Ajustar datas para o formato yyyy-MM-dd (aceito pelo input type="date")
   const formatDateForInput = (val: string) => {
     if (!val) return "";
+    console.log("formatDateForInput - valor original:", val);
     if (val.includes("/")) {
       // dd/MM/yyyy → yyyy-MM-dd
       const [d, m, y] = val.split("/");
-      return `${y}-${m}-${d}`;
+      const formatted = `${y}-${m}-${d}`;
+      console.log("formatDateForInput - convertido de dd/MM/yyyy:", formatted);
+      return formatted;
     }
+    if(val.includes("T")){
+      const formatted = val.split("T")[0]; // extrai só a parte da data
+      console.log("formatDateForInput - extraído de ISO:", formatted);
+      return formatted;
+    }
+    console.log("formatDateForInput - retornado como está:", val);
     return val; // já está no formato ISO
   };
 
@@ -155,7 +170,7 @@ function EditUserModal<T extends object>({
         }}
       >
         <h2 className="text-[1.1rem] mb-6 text-theme-blue font-semibold">
-          Alterar usuário
+          Editar {title}
         </h2>
 
         <div
@@ -213,14 +228,27 @@ function EditUserModal<T extends object>({
                       | IPermissao
                       | undefined;
 
-                    // Se o campo atual contém um objeto de permissão, passamos o objeto
-                    if (value && typeof value === "object") {
+                    // Se o campo atual é permissaoUsuario (objeto), atualizamos o objeto e o idPermissao
+                    if (key === "permissaoUsuario") {
+                      console.log("Atualizando permissaoUsuario:", selected);
+                      console.log("Atualizando idPermissao:", id);
                       onChange(
                         key as keyof T,
                         selected as unknown as T[keyof T]
                       );
+                      // Sempre atualizar o idPermissao quando mudar a permissão
+                      onChange("idPermissao" as keyof T, id as unknown as T[keyof T]);
+                    } else if (key === "idPermissao") {
+                      // Se estamos atualizando diretamente o idPermissao
+                      console.log(`Atualizando idPermissao diretamente:`, id);
+                      onChange(key as keyof T, id as unknown as T[keyof T]);
+                      // Também atualizar o objeto permissaoUsuario se ele existir
+                      if ("permissaoUsuario" in formData) {
+                        onChange("permissaoUsuario" as keyof T, selected as unknown as T[keyof T]);
+                      }
                     } else {
-                      // caso o campo seja apenas o id (ex: idPermissao) passamos o número
+                      // caso o campo seja apenas outro select qualquer
+                      console.log(`Atualizando campo ${key}:`, id);
                       onChange(key as keyof T, id as unknown as T[keyof T]);
                     }
                   }}
@@ -271,21 +299,29 @@ function EditUserModal<T extends object>({
             return (
               <input
                 key={key}
-                type={getInputType(key)}
+                type={getInputType(key) === "phone" ? "text" : getInputType(key)}
                 placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
                 value={
                   getInputType(key) === "date"
                     ? formatDateForInput(value as string)
+                    : getInputType(key) === "phone"
+                    ? maskPhone(value as string)
                     : (value as string)
                 }
-                onChange={(e) =>
-                  onChange(
-                    key as keyof T,
-                    (getInputType(key) === "date"
-                      ? formatDateForSave(e.target.value)
-                      : e.target.value) as T[keyof T]
-                  )
-                }
+                onChange={(e) => {
+                  let newValue = e.target.value;
+                  
+                  // Para campos de telefone, remover a máscara antes de salvar
+                  if (getInputType(key) === "phone") {
+                    newValue = removeMaskPhone(e.target.value);
+                  } else if (getInputType(key) === "date") {
+                    console.log(`Campo de data ${key} - valor original:`, e.target.value);
+                    newValue = formatDateForSave(e.target.value);
+                    console.log(`Campo de data ${key} - valor formatado:`, newValue);
+                  }
+                  
+                  onChange(key as keyof T, newValue as T[keyof T]);
+                }}
                 className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
               />
             );
@@ -301,7 +337,10 @@ function EditUserModal<T extends object>({
           </button>
 
           <button
-            onClick={onSave}
+            onClick={() => {
+              console.log("FormData antes de salvar:", formData);
+              onSave();
+            }}
             className="bg-theme-green text-theme-white font-normal text-[0.9rem] h-[40px] w-full max-w-[200px] rounded-[8px]"
           >
             Salvar

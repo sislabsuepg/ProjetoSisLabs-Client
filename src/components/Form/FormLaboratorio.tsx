@@ -15,6 +15,7 @@ export default function FormLaboratorio() {
     nome: '',
     numero: '',
     restrito: false,
+    gerarHorarios: false,
   });
 
   const CustomSwitch = styled(Switch)(({ theme }) => ({
@@ -76,6 +77,7 @@ export default function FormLaboratorio() {
         nome: '',
         numero: '',
         restrito: false,
+        gerarHorarios: false,
       });
       console.log('✅ Dados válidos:', form);
     } catch (err) {
@@ -131,6 +133,18 @@ export default function FormLaboratorio() {
                   setForm((prev) => ({ ...prev, restrito: e.target.checked }))
                 }
                 name="restrito"
+              />
+            </label>
+            <label className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">
+                O laboratório deve gerar horários automaticamente?
+              </span>
+              <CustomSwitch
+                checked={form.gerarHorarios}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, gerarHorarios: e.target.checked }))
+                }
+                name="gerarHorarios"
               />
             </label>
           </div>
