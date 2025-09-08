@@ -1,4 +1,7 @@
+import { IPermissao } from "@/interfaces/interfaces";
+import { apiOnline } from "@/services/services";
 import { Modal, styled, Switch } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
 
 interface EditUserModalProps<T extends object> {
   open: boolean;
@@ -15,6 +18,36 @@ function EditUserModal<T extends object>({
   formData,
   onChange,
 }: EditUserModalProps<T>) {
+  const [options, setOptions] = useState<IPermissao[]>([]);
+
+  // Detecta se o formData parece ser um usuário (existem campos típicos de usuário)
+  const isUserForm = useMemo(() => {
+    const f = formData as unknown as Record<string, unknown> | null;
+    return !!(
+      f &&
+      ("permissaoUsuario" in f || "idPermissao" in f || "login" in f)
+    );
+  }, [formData]);
+
+  useEffect(() => {
+    if (!isUserForm) return; // só carrega quando for form de usuário
+
+    const fetchPermissions = async () => {
+      try {
+        const resp = await apiOnline.get("/permissao");
+        // tenta extrair data com tipagem segura
+        const typedResp = resp as { data?: IPermissao[] } | undefined;
+        const data = typedResp?.data;
+        setOptions(data ?? []);
+        console.log("Permissões carregadas:", data);
+      } catch (error) {
+        console.error("Erro ao buscar permissões:", error);
+      }
+    };
+
+    fetchPermissions();
+  }, [isUserForm]);
+
   const CustomSwitch = styled(Switch)(({ theme }) => ({
     width: 42,
     height: 26,
@@ -59,6 +92,16 @@ function EditUserModal<T extends object>({
     if (key.toLowerCase().includes("email")) return "email";
     if (key.toLowerCase().includes("data")) return "date";
     switch (key.toLowerCase()) {
+      case "curso":
+      case "laboratorio":
+      case "professor":
+      case "aluno":
+        return "disabledtext";
+      case "permissaousuario":
+        return "select";
+      case "ra":
+      case "login":
+        return "readonlytext";
       case "senha":
       case "repetirSenha":
         return "password";
@@ -126,6 +169,90 @@ function EditUserModal<T extends object>({
         >
           {Object.keys(formData).map((key) => {
             const value = formData[key as keyof T];
+
+            if (key.toLowerCase().includes("id")) {
+              return null; // Não renderiza campos que contenham "id"
+            }
+
+            if (getInputType(key) === "disabledtext") {
+              return (
+                <input
+                  key={key}
+                  type="text"
+                  disabled
+                  readOnly
+                  placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                  value={
+                    typeof value === "object" && value !== null
+                      ? (value as Record<string, unknown>)?.nome?.toString() ??
+                        ""
+                      : (String(value ?? "") as string)
+                  }
+                  className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+                />
+              );
+            }
+
+            if (getInputType(key) === "select") {
+              // Se o campo for um objeto (por exemplo permissaoUsuario) usamos o id do objeto
+              const selectedId = (() => {
+                if (value && typeof value === "object") {
+                  const v = value as Record<string, unknown>;
+                  return typeof v.id === "number" ? v.id : Number(v.id ?? NaN);
+                }
+                return typeof value === "number" ? value : Number(value ?? NaN);
+              })();
+
+              return (
+                <select
+                  key={key}
+                  value={selectedId ?? ""}
+                  onChange={(e) => {
+                    const id = Number(e.target.value);
+                    const selected = options.find((o) => o.id === id) as
+                      | IPermissao
+                      | undefined;
+
+                    // Se o campo atual contém um objeto de permissão, passamos o objeto
+                    if (value && typeof value === "object") {
+                      onChange(
+                        key as keyof T,
+                        selected as unknown as T[keyof T]
+                      );
+                    } else {
+                      // caso o campo seja apenas o id (ex: idPermissao) passamos o número
+                      onChange(key as keyof T, id as unknown as T[keyof T]);
+                    }
+                  }}
+                  className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+                >
+                  <option value="">Selecione...</option>
+                  {options.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.nomePermissao}
+                    </option>
+                  ))}
+                </select>
+              );
+            }
+
+            if (getInputType(key) === "readonlytext") {
+              return (
+                <input
+                  key={key}
+                  type="text"
+                  readOnly
+                  disabled
+                  value={
+                    typeof value === "object" && value !== null
+                      ? (value as Record<string, unknown>)?.nome?.toString() ??
+                        ""
+                      : (String(value ?? "") as string)
+                  }
+                  className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+                />
+              );
+            }
 
             if (typeof value === "boolean") {
               return (
