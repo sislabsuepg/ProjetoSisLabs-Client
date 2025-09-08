@@ -146,9 +146,8 @@ function EditUserModal<T extends object>({
   const formatDateForSave = (val: string) => {
     if (!val) return "";
     if (val.includes("-")) {
-      // yyyy-MM-dd → dd/MM/yyyy
-      const [y, m, d] = val.split("-");
-      return `${d}/${m}/${y}`;
+      const formatted = new Date(val).toISOString();
+      return formatted;
     }
     return val;
   };

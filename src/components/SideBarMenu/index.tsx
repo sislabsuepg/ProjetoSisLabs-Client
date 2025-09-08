@@ -157,21 +157,11 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           />
           <SidebarItem
             icon={data_images?.icon_chave}
-            text="Entrega de chave"
-            active={activeItem === 'Entrega de chave'}
+            text="Empréstimo"
+            active={activeItem === 'Empréstimo'}
             onClick={() => {
-              setActiveItem('Entrega de chave');
-              router.push('/dashboard/entrega');
-            }}
-            isOpen={isOpen}
-          />
-          <SidebarItem
-            icon={data_images?.icon_pesquisa}
-            text="Laboratório para pesquisa"
-            active={activeItem === 'Laboratório para pesquisa'}
-            onClick={() => {
-              setActiveItem('Laboratório para pesquisa');
-              router.push('/dashboard/pesquisa');
+              setActiveItem('Empréstimo');
+              router.push('/dashboard/emprestimo');
             }}
             isOpen={isOpen}
           />

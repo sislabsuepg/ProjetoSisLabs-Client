@@ -91,7 +91,7 @@ export default function ListOrientacao({
                           />
                         </button>
                       </Popover>
-                      <Popover title="Excluir">
+                      <Popover title="Desativar">
                         <button
                           onClick={() =>
                             setOpenExcluir({ status: true, id: item.id })

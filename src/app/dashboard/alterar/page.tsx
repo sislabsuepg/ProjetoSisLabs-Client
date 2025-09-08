@@ -64,6 +64,7 @@ export default function Alterar() {
     7: "usuario",
   };
 
+  
   const handleSaveEditUser = async () => {
     const id = openEditUser.id;
     if (id === 0) return;
@@ -436,17 +437,27 @@ setLoading(true);
         open={openExcluir.status}
         onClose={() => setOpenExcluir({ status: false, id: 0 })}
         title="Atenção"
-        message="Deseja, realmente, excluir o usuário?"
+        message={`Deseja, realmente, desativar esta(e) ${listButtons.find((btn) => btn.id === activeId)?.title || ""}?`}
         onCancel={() => setOpenExcluir({ status: false, id: 0 })}
         onConfirm={() => {
+          async function desativar() {
+            if(openExcluir.id === 0) return;
+            try{
+              await apiOnline.delete(`/${mapRoutes[activeId]}/${openExcluir.id}`);
+            }catch(err){
+              const error = err as any;
+              console.error("Erro ao desativar no backend:", error);
+            }
+
           setCurrentItems((prev) =>
             prev.filter((el) => el.id !== openExcluir.id)
           );
           setOpenExcluir({ status: false, id: 0 });
-          toast.success("Usuário removido com sucesso!");
-        }}
+          toast.success(`${listButtons.find((btn) => btn.id === activeId)?.title || ""} desativado com sucesso!`);
+        }
+        desativar();}}
         cancelText="Cancelar"
-        confirmText="Desativar usuário"
+        confirmText={`Desativar ${listButtons.find((btn) => btn.id === activeId)?.title || ""}`}
       />
 
       <EditUserModal<typeof formData>
@@ -455,7 +466,13 @@ setLoading(true);
         onSave={handleSaveEditUser}
         formData={formData}
         onChange={(field, value) =>
-          setFormData((prev) => ({ ...prev, [field]: value }))
+          setFormData((prev) => {
+            if(field==="geral" && value===true){
+              return { ...prev, [field]: value, cadastro: true, alteracao: true, advertencia: true, relatorio: true };
+            }
+            
+            return { ...prev, [field]: value };
+          })
         }
         title={listButtons.find((btn) => btn.id === activeId)?.title || ""}
       />
