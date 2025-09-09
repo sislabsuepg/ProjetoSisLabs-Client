@@ -524,6 +524,7 @@ export default function Alterar() {
               await apiOnline.delete(
                 `/${mapRoutes[activeId]}/${openExcluir.id}`
               );
+              currentItems.filter((el) => el.id !== openExcluir.id);
             } catch (err) {
               const error = (err as AxiosError).response?.data as ApiResponse;
               console.error("Erro ao desativar no backend:", error);
