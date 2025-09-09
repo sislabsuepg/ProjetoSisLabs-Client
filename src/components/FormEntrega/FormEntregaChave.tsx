@@ -57,7 +57,8 @@ export default function FormEntregaChave() {
       toast.success("Entrega de chave realizada com sucesso!");
       setForm({ ra: "", senha: "", laboratorio: "" });
     } catch (err: unknown) {
-      if (err instanceof Error) toast.error(err.message || "Erro ao enviar formulário");
+      if (err instanceof Error)
+        toast.error(err.message || "Erro ao enviar formulário");
       else toast.error("Erro ao enviar formulário");
     }
   };

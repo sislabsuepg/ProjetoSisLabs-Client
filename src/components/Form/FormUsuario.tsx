@@ -77,7 +77,13 @@ export default function FormUsuario() {
       return;
     }
 
-    setForm((f) => ({ ...f, [name]: value } as Pick<FormUsuarioState, keyof FormUsuarioState>));
+    setForm(
+      (f) =>
+        ({ ...f, [name]: value } as Pick<
+          FormUsuarioState,
+          keyof FormUsuarioState
+        >)
+    );
   };
   const isFormValid =
     form.idPermissao > 0 &&
