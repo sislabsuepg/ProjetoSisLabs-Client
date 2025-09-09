@@ -95,8 +95,8 @@ export default function FormUsuario() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiOnline.get<IPermissao[]>("/permissao");
-        setPermissoes(response ?? []);
+        const response = await apiOnline.get("/permissao?ativo=true");
+        setPermissoes((response as { data: IPermissao[] }).data ?? []);
       } catch (error: unknown) {
         console.error(error);
         toast.error("Erro ao buscar permissões");
