@@ -117,6 +117,9 @@ function EditUserModal<T extends object>({
       case "relatorio":
       case "advertencia":
         return "switch";
+      case "anocurso":
+      case "anosmaximo":
+        return "number";
       default:
         return "text";
     }
@@ -133,7 +136,7 @@ function EditUserModal<T extends object>({
       console.log("formatDateForInput - convertido de dd/MM/yyyy:", formatted);
       return formatted;
     }
-    if(val.includes("T")){
+    if (val.includes("T")) {
       const formatted = val.split("T")[0]; // extrai só a parte da data
       console.log("formatDateForInput - extraído de ISO:", formatted);
       return formatted;
@@ -188,6 +191,47 @@ function EditUserModal<T extends object>({
               return null; // Não renderiza campos que contenham "id"
             }
 
+            if (getInputType(key) === "number") {
+              return (
+                <input
+                  className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
+                  key={key}
+                  type="number"
+                  placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                  value={(value as number) ?? 0}
+                  onChange={(e) => {
+                    if (key === "anoCurso") {
+                      let newValue = parseInt(e.target.value);
+                      const curso = (formData as Record<string, unknown>)[
+                        "curso"
+                      ];
+                      if (
+                        curso &&
+                        typeof curso === "object" &&
+                        "anosMaximo" in curso &&
+                        typeof (curso as { anosMaximo?: unknown })
+                          .anosMaximo === "number"
+                      ) {
+                        const anosMaximo = (curso as { anosMaximo: number })
+                          .anosMaximo;
+                        if (newValue > anosMaximo) {
+                          newValue = anosMaximo;
+                        }
+                      }
+                      console.log(curso);
+                      onChange(key as keyof T, newValue as T[keyof T]);
+                    }
+                    if (key === "anosMaximo") {
+                      let newValue = parseInt(e.target.value);
+                      if (newValue < 1) newValue = 1;
+                      if (newValue > 8) newValue = 8;
+                      onChange(key as keyof T, newValue as T[keyof T]);
+                    }
+                  }}
+                />
+              );
+            }
+
             if (getInputType(key) === "disabledtext") {
               return (
                 <input
@@ -236,14 +280,20 @@ function EditUserModal<T extends object>({
                         selected as unknown as T[keyof T]
                       );
                       // Sempre atualizar o idPermissao quando mudar a permissão
-                      onChange("idPermissao" as keyof T, id as unknown as T[keyof T]);
+                      onChange(
+                        "idPermissao" as keyof T,
+                        id as unknown as T[keyof T]
+                      );
                     } else if (key === "idPermissao") {
                       // Se estamos atualizando diretamente o idPermissao
                       console.log(`Atualizando idPermissao diretamente:`, id);
                       onChange(key as keyof T, id as unknown as T[keyof T]);
                       // Também atualizar o objeto permissaoUsuario se ele existir
                       if ("permissaoUsuario" in formData) {
-                        onChange("permissaoUsuario" as keyof T, selected as unknown as T[keyof T]);
+                        onChange(
+                          "permissaoUsuario" as keyof T,
+                          selected as unknown as T[keyof T]
+                        );
                       }
                     } else {
                       // caso o campo seja apenas outro select qualquer
@@ -298,7 +348,9 @@ function EditUserModal<T extends object>({
             return (
               <input
                 key={key}
-                type={getInputType(key) === "phone" ? "text" : getInputType(key)}
+                type={
+                  getInputType(key) === "phone" ? "text" : getInputType(key)
+                }
                 placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
                 value={
                   getInputType(key) === "date"
@@ -309,16 +361,22 @@ function EditUserModal<T extends object>({
                 }
                 onChange={(e) => {
                   let newValue = e.target.value;
-                  
+
                   // Para campos de telefone, remover a máscara antes de salvar
                   if (getInputType(key) === "phone") {
                     newValue = removeMaskPhone(e.target.value);
                   } else if (getInputType(key) === "date") {
-                    console.log(`Campo de data ${key} - valor original:`, e.target.value);
+                    console.log(
+                      `Campo de data ${key} - valor original:`,
+                      e.target.value
+                    );
                     newValue = formatDateForSave(e.target.value);
-                    console.log(`Campo de data ${key} - valor formatado:`, newValue);
+                    console.log(
+                      `Campo de data ${key} - valor formatado:`,
+                      newValue
+                    );
                   }
-                  
+
                   onChange(key as keyof T, newValue as T[keyof T]);
                 }}
                 className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"

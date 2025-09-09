@@ -11,6 +11,7 @@ import ListProfessor from "@/components/Lists/ListProfessor";
 import ListCurso from "@/components/Lists/ListCurso";
 import ListPermissao from "@/components/Lists/ListPermissao";
 import ListUsuario from "@/components/Lists/ListUsuario";
+import * as Yup from "yup";
 import {
   FormAcademico,
   FormCurso,
@@ -21,6 +22,15 @@ import {
   FormUsuario,
   IData,
 } from "@/components/Lists/types";
+import {
+  edicao_academico,
+  edicao_curso,
+  edicao_laboratorio,
+  edicao_orientacao,
+  edicao_permissao,
+  edicao_professor,
+  edicao_usuario,
+} from "@/schemas";
 import Pagination from "@/components/Pagination";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -29,6 +39,7 @@ import { CircularProgress } from "@mui/material";
 export default function Alterar() {
   const [activeId, setActiveId] = useState(1);
   const [filtro, setFiltro] = useState("");
+  const [Inativo, setInativo] = useState(false);
   const [openExcluir, setOpenExcluir] = useState({ status: false, id: 0 });
   const [openEditUser, setOpenEditUser] = useState({ status: false, id: 0 });
   const [currentItems, setCurrentItems] = useState<IData[]>([]);
@@ -64,7 +75,25 @@ export default function Alterar() {
     7: "usuario",
   };
 
-  
+  function getValidator(id: number) {
+    switch (id) {
+      case 1:
+        return edicao_academico;
+      case 2:
+        return edicao_professor;
+      case 3:
+        return edicao_laboratorio;
+      case 4:
+        return edicao_orientacao;
+      case 5:
+        return edicao_curso;
+      case 6:
+        return edicao_permissao;
+      case 7:
+        return edicao_usuario;
+    }
+  }
+
   const handleSaveEditUser = async () => {
     const id = openEditUser.id;
     if (id === 0) return;
@@ -75,48 +104,68 @@ export default function Alterar() {
       return;
     }
 
-    const updatedItem = currentItems.find((item) => item.id === id);
-    if (!updatedItem) {
-      toast.error(`${listButtons.find((btn) => btn.id === activeId)?.title} não encontrado.`);
+    const validator = getValidator(activeId);
+    try {
+      await validator.validate(formData);
+    } catch (error) {
+      console.error("Erro de validação:", error);
+      if (error instanceof Yup.ValidationError) {
+        error.errors.forEach((e) => toast.error(e));
+      } else {
+        toast.error("Erro ao validar os dados. Tente novamente.");
+      }
       return;
     }
-    
+
+    const updatedItem = currentItems.find((item) => item.id === id);
+    if (!updatedItem) {
+      toast.error(
+        `${
+          listButtons.find((btn) => btn.id === activeId)?.title
+        } não encontrado.`
+      );
+      return;
+    }
+
     // Preparar dados para envio - garantir que idPermissao está correto e telefone sem máscara
     let dataToSend = { ...formData };
-    
+
     // Se estivermos editando um usuário e há permissaoUsuario definido, garantir que idPermissao está correto
-    if (activeId === 7 && "permissaoUsuario" in formData && formData.permissaoUsuario) {
+    if (
+      activeId === 7 &&
+      "permissaoUsuario" in formData &&
+      formData.permissaoUsuario
+    ) {
       const permissao = formData.permissaoUsuario as any;
       if (permissao.id) {
         dataToSend = { ...dataToSend, idPermissao: permissao.id };
       }
     }
-    
+
     // Se estivermos editando um acadêmico e há telefone, garantir que seja enviado sem máscara
     if (activeId === 1 && "telefone" in formData && formData.telefone) {
       // O telefone já deve estar sem máscara pois é tratado no EditUserModal
       // mas vamos garantir removendo qualquer máscara restante
       const telefone = formData.telefone as string;
-      dataToSend = { ...dataToSend, telefone: telefone.replace(/\D/g, '') };
+      dataToSend = { ...dataToSend, telefone: telefone.replace(/\D/g, "") };
     }
-    
+
     // Log para debug: verificar os dados que estão sendo enviados
     console.log("Dados sendo enviados para o backend:", dataToSend);
     console.log("Rota:", `/${mapRoutes[activeId]}/${id}`);
-    
-    try{
+
+    try {
       await apiOnline.put(`/${mapRoutes[activeId]}/${id}`, dataToSend);
-    }catch(err){
+    } catch (err) {
       const error = err as any;
       console.error("Erro ao atualizar no backend:", error);
-      if(error.response?.data?.erros){
+      if (error.response?.data?.erros) {
         error.response.data.erros.forEach((e: string) => toast.error(e));
-      }else{
+      } else {
         toast.error("Erro ao atualizar os dados. Tente novamente.");
       }
       return;
     }
-
 
     setCurrentItems((prev) =>
       prev.map((item) => {
@@ -188,11 +237,13 @@ export default function Alterar() {
       case 1:
         try {
           const countResponse = await apiOnline.get<{ count: number }>(
-          "/aluno/count"
+            "/aluno/count"
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(`/aluno?page=${currentPage}&items=${itemsPerPage}`);
+          const response = await apiOnline.get(
+            `/aluno?page=${currentPage}&items=${itemsPerPage}`
+          );
           return response.data as FormAcademico[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -206,7 +257,9 @@ export default function Alterar() {
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(`/professor?page=${currentPage}&items=${itemsPerPage}`);
+          const response = await apiOnline.get(
+            `/professor?page=${currentPage}&items=${itemsPerPage}`
+          );
           return response.data as FormProfessor[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -219,21 +272,24 @@ export default function Alterar() {
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(`/laboratorio?page=${currentPage}&items=${itemsPerPage}`);
+          const response = await apiOnline.get(
+            `/laboratorio?page=${currentPage}&items=${itemsPerPage}`
+          );
           return response.data as FormLaboratorio[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
         }
       case 4:
-
         try {
           const countResponse = await apiOnline.get<{ count: number }>(
             "/orientacao/count"
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(`/orientacao?page=${currentPage}&items=${itemsPerPage}`);
+          const response = await apiOnline.get(
+            `/orientacao?page=${currentPage}&items=${itemsPerPage}`
+          );
           return response.data as FormOrientacao[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -246,7 +302,9 @@ export default function Alterar() {
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(`/curso?page=${currentPage}&items=${itemsPerPage}`);
+          const response = await apiOnline.get(
+            `/curso?page=${currentPage}&items=${itemsPerPage}`
+          );
           return response.data as FormCurso[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -259,7 +317,9 @@ export default function Alterar() {
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(`/permissao?page=${currentPage}&items=${itemsPerPage}`);
+          const response = await apiOnline.get(
+            `/permissao?page=${currentPage}&items=${itemsPerPage}`
+          );
           return response.data as FormPermissao[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -272,7 +332,9 @@ export default function Alterar() {
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(`/usuario?page=${currentPage}&items=${itemsPerPage}`);
+          const response = await apiOnline.get(
+            `/usuario?page=${currentPage}&items=${itemsPerPage}`
+          );
           return response.data as FormUsuario[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -295,7 +357,7 @@ export default function Alterar() {
   }, [activeId]);
 
   useEffect(() => {
-setLoading(true);
+    setLoading(true);
     getDados(activeId).then((data) => setCurrentItems(data));
     setFormData(formMap[activeId]);
     setLoading(false);
@@ -339,6 +401,16 @@ setLoading(true);
         </p>
 
         <div className="flex items-center justify-end gap-2 w-full max-w-[500px]">
+          <span className="font-normal text-[0.9rem] text-theme-text whitespace-nowrap mr-2">
+            Mostrar Inativo:
+          </span>
+          <input
+            type="checkbox"
+            className="w-4 h-4 accent-theme-blue"
+            checked={Inativo}
+            onChange={() => setInativo(!Inativo)}
+          />
+
           <input
             placeholder={placeholderMap[activeId]}
             type="text"
@@ -437,27 +509,38 @@ setLoading(true);
         open={openExcluir.status}
         onClose={() => setOpenExcluir({ status: false, id: 0 })}
         title="Atenção"
-        message={`Deseja, realmente, desativar esta(e) ${listButtons.find((btn) => btn.id === activeId)?.title || ""}?`}
+        message={`Deseja, realmente, desativar esta(e) ${
+          listButtons.find((btn) => btn.id === activeId)?.title || ""
+        }?`}
         onCancel={() => setOpenExcluir({ status: false, id: 0 })}
         onConfirm={() => {
           async function desativar() {
-            if(openExcluir.id === 0) return;
-            try{
-              await apiOnline.delete(`/${mapRoutes[activeId]}/${openExcluir.id}`);
-            }catch(err){
+            if (openExcluir.id === 0) return;
+            try {
+              await apiOnline.delete(
+                `/${mapRoutes[activeId]}/${openExcluir.id}`
+              );
+            } catch (err) {
               const error = err as any;
               console.error("Erro ao desativar no backend:", error);
             }
 
-          setCurrentItems((prev) =>
-            prev.filter((el) => el.id !== openExcluir.id)
-          );
-          setOpenExcluir({ status: false, id: 0 });
-          toast.success(`${listButtons.find((btn) => btn.id === activeId)?.title || ""} desativado com sucesso!`);
-        }
-        desativar();}}
+            setCurrentItems((prev) =>
+              prev.filter((el) => el.id !== openExcluir.id)
+            );
+            setOpenExcluir({ status: false, id: 0 });
+            toast.success(
+              `${
+                listButtons.find((btn) => btn.id === activeId)?.title || ""
+              } desativado com sucesso!`
+            );
+          }
+          desativar();
+        }}
         cancelText="Cancelar"
-        confirmText={`Desativar ${listButtons.find((btn) => btn.id === activeId)?.title || ""}`}
+        confirmText={`Desativar ${
+          listButtons.find((btn) => btn.id === activeId)?.title || ""
+        }`}
       />
 
       <EditUserModal<typeof formData>
@@ -467,10 +550,41 @@ setLoading(true);
         formData={formData}
         onChange={(field, value) =>
           setFormData((prev) => {
-            if(field==="geral" && value===true){
-              return { ...prev, [field]: value, cadastro: true, alteracao: true, advertencia: true, relatorio: true };
+            if (
+              (field as string) === "geral" &&
+              (value as unknown as boolean) === true
+            ) {
+              return {
+                ...prev,
+                [field]: value,
+                cadastro: true,
+                alteracao: true,
+                advertencia: true,
+                relatorio: true,
+              };
             }
-            
+            if ((field as string) === "dataInicio") {
+              const date = new Date(value as unknown as string);
+              const dateFim = new Date(prev.dataFim as unknown as string);
+              if (dateFim < date) {
+                toast.error(
+                  "Data de início não pode ser maior que a data de fim."
+                );
+                return prev;
+              }
+              return { ...prev, [field]: date.toISOString() };
+            }
+            if ((field as string) === "dataFim") {
+              const date = new Date(value as unknown as string);
+              const dateInicio = new Date(prev.dataInicio as unknown as string);
+              if (date < dateInicio) {
+                toast.error(
+                  "Data de fim não pode ser menor que a data de início."
+                );
+                return prev;
+              }
+              return { ...prev, [field]: date.toISOString() };
+            }
             return { ...prev, [field]: value };
           })
         }

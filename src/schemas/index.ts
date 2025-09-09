@@ -146,3 +146,118 @@ export const cadastro_usuario = Yup.object().shape(
       .min(1, 'O campo "Permissão" deve ser um número válido'),
   })
 );
+
+// FUNÇÕES DE VALIDAÇÃO DE FORMULÁRIOS DE EDIÇÃO
+export const edicao_academico = Yup.object().shape(
+  createNewSchema({
+    nome: Yup.string()
+      .required('O campo "Nome" é obrigatório')
+      .max(40, 'O campo "Nome" deve ter no máximo 40 caracteres')
+      .matches(fullNameRegex, 'O campo "Nome" deve conter nome e sobrenome'),
+
+    email: Yup.string()
+      .optional()
+      .max(40, "O campo 'E-mail' deve ter no máximo 40 caracteres")
+      .email("E-mail inválido"),
+
+    telefone: Yup.string()
+      .optional()
+      .test("O telefone deve ter no mínimo 11 dígitos", (value) => {
+        if (!value || value.trim() === "") return true;
+        return value.length >= 11;
+      }),
+    idCurso: Yup.number()
+      .required('O campo "Curso" é obrigatório')
+      .min(1, 'O campo "Curso" deve ser um número válido'),
+
+    anoCurso: Yup.number()
+      .required('O campo "Ano/Série" é obrigatório')
+      .min(1, 'O campo "Ano/Série" deve ser um número válido'),
+  })
+);
+
+export const edicao_laboratorio = Yup.object().shape(
+  createNewSchema({
+    nome: Yup.string()
+      .max(60, 'O campo "Nome" deve ter no máximo 60 caracteres')
+      .required('O campo "Nome" é obrigatório'),
+    numero: Yup.string()
+      .max(8, 'O campo "Número" deve ter no máximo 8 caracteres')
+      .required('O campo "Número" é obrigatório'),
+  })
+);
+
+export const edicao_permissao = Yup.object().shape(
+  createNewSchema({
+    nomePermissao: Yup.string().required(
+      'O campo "Nome da permissão" é obrigatório'
+    ),
+  })
+);
+
+export const edicao_professor = Yup.object().shape(
+  createNewSchema({
+    nome: Yup.string()
+      .max(40, 'O campo "Nome" deve ter no máximo 40 caracteres')
+      .required('O campo "Nome" é obrigatório')
+      .matches(fullNameRegex, 'O campo "Nome" deve conter nome e sobrenome'),
+    email: Yup.string()
+      .max(40, "O campo 'E-mail' deve ter no máximo 40 caracteres")
+      .email("E-mail inválido")
+      .required('O campo "E-mail" é obrigatório'),
+  })
+);
+
+export const edicao_orientacao = Yup.object().shape({
+  dataInicio: Yup.string()
+    .test("Data de início deve ser uma data válida", (value) => {
+      const date = new Date(String(value));
+      return !isNaN(date.getTime());
+    })
+    .test(
+      "data-inicio",
+      "Data de inicio deve ser anterior a data de fim",
+      (value, context) => {
+        const dataInicio = new Date(String(value));
+        const dataFim = new Date(String(context.parent.dataFim));
+        return dataInicio < dataFim;
+      }
+    )
+    .required('O campo "Data de início" é obrigatório'),
+  dataFim: Yup.string()
+    .test("data-fim", "Data final deve ser uma data válida", (value) => {
+      const date = new Date(String(value));
+      return !isNaN(date.getTime());
+    })
+    .required('O campo "Data final" é obrigatório'),
+});
+
+export const edicao_curso = Yup.object().shape(
+  createNewSchema({
+    nome: Yup.string()
+      .max(35, 'O campo "Nome do curso" deve ter no máximo 35 caracteres')
+      .required('O campo "Nome do curso" é obrigatório'),
+    anosMaximo: Yup.number()
+      .required('O campo "Quantos anos tem o curso?" é obrigatório')
+      .min(
+        1,
+        'O campo "Quantos anos tem o curso?" deve ser um número maior que 0'
+      )
+      .max(
+        8,
+        'O campo "Quantos anos tem o curso?" deve ser um número menor que 9'
+      ),
+  })
+);
+
+export const edicao_usuario = Yup.object().shape(
+  createNewSchema({
+    nome: Yup.string()
+      .max(40, 'O campo "Nome" deve ter no máximo 40 caracteres')
+      .required('O campo "Nome" é obrigatório')
+      .matches(fullNameRegex, 'O campo "Nome" deve conter nome e sobrenome'),
+    idPermissao: Yup.number()
+      .required('O campo "Permissão" é obrigatório')
+      .min(1, 'O campo "Permissão" deve ser um número válido'),
+  })
+);
