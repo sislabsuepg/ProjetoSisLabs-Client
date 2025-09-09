@@ -5,13 +5,17 @@ import { ApiResponse, IEmprestimo } from "@/interfaces/interfaces";
 import { useEffect, useState } from "react";
 //import { useCookies } from "react-cookie";
 import { apiOnline } from "@/services/services";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Popover } from "@mui/material";
+import { Cancel } from "@mui/icons-material";
+import CustomModal from "@/components/CustomModal";
 
 export default function Inicio() {
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [update, setUpdate] = useState(false);
+  const [openEncerrar, setOpenEncerrar] = useState<{ status: boolean; id: number }>({ status: false, id: 0 });
   //const [cookies] = useCookies(["usuario"]);
   const [data, setData] = useState<IEmprestimo[]>([]);
   useEffect(() => {
@@ -36,7 +40,7 @@ export default function Inicio() {
       }
     }
     fetchData();
-  }, [currentPage]);
+  }, [currentPage, update]);
 
   if (loading) {
     return (
@@ -73,7 +77,7 @@ export default function Inicio() {
                     <span className="font-semibold">{item?.aluno?.nome || "-"}</span> -{" "}
                     {item?.dataHoraEntrada
                       ? new Date(item.dataHoraEntrada).toLocaleString()
-                      : ""}
+                      : ""}<Cancel className="text-theme-red" sx={{ width: 22, height: 22 }}/>
                   </>
                 ) : (
                   <>
@@ -88,7 +92,9 @@ export default function Inicio() {
                     - :{" "}
                     {item?.dataHoraEntrada
                       ? new Date(item.dataHoraEntrada).toLocaleString()
-                      : ""}
+                      : ""}<Cancel className="text-theme-red ml-2" sx={{ width: 22, height: 22 }} onClick={
+                        () => setOpenEncerrar({ status: true, id: item.id })
+                      }/>
                   </>
                 )}
               </p>
@@ -101,6 +107,26 @@ export default function Inicio() {
             </p>
           </div>
         )}
+
+        <CustomModal
+          open={openEncerrar.status}
+          onClose={() => setOpenEncerrar({ status: false, id: 0 })}
+          title="Encerrar Uso do Laboratório"
+          message={`Tem certeza que deseja encerrar o emprestimo para ${data.find(item => item.id === openEncerrar.id)?.aluno.nome} no laboratório ${data.find(item => item.id === openEncerrar.id)?.laboratorio.nome}?`}
+          onConfirm={async () => {
+            try{
+              await apiOnline.put(`/emprestimo/close/${openEncerrar.id}`, {idUsuario: 1})
+              setData(data.filter(item => item.id !== openEncerrar.id));
+              setOpenEncerrar({ status: false, id: 0 });
+            }catch(e){
+              console.error(e);
+              setOpenEncerrar({ status: false, id: 0 });
+            }finally{
+              setUpdate(!update);
+            }
+          }}
+          onCancel={() => setOpenEncerrar({ status: false, id: 0 })}
+        />
 
         <Pagination
           currentPage={currentPage}
