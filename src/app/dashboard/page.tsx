@@ -70,7 +70,7 @@ export default function Inicio() {
                     </span>{" "}
                     - Chave do Laboratório {item?.laboratorio.nome} foi
                     emprestado pelo(a) aluno(a){" "}
-                    <span className="font-semibold">{item?.aluno.nome}</span> -{" "}
+                    <span className="font-semibold">{item?.aluno?.nome || "-"}</span> -{" "}
                     {item?.dataHoraEntrada
                       ? new Date(item.dataHoraEntrada).toLocaleString()
                       : ""}
@@ -83,7 +83,7 @@ export default function Inicio() {
                     </span>{" "}
                     foi aberto pelo(a) aluno(a){" "}
                     <span className="font-semibold">
-                      {item?.aluno.nome} para pesquisa
+                      {item?.aluno?.nome || "-"} para pesquisa
                     </span>{" "}
                     - :{" "}
                     {item?.dataHoraEntrada

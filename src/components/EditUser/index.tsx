@@ -187,7 +187,7 @@ function EditUserModal<T extends object>({
           {Object.keys(formData).map((key) => {
             const value = formData[key as keyof T];
 
-            if (key.toLowerCase().includes("id")) {
+            if (key.toLowerCase().includes("id") || key === "ativo") {
               return null; // Não renderiza campos que contenham "id"
             }
 

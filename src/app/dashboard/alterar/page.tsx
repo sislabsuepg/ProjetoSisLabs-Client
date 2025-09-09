@@ -44,6 +44,7 @@ export default function Alterar() {
   const [Inativo, setInativo] = useState(false);
   const [openExcluir, setOpenExcluir] = useState({ status: false, id: 0 });
   const [openEditUser, setOpenEditUser] = useState({ status: false, id: 0 });
+  const [openAtivar, setOpenAtivar] = useState({ status: false, id: 0 });
   const [currentItems, setCurrentItems] = useState<IData[]>([]);
   const [formData, setFormData] = useState<IData>(formMap[activeId]);
   const itemsPerPage = 10;
@@ -240,14 +241,32 @@ export default function Alterar() {
     switch (id) {
       case 1:
         try {
+          let filtroTemp = filtro.trim();
+          if (
+            (/[0-9]+/.test(filtroTemp) && /[a-zA-Z]+/.test(filtroTemp)) ||
+            (!/[0-9]+/.test(filtroTemp) && !/[a-zA-Z]+/.test(filtroTemp))
+          ) {
+            filtroTemp = "";
+          }
+          if (/[0-9]+/.test(filtroTemp) && !/[a-zA-Z]+/.test(filtroTemp)) {
+            filtroTemp = `ra=${filtroTemp}`;
+          }
+          if (!/[0-9]+/.test(filtroTemp) && /[a-zA-Z]+/.test(filtroTemp)) {
+            filtroTemp = `nome=${filtroTemp}`;
+          }
           const countResponse = await apiOnline.get<{ count: number }>(
-            "/aluno/count"
+            `/aluno/count?ativo=${Inativo == true ? "false" : "true"}`
           );
           const count = countResponse?.count ?? 0;
-          setTotalPages(Math.ceil(count / itemsPerPage));
+          const pages = Math.ceil(count / itemsPerPage);
+          setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/aluno?page=${currentPage}&items=${itemsPerPage}`
+            `/aluno?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"}${filtroTemp ? `&${filtroTemp}` : ""
+            }`
           );
+          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
+            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          }
           return response.data as unknown as FormAcademico[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -257,13 +276,17 @@ export default function Alterar() {
       case 2:
         try {
           const countResponse = await apiOnline.get<{ count: number }>(
-            "/professor/count"
+            `/professor/count?ativo=${Inativo == true ? "false" : "true"}`
           );
           const count = countResponse?.count ?? 0;
-          setTotalPages(Math.ceil(count / itemsPerPage));
+          const pages = Math.ceil(count / itemsPerPage);
+          setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/professor?page=${currentPage}&items=${itemsPerPage}`
+            `/professor?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"}${filtro ? `&nome=${filtro}` : ""}`
           );
+          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
+            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          }
           return response.data as unknown as FormProfessor[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -272,13 +295,17 @@ export default function Alterar() {
       case 3:
         try {
           const countResponse = await apiOnline.get<{ count: number }>(
-            "/laboratorio/count"
+            `/laboratorio/count?ativo=${Inativo == true ? "false" : "true"}`
           );
           const count = countResponse?.count ?? 0;
-          setTotalPages(Math.ceil(count / itemsPerPage));
+          const pages = Math.ceil(count / itemsPerPage);
+          setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/laboratorio?page=${currentPage}&items=${itemsPerPage}`
+            `/laboratorio?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"}${filtro ? `&nome=${filtro}` : ""}`
           );
+          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
+            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          }
           return response.data as unknown as FormLaboratorio[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -287,13 +314,17 @@ export default function Alterar() {
       case 4:
         try {
           const countResponse = await apiOnline.get<{ count: number }>(
-            "/orientacao/count"
+            `/orientacao/count?ativo=${Inativo == true ? "false" : "true"}`
           );
           const count = countResponse?.count ?? 0;
-          setTotalPages(Math.ceil(count / itemsPerPage));
+          const pages = Math.ceil(count / itemsPerPage);
+          setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/orientacao?page=${currentPage}&items=${itemsPerPage}`
+            `/orientacao?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo == true ? "false" : "true"}${filtro ? `&nome=${filtro}` : ""}`
           );
+          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
+            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          }
           return response.data as unknown as FormOrientacao[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -302,13 +333,17 @@ export default function Alterar() {
       case 5:
         try {
           const countResponse = await apiOnline.get<{ count: number }>(
-            "/curso/count"
+            `/curso/count?ativo=${Inativo == true ? "false" : "true"}`
           );
           const count = countResponse?.count ?? 0;
+          const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(Math.ceil(count / itemsPerPage));
           const response: ApiResponse = await apiOnline.get(
-            `/curso?page=${currentPage}&items=${itemsPerPage}`
+            `/curso?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"}${filtro ? `&nome=${filtro}` : ""}`
           );
+          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
+            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          }
           return response.data as unknown as FormCurso[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -317,13 +352,17 @@ export default function Alterar() {
       case 6:
         try {
           const countResponse = await apiOnline.get<{ count: number }>(
-            "/permissao/count"
+            `/permissao/count?ativo=${Inativo == true ? "false" : "true"}`
           );
           const count = countResponse?.count ?? 0;
-          setTotalPages(Math.ceil(count / itemsPerPage));
+          const pages = Math.ceil(count / itemsPerPage);
+          setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/permissao?page=${currentPage}&items=${itemsPerPage}`
+            `/permissao?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"}${filtro ? `&nome=${filtro}` : ""}`
           );
+          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
+            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          }
           return response.data as unknown as FormPermissao[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -332,13 +371,17 @@ export default function Alterar() {
       case 7:
         try {
           const countResponse = await apiOnline.get<{ count: number }>(
-            "/usuario/count"
+            `/usuario/count?ativo=${Inativo == true ? "false" : "true"}`
           );
           const count = countResponse?.count ?? 0;
-          setTotalPages(Math.ceil(count / itemsPerPage));
+          const pages = Math.ceil(count / itemsPerPage);
+          setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/usuario?page=${currentPage}&items=${itemsPerPage}`
+            `/usuario?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"}${filtro ? `&nome=${filtro}` : ""  }`
           );
+          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
+            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          }
           return response.data as unknown as FormUsuario[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
@@ -354,7 +397,7 @@ export default function Alterar() {
     setCurrentPage(1);
     setFormData(formMap[activeId]);
     setLoading(false);
-  }, [activeId]);
+  }, [activeId, Inativo, filtro]);
 
   useEffect(() => {
     setFormData(formMap[activeId]);
@@ -444,6 +487,7 @@ export default function Alterar() {
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
+            setOpenAtivar={setOpenAtivar}
           />
         )}
         {activeId === 2 && (
@@ -453,6 +497,7 @@ export default function Alterar() {
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
+            setOpenAtivar={setOpenAtivar}
           />
         )}
         {activeId === 3 && (
@@ -462,6 +507,7 @@ export default function Alterar() {
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
+            setOpenAtivar={setOpenAtivar}
           />
         )}
         {activeId === 4 && (
@@ -480,6 +526,7 @@ export default function Alterar() {
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
+            setOpenAtivar={setOpenAtivar}
           />
         )}
         {activeId === 6 && (
@@ -489,6 +536,7 @@ export default function Alterar() {
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
+            setOpenAtivar={setOpenAtivar}
           />
         )}
         {activeId === 7 && (
@@ -498,6 +546,7 @@ export default function Alterar() {
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
+            setOpenAtivar={setOpenAtivar}
           />
         )}
         {getCurrentList()?.length > 0 && (
@@ -508,6 +557,46 @@ export default function Alterar() {
           />
         )}
       </div>
+
+      <CustomModal
+        open={openAtivar.status}
+        onClose={() => setOpenAtivar({ status: false, id: 0 })}
+        title="Atenção"
+        message={`Deseja, realmente, ativar esta(e) ${
+          listButtons.find((btn) => btn.id === activeId)?.title || ""
+        }?`}
+        onCancel={() => setOpenAtivar({ status: false, id: 0 })}
+        onConfirm={() => {
+          async function ativar() {
+            if (openAtivar.id === 0) return;
+            try {
+              await apiOnline.put(
+                `/${mapRoutes[activeId]}/${openAtivar.id}`,
+                { ativo: true }
+              );
+              currentItems.filter((el) => el.id !== openAtivar.id);
+            } catch (err) {
+              const error = (err as AxiosError).response?.data as ApiResponse;
+              console.error("Erro ao ativar no backend:", error);
+            }
+
+            setCurrentItems((prev) =>
+              prev.filter((el) => el.id !== openAtivar.id)
+            );
+            setOpenAtivar({ status: false, id: 0 });
+            toast.success(
+              `${
+                listButtons.find((btn) => btn.id === activeId)?.title || ""
+              } ativado com sucesso!`
+            );
+          }
+          ativar();
+        }}
+        cancelText="Cancelar"
+        confirmText={`Ativar ${
+          listButtons.find((btn) => btn.id === activeId)?.title || ""
+        }`}
+      />
 
       <CustomModal
         open={openExcluir.status}
@@ -527,7 +616,7 @@ export default function Alterar() {
               currentItems.filter((el) => el.id !== openExcluir.id);
             } catch (err) {
               const error = (err as AxiosError).response?.data as ApiResponse;
-              console.error("Erro ao desativar no backend:", error);
+              console.error("Erro ao desativar:", error);
             }
 
             setCurrentItems((prev) =>

@@ -7,12 +7,14 @@ export interface FormAcademico {
   idCurso: number;
   anoCurso: number;
   curso?: FormCurso; 
+  ativo?: boolean;
 }
 
 export interface FormProfessor {
   id: number;
   nome: string;
   email: string;
+  ativo?: boolean;
 }
 
 export interface FormLaboratorio {
@@ -20,6 +22,7 @@ export interface FormLaboratorio {
   nome: string;
   numero: string;
   restrito: boolean;
+  ativo?: boolean;
 }
 
 export interface FormOrientacao {
@@ -38,6 +41,7 @@ export interface FormCurso {
   id: number;
   nome: string;
   anosMaximo: number;
+  ativo?: boolean;
 }
 
 export interface FormPermissao {
@@ -48,6 +52,7 @@ export interface FormPermissao {
   alteracao?: boolean;
   relatorio?: boolean;
   advertencia?: boolean;
+  ativo?: boolean;
 }
 
 export interface FormUsuario {

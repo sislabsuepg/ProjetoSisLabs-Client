@@ -5,6 +5,7 @@ import BorderColorIcon from '@mui/icons-material/BorderColor';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import { FormAcademico } from './types';
 import {maskPhone} from '@/utils/maskPhone';
+import { PersonAdd } from '@mui/icons-material';
 
 interface Props {
   list: FormAcademico[];
@@ -12,6 +13,7 @@ interface Props {
   setFormData: (data: FormAcademico) => void;
   setOpenEditUser: (state: { status: boolean; id: number }) => void;
   setOpenExcluir: (state: { status: boolean; id: number }) => void;
+  setOpenAtivar: (state: { status: boolean; id: number }) => void;
 }
 
 export default function ListAcademico({
@@ -20,6 +22,7 @@ export default function ListAcademico({
   setFormData,
   setOpenEditUser,
   setOpenExcluir,
+  setOpenAtivar,
 }: Props) {
 
   return (
@@ -93,18 +96,33 @@ export default function ListAcademico({
                         />
                       </button>
                     </Popover>
-                    <Popover title="Desativar">
-                      <button
-                        onClick={() =>
-                          setOpenExcluir({ status: true, id: item.id })
-                        }
-                      >
+                    {item.ativo ? (
+                      <Popover title="Desativar">
+                        <button
+                          onClick={() =>
+                            setOpenExcluir({ status: true, id: item.id })
+                          }
+                        >
                         <PersonRemoveIcon
                           className="text-theme-blue"
                           sx={{ width: 22, height: 22 }}
                         />
                       </button>
                     </Popover>
+                    ):(
+                      <Popover title="Ativar">
+                        <button
+                          onClick={() =>
+                            setOpenAtivar({ status: true, id: item.id })
+                          }
+                        >
+                        <PersonAdd
+                          className="text-theme-blue"
+                          sx={{ width: 22, height: 22 }}
+                        />
+                      </button>
+                    </Popover>
+                    )}
                   </td>
                 </tr>
               ))

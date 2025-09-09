@@ -88,7 +88,7 @@ export default function FormOrientacao() {
     const fetchData = async () => {
       try {
         const [professoresResponse, laboratoriosResponse] = await Promise.all([
-          apiOnline.get<IProfessor[]>("/professor"),
+          apiOnline.get<IProfessor[]>("/professor?ativo=true"),
           apiOnline.get<ILaboratorio[]>("/laboratorio?restrito=true"),
         ]);
         setProfessores(professoresResponse ?? []);

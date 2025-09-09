@@ -4,6 +4,7 @@ import Popover from '@/components/Popover';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import { FormCurso } from './types';
+import { PersonAdd } from '@mui/icons-material';
 
 interface Props {
   list: FormCurso[];
@@ -11,6 +12,7 @@ interface Props {
   setFormData: (data: FormCurso) => void;
   setOpenEditUser: (state: { status: boolean; id: number }) => void;
   setOpenExcluir: (state: { status: boolean; id: number }) => void;
+  setOpenAtivar: (state: { status: boolean; id: number }) => void;
 }
 
 export default function ListCurso({
@@ -19,6 +21,7 @@ export default function ListCurso({
   setFormData,
   setOpenEditUser,
   setOpenExcluir,
+  setOpenAtivar,
 }: Props) {
   return (
     <div className="w-full h-full flex flex-col justify-between">
@@ -67,18 +70,33 @@ export default function ListCurso({
                           />
                         </button>
                       </Popover>
-                      <Popover title="Desativar">
-                        <button
-                          onClick={() =>
-                            setOpenExcluir({ status: true, id: item.id })
-                          }
-                        >
+                      {item.ativo ? (
+                        <Popover title="Desativar">
+                          <button
+                            onClick={() =>
+                              setOpenExcluir({ status: true, id: item.id })
+                            }
+                          >
                           <PersonRemoveIcon
                             className="text-theme-blue"
                             sx={{ width: 22, height: 22 }}
                           />
                         </button>
+                      </Popover>):
+                      (
+                        <Popover title="Ativar">
+                          <button
+                            onClick={() =>
+                              setOpenAtivar({ status: true, id: item.id })
+                            }
+                          >
+                          <PersonAdd
+                            className="text-theme-blue"
+                            sx={{ width: 22, height: 22 }}
+                          />
+                        </button>
                       </Popover>
+                      )}
                     </div>
                   </td>
                 </tr>

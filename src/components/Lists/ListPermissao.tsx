@@ -4,6 +4,7 @@ import Popover from '@/components/Popover';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import { FormPermissao } from './types';
+import { PersonAdd } from '@mui/icons-material';
 
 interface Props {
   list: FormPermissao[];
@@ -11,6 +12,7 @@ interface Props {
   setFormData: (data: FormPermissao) => void;
   setOpenEditUser: (state: { status: boolean; id: number }) => void;
   setOpenExcluir: (state: { status: boolean; id: number }) => void;
+  setOpenAtivar: (state: { status: boolean; id: number }) => void;
 }
 
 export default function ListLaboratorio({
@@ -19,6 +21,7 @@ export default function ListLaboratorio({
   setFormData,
   setOpenEditUser,
   setOpenExcluir,
+  setOpenAtivar
 }: Props) {
   return (
     <div className="w-full h-full flex flex-col justify-between">
@@ -99,7 +102,7 @@ export default function ListLaboratorio({
                           />
                         </button>
                       </Popover>
-                      <Popover title="Desativar">
+                      {item.ativo?(<Popover title="Desativar">
                         <button
                           onClick={() =>
                             setOpenExcluir({ status: true, id: item.id })
@@ -110,7 +113,20 @@ export default function ListLaboratorio({
                             sx={{ width: 22, height: 22 }}
                           />
                         </button>
-                      </Popover>
+                      </Popover>):
+                      (<Popover title="Ativar">
+                        <button
+                          onClick={() =>
+                            setOpenAtivar({ status: true, id: item.id })
+                          }
+                        >
+                          <PersonAdd
+                            className="text-theme-blue"
+                            sx={{ width: 22, height: 22 }}
+                          />
+                        </button>
+                      </Popover>)
+                    }
                     </div>
                   </td>
                 </tr>
