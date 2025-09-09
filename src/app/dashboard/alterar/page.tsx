@@ -35,6 +35,8 @@ import Pagination from "@/components/Pagination";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { CircularProgress } from "@mui/material";
+import { ApiResponse, IPermissao } from "@/interfaces/interfaces";
+import { AxiosError } from "axios";
 
 export default function Alterar() {
   const [activeId, setActiveId] = useState(1);
@@ -91,6 +93,8 @@ export default function Alterar() {
         return edicao_permissao;
       case 7:
         return edicao_usuario;
+      default:
+        return Yup.object(); // Retorna um validador vazio por padrão
     }
   }
 
@@ -136,7 +140,7 @@ export default function Alterar() {
       "permissaoUsuario" in formData &&
       formData.permissaoUsuario
     ) {
-      const permissao = formData.permissaoUsuario as any;
+      const permissao = formData.permissaoUsuario as IPermissao;
       if (permissao.id) {
         dataToSend = { ...dataToSend, idPermissao: permissao.id };
       }
@@ -156,11 +160,11 @@ export default function Alterar() {
 
     try {
       await apiOnline.put(`/${mapRoutes[activeId]}/${id}`, dataToSend);
-    } catch (err) {
-      const error = err as any;
+    } catch (err: unknown) {
+      const error = (err as AxiosError).response?.data as ApiResponse;
       console.error("Erro ao atualizar no backend:", error);
-      if (error.response?.data?.erros) {
-        error.response.data.erros.forEach((e: string) => toast.error(e));
+      if (error.erros) {
+        error.erros.forEach((e: string) => toast.error(e));
       } else {
         toast.error("Erro ao atualizar os dados. Tente novamente.");
       }
@@ -241,10 +245,10 @@ export default function Alterar() {
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(
+          const response: ApiResponse = await apiOnline.get(
             `/aluno?page=${currentPage}&items=${itemsPerPage}`
           );
-          return response.data as FormAcademico[];
+          return response.data as unknown as FormAcademico[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -257,10 +261,10 @@ export default function Alterar() {
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(
+          const response: ApiResponse = await apiOnline.get(
             `/professor?page=${currentPage}&items=${itemsPerPage}`
           );
-          return response.data as FormProfessor[];
+          return response.data as unknown as FormProfessor[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -272,10 +276,10 @@ export default function Alterar() {
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(
+          const response: ApiResponse = await apiOnline.get(
             `/laboratorio?page=${currentPage}&items=${itemsPerPage}`
           );
-          return response.data as FormLaboratorio[];
+          return response.data as unknown as FormLaboratorio[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -287,10 +291,10 @@ export default function Alterar() {
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(
+          const response: ApiResponse = await apiOnline.get(
             `/orientacao?page=${currentPage}&items=${itemsPerPage}`
           );
-          return response.data as FormOrientacao[];
+          return response.data as unknown as FormOrientacao[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -302,10 +306,10 @@ export default function Alterar() {
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(
+          const response: ApiResponse = await apiOnline.get(
             `/curso?page=${currentPage}&items=${itemsPerPage}`
           );
-          return response.data as FormCurso[];
+          return response.data as unknown as FormCurso[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -317,10 +321,10 @@ export default function Alterar() {
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(
+          const response: ApiResponse = await apiOnline.get(
             `/permissao?page=${currentPage}&items=${itemsPerPage}`
           );
-          return response.data as FormPermissao[];
+          return response.data as unknown as FormPermissao[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -332,10 +336,10 @@ export default function Alterar() {
           );
           const count = countResponse?.count ?? 0;
           setTotalPages(Math.ceil(count / itemsPerPage));
-          const response = await apiOnline.get(
+          const response: ApiResponse = await apiOnline.get(
             `/usuario?page=${currentPage}&items=${itemsPerPage}`
           );
-          return response.data as FormUsuario[];
+          return response.data as unknown as FormUsuario[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -521,7 +525,7 @@ export default function Alterar() {
                 `/${mapRoutes[activeId]}/${openExcluir.id}`
               );
             } catch (err) {
-              const error = err as any;
+              const error = (err as AxiosError).response?.data as ApiResponse;
               console.error("Erro ao desativar no backend:", error);
             }
 
@@ -565,7 +569,10 @@ export default function Alterar() {
             }
             if ((field as string) === "dataInicio") {
               const date = new Date(value as unknown as string);
-              const dateFim = new Date(prev.dataFim as unknown as string);
+              const dateFim = new Date(
+                (prev as unknown as { dataFim: string })
+                  .dataFim as unknown as string
+              );
               if (dateFim < date) {
                 toast.error(
                   "Data de início não pode ser maior que a data de fim."
@@ -576,7 +583,10 @@ export default function Alterar() {
             }
             if ((field as string) === "dataFim") {
               const date = new Date(value as unknown as string);
-              const dateInicio = new Date(prev.dataInicio as unknown as string);
+              const dateInicio = new Date(
+                (prev as unknown as { dataInicio: string })
+                  .dataInicio as unknown as string
+              );
               if (date < dateInicio) {
                 toast.error(
                   "Data de fim não pode ser menor que a data de início."

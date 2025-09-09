@@ -7,8 +7,9 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { cadastro_orientacao } from "@/schemas";
-import { ILaboratorio, IProfessor } from "@/interfaces/interfaces";
+import { ILaboratorio, IProfessor, IAcademico } from "@/interfaces/interfaces";
 import { apiOnline } from "@/services/services";
+import { AxiosError } from "axios";
 import {
   CircularProgress,
   FormControl,
@@ -18,7 +19,6 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
-import { AxiosError } from "axios";
 
 export default function FormOrientacao() {
   const [form, setForm] = useState<{
@@ -48,15 +48,15 @@ export default function FormOrientacao() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await apiOnline.get(`/aluno?ra=${ra}`);
-      if (!res.data[0]?.id) {
+      const alunos = await apiOnline.get<IAcademico[]>(`/aluno?ra=${ra}`);
+      if (!alunos?.[0]?.id) {
         toast.error("RA não encontrado.");
         return;
       }
 
       const formComAluno = {
         ...form,
-        idAluno: res.data[0].id,
+        idAluno: alunos[0].id,
         dataInicio: form.dataInicio?.toISOString(),
         dataFim: form.dataFim?.toISOString(),
       };
@@ -64,11 +64,16 @@ export default function FormOrientacao() {
       await cadastro_orientacao.validate(formComAluno);
       await apiOnline.post("/orientacao", formComAluno);
       toast.success("Cadastro da orientação realizado com sucesso!");
-    } catch (err: any) {
-      if (err instanceof Yup.ValidationError) toast.error(err.message);
-      else if (err.response?.data?.erros)
-        err.response.data.erros.forEach((e: string) => toast.error(e));
-      else toast.error("Erro inesperado. Tente novamente.");
+    } catch (err: unknown) {
+      if (err instanceof Yup.ValidationError) {
+        toast.error(err.message);
+      } else if (err instanceof AxiosError) {
+        const data = err.response?.data as { erros?: string[] } | undefined;
+        if (data?.erros) data.erros.forEach((e) => toast.error(e));
+        else toast.error("Erro inesperado. Tente novamente.");
+      } else {
+        toast.error("Erro inesperado. Tente novamente.");
+      }
     }
   };
 
@@ -83,15 +88,19 @@ export default function FormOrientacao() {
     const fetchData = async () => {
       try {
         const [professoresResponse, laboratoriosResponse] = await Promise.all([
-          apiOnline.get("/professor").then((res) => res.data),
-          apiOnline.get("/laboratorio?restrito=true").then((res) => {console.log(res);return res.data}),
+          apiOnline.get<IProfessor[]>("/professor"),
+          apiOnline.get<ILaboratorio[]>("/laboratorio?restrito=true"),
         ]);
-        setProfessores(professoresResponse);
-        setLaboratorios(laboratoriosResponse);
-      } catch (err: any) {
-        if (err?.response?.data?.erros?.length > 0) {
-          console.log(err);
-          err.response.data.erros.forEach((e: string) => toast.error(e));
+        setProfessores(professoresResponse ?? []);
+        setLaboratorios(laboratoriosResponse ?? []);
+      } catch (err: unknown) {
+        if (err instanceof AxiosError) {
+          const data = err.response?.data as { erros?: string[] } | undefined;
+          if (data?.erros && data.erros.length > 0) {
+            data.erros.forEach((e) => toast.error(e));
+          } else {
+            toast.error("Erro ao buscar dados. Tente novamente.");
+          }
         } else {
           toast.error("Erro ao buscar dados. Tente novamente.");
         }
@@ -113,7 +122,7 @@ export default function FormOrientacao() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-       📝 Cadastro da orientação
+        📝 Cadastro da orientação
       </p>
 
       <form

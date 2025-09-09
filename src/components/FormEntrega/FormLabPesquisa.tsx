@@ -31,17 +31,14 @@ export default function FormEntregaPesquisa() {
   ];
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    if (e instanceof HTMLSelectElement) {
-      setForm((f) => ({ ...f, laboratorio: value }));
-      return;
-    }
+    setForm((f) => ({ ...f, [name]: value } as unknown as FormState));
+  };
 
-    setForm((f) => ({ ...f, [name]: value }));
+  const handleSelectChange = (e: SelectChangeEvent<number | string>) => {
+    setForm((f) => ({ ...f, idLaboratorio: Number(e.target.value) }));
   };
 
   const isFormValid = form.idLaboratorio !== 0;
@@ -55,9 +52,10 @@ export default function FormEntregaPesquisa() {
       // Aqui você pode chamar sua API, ex:
       // await apiOnline.post("/entrega-chave", form);
       toast.success("Entrega de chave realizada com sucesso!");
-      setForm({ laboratorio: "" });
-    } catch (err: any) {
-      toast.error(err.message || "Erro ao enviar formulário");
+      setForm({ ra: "", senha: "", idLaboratorio: 0 });
+    } catch (err: unknown) {
+      if (err instanceof Error) toast.error(err.message || "Erro ao enviar formulário");
+      else toast.error("Erro ao enviar formulário");
     }
   };
 
@@ -105,7 +103,7 @@ export default function FormEntregaPesquisa() {
                 labelId="lab-label"
                 id="lab-select"
                 value={form.idLaboratorio}
-                onChange={handleChange}
+                onChange={handleSelectChange}
               >
                 <MenuItem value={0}>-- Selecione uma opção --</MenuItem>
                 {listaLab.map((el) => (

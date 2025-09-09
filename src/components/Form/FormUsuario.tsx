@@ -18,8 +18,16 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
+interface FormUsuarioState {
+  nome: string;
+  login: string;
+  senha: string;
+  repetirSenha: string;
+  idPermissao: number;
+}
+
 export default function FormUsuario() {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormUsuarioState>({
     nome: "",
     login: "",
     senha: "",
@@ -64,23 +72,27 @@ export default function FormUsuario() {
   ) => {
     const { name, value } = e.target;
 
-    setForm((f) => ({ ...f, [name]: value }));
-  };
+    if (name === "idPermissao") {
+      setForm((f) => ({ ...f, idPermissao: Number(value) }));
+      return;
+    }
 
-  const isFormValid = Object.entries(form).every(([key, value]) => {
-    if (key === "idPermissao") return value > 0;
-    if (key === "repetirSenha") return value === form.senha;
-    return value.trim() !== "";
-  });
+    setForm((f) => ({ ...f, [name]: value } as Pick<FormUsuarioState, keyof FormUsuarioState>));
+  };
+  const isFormValid =
+    form.idPermissao > 0 &&
+    form.repetirSenha === form.senha &&
+    form.nome.trim() !== "" &&
+    form.login.trim() !== "" &&
+    form.senha.trim() !== "";
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response: IPermissao[] = await apiOnline
-          .get("/permissao")
-          .then((res) => res.data);
-        setPermissoes(response);
-      } catch (error) {
+        const response = await apiOnline.get<IPermissao[]>("/permissao");
+        setPermissoes(response ?? []);
+      } catch (error: unknown) {
+        console.error(error);
         toast.error("Erro ao buscar permissões");
       }
       setLoading(false);
@@ -99,7 +111,7 @@ export default function FormUsuario() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-       📝 Cadastro do usuário
+        📝 Cadastro do usuário
       </p>
 
       <form
