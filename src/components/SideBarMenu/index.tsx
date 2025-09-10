@@ -175,6 +175,16 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             }}
             isOpen={isOpen}
           />
+          <SidebarItem
+            icon={data_images?.icon_agenda}
+            text="Eventos e Avisos"
+            active={activeItem === 'Eventos e Avisos'}
+            onClick={() => {
+              setActiveItem('Eventos e Avisos');
+              router.push('/dashboard/agenda');
+            }}
+            isOpen={isOpen}
+          />
         </ul>
 
         <div className="mt-auto">

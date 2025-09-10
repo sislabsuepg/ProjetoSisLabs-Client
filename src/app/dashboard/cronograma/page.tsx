@@ -178,7 +178,7 @@ export default function Cronograma() {
             })}
           </tbody>
         </table>
-      </div>
+       </div>
 
       <div className="w-full flex items-center justify-end mt-4">
         <button

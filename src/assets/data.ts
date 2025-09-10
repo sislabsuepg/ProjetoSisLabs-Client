@@ -6,6 +6,7 @@ import icon_chave from '../assets/images/icon_chave.webp';
 import icon_inicio from '../assets/images/icon_inicio.webp';
 import icon_pesquisa from '../assets/images/icon_pesquisa.webp';
 import icon_relatorio from '../assets/images/icon_relatorio.webp';
+import icon_agenda from '../assets/images/icon_agenda.png';
 import icon_sair from '../assets/images/icon_sair.webp';
 import logo_uepg_desktop from '../assets/images/logosUEPG/logo_uepg_desktop.webp';
 import logo_uepg_desktop_white from '../assets/images/logosUEPG/logo_uepg_desktop_white.webp';
@@ -18,6 +19,7 @@ export const data_images = {
   logo_uepg_mobile: logo_uepg_mobile.src,
   user_login: user_login.src,
   icon_sair: icon_sair.src,
+  icon_agenda: icon_agenda.src,
   icon_advertencia: icon_advertencia.src,
   icon_alterar_excluir: icon_alterar_excluir.src,
   icon_aulas: icon_aulas.src,
