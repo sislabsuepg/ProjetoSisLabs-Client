@@ -30,7 +30,7 @@ export default function FormCurso() {
       await cadastro_curso.validate(form);
       await apiOnline.post("/curso", {
         nome: form.nome,
-        anosMax: form.anosMaximo,
+        anosMaximo: form.anosMaximo,
       });
       toast.success("Cadastro do curso realizado com sucesso!");
       console.log("✅ Dados válidos:", form);
