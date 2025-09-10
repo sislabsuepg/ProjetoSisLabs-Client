@@ -45,6 +45,9 @@ export interface IOrientacao {
   idLaboratorio: number;
   dataInicio: Date;
   dataFim: Date;
+  laboratorio?: ILaboratorio;
+  professor?: IProfessor;
+  aluno?: IAcademico;
 }
 
 export interface IUsuario {
