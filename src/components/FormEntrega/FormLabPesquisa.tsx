@@ -1,6 +1,10 @@
 "use client";
 
+import { ILaboratorio } from "@/interfaces/interfaces";
+import { apiOnline } from "@/services/services";
+import { removeLetters } from "@/utils/removeLetters";
 import {
+  CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
@@ -8,13 +12,14 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 interface FormState {
   ra: string;
   senha: string;
   idLaboratorio: number;
+  idAluno?: number;
 }
 
 export default function FormEntregaPesquisa() {
@@ -22,26 +27,36 @@ export default function FormEntregaPesquisa() {
     ra: "",
     senha: "",
     idLaboratorio: 0,
+    idAluno: 0,
   });
+  const [validado, setValidado] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [laboratorios, setLaboratorios] = useState<ILaboratorio[]>([]);
 
-  const listaLab = [
-    { id: 1, lab: "Lab A" },
-    { id: 2, lab: "Lab B" },
-    { id: 3, lab: "Lab C" },
-  ];
+  useEffect(() => {
+    setLoading(true);
+    try {
+      const fetchLaboratorios = async () => {
+        const response = await apiOnline.get<ILaboratorio[]>(
+          "/laboratorio?ativo=true&restrito=false"
+        );
+        setLaboratorios(response.data);
+        setLoading(false);
+      };
+      fetchLaboratorios();
+    } catch (error) {
+      if (error?.response?.data?.erros)
+        error.response.data.erros.forEach((err: string) => toast.error(err));
+      else toast.error("Erro ao buscar laboratórios");
+      setLoading(false);
+    }
+  }, []);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value } as unknown as FormState));
-  };
-
-  const handleSelectChange = (e: SelectChangeEvent<number | string>) => {
-    setForm((f) => ({ ...f, idLaboratorio: Number(e.target.value) }));
-  };
-
-  const isFormValid = form.idLaboratorio !== 0;
+  const isFormValid =
+    form.idLaboratorio !== 0 &&
+    form.ra.trim() !== "" &&
+    form.senha.trim() !== "" &&
+    form.idAluno !== 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,16 +64,26 @@ export default function FormEntregaPesquisa() {
 
     try {
       console.log("✅ Dados do formulário:", form);
-      // Aqui você pode chamar sua API, ex:
-      // await apiOnline.post("/entrega-chave", form);
-      toast.success("Entrega de chave realizada com sucesso!");
+      await apiOnline.post("/emprestimo", {
+        idAluno: form.idAluno,
+        idLaboratorio: form.idLaboratorio,
+      });
+      toast.success("Empréstimo realizado com sucesso!");
       setForm({ ra: "", senha: "", idLaboratorio: 0 });
+      setValidado(false);
     } catch (err: unknown) {
-      if (err instanceof Error)
-        toast.error(err.message || "Erro ao enviar formulário");
-      else toast.error("Erro ao enviar formulário");
+      if (err?.response?.data?.erros)
+        err.response.data.erros.forEach((err: string) => toast.error(err));
     }
   };
+
+  if (loading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <CircularProgress size={40} />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full flex flex-col justify-start">
@@ -79,9 +104,31 @@ export default function FormEntregaPesquisa() {
               variant="filled"
               type="text"
               name="ra"
-              value={form.ra}
+              value={removeLetters(form.ra)}
               inputProps={{ maxLength: 13 }}
-              onChange={handleChange}
+              onChange={(e) => {
+                const value = removeLetters(e.target.value);
+                if (value.length > 13) return;
+                setForm((f) => ({ ...f, ra: value }));
+              }}
+              onKeyDown={async (e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  await apiOnline
+                    .get(`/aluno/${form.ra}`)
+                    .then((res) => {
+                      setForm((f) => ({ ...f, idAluno: res.data.id }));
+                      console.log("🔍 Usuário encontrado:", res.data);
+                    })
+                    .catch((err) => {
+                      setValidado(false);
+                      setForm((f) => ({ ...f, idAluno: 0 }));
+                      err.response.data.erros.forEach((err: string) =>
+                        toast.error(err)
+                      );
+                    });
+                }
+              }}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
             />
 
@@ -89,10 +136,40 @@ export default function FormEntregaPesquisa() {
               id="senha"
               label="Senha"
               variant="filled"
-              type="text"
+              type="password"
               name="senha"
               value={form.senha}
-              onChange={handleChange}
+              onChange={(e) => {
+                const value = removeLetters(e.target.value);
+                if (value.length > 6) return;
+                setForm((f) => ({ ...f, senha: value }));
+              }}
+              onKeyDown={async (e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (form.senha.length < 4) {
+                    toast.error("Senha deve ter pelo menos 4 caracteres");
+                    return;
+                  }
+                  const valido = await apiOnline
+                    .post("/aluno/login", {
+                      ra: form.ra,
+                      senha: form.senha,
+                    })
+                    .then((res) => {
+                      return res.data != null;
+                    })
+                    .catch((err) => {
+                      err.response.data.erros.forEach((err: string) =>
+                        toast.error(err)
+                      );
+                      return false;
+                    });
+                  setValidado(valido);
+                  if (valido) toast.success("Usuário validado com sucesso");
+                }
+              }}
+              disabled={form.idAluno === 0}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
             />
             <FormControl
@@ -104,12 +181,18 @@ export default function FormEntregaPesquisa() {
                 labelId="lab-label"
                 id="lab-select"
                 value={form.idLaboratorio}
-                onChange={handleSelectChange}
+                onChange={(e: SelectChangeEvent<number>) => {
+                  setForm((f) => ({
+                    ...f,
+                    idLaboratorio: Number(e.target.value),
+                  }));
+                }}
+                disabled={!validado}
               >
                 <MenuItem value={0}>-- Selecione uma opção --</MenuItem>
-                {listaLab.map((el) => (
+                {laboratorios.map((el) => (
                   <MenuItem key={el.id} value={el.id}>
-                    {el.lab}
+                    {el.numero} - {el.nome}
                   </MenuItem>
                 ))}
               </Select>

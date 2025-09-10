@@ -5,7 +5,7 @@ import { ApiResponse, IEmprestimo } from "@/interfaces/interfaces";
 import { useEffect, useState } from "react";
 //import { useCookies } from "react-cookie";
 import { apiOnline } from "@/services/services";
-import { CircularProgress, Popover } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { Cancel } from "@mui/icons-material";
 import CustomModal from "@/components/CustomModal";
 
@@ -15,7 +15,10 @@ export default function Inicio() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [update, setUpdate] = useState(false);
-  const [openEncerrar, setOpenEncerrar] = useState<{ status: boolean; id: number }>({ status: false, id: 0 });
+  const [openEncerrar, setOpenEncerrar] = useState<{
+    status: boolean;
+    id: number;
+  }>({ status: false, id: 0 });
   //const [cookies] = useCookies(["usuario"]);
   const [data, setData] = useState<IEmprestimo[]>([]);
   useEffect(() => {
@@ -61,8 +64,9 @@ export default function Inicio() {
           data?.map((item) => (
             <div
               key={item?.id}
-              className={`w-full flex items-center gap-2 ${Number(item?.id) % 2 == 0 ? "bg-transparent" : "bg-[#F3F3F3]"
-                } h-12 py-2 px-4 rounded-[10px]`}
+              className={`w-full flex items-center gap-2 ${
+                Number(item?.id) % 2 == 0 ? "bg-transparent" : "bg-[#F3F3F3]"
+              } h-12 py-2 px-4 rounded-[10px]`}
             >
               <div className="h-2 w-2 bg-[#22FF00] rounded-full"></div>
               <p className="text-theme-text text-[0.9rem] font-normal">
@@ -74,10 +78,17 @@ export default function Inicio() {
                     </span>{" "}
                     - Chave do Laboratório {item?.laboratorio.nome} foi
                     emprestado pelo(a) aluno(a){" "}
-                    <span className="font-semibold">{item?.aluno?.nome || "-"}</span> -{" "}
+                    <span className="font-semibold">
+                      {item?.aluno?.nome || "-"}
+                    </span>{" "}
+                    -{" "}
                     {item?.dataHoraEntrada
                       ? new Date(item.dataHoraEntrada).toLocaleString()
-                      : ""}<Cancel className="text-theme-red" sx={{ width: 22, height: 22 }}/>
+                      : ""}
+                    <Cancel
+                      className="text-theme-red"
+                      sx={{ width: 22, height: 22 }}
+                    />
                   </>
                 ) : (
                   <>
@@ -92,9 +103,14 @@ export default function Inicio() {
                     - :{" "}
                     {item?.dataHoraEntrada
                       ? new Date(item.dataHoraEntrada).toLocaleString()
-                      : ""}<Cancel className="text-theme-red ml-2" sx={{ width: 22, height: 22 }} onClick={
-                        () => setOpenEncerrar({ status: true, id: item.id })
-                      }/>
+                      : ""}
+                    <Cancel
+                      className="text-theme-red ml-2"
+                      sx={{ width: 22, height: 22 }}
+                      onClick={() =>
+                        setOpenEncerrar({ status: true, id: item.id })
+                      }
+                    />
                   </>
                 )}
               </p>
@@ -112,16 +128,20 @@ export default function Inicio() {
           open={openEncerrar.status}
           onClose={() => setOpenEncerrar({ status: false, id: 0 })}
           title="Encerrar Uso do Laboratório"
-          message={`Tem certeza que deseja encerrar o emprestimo para ${data.find(item => item.id === openEncerrar.id)?.aluno.nome} no laboratório ${data.find(item => item.id === openEncerrar.id)?.laboratorio.nome}?`}
+          message={`Tem certeza que deseja encerrar o emprestimo para ${
+            data.find((item) => item.id === openEncerrar.id)?.aluno.nome
+          } no laboratório ${
+            data.find((item) => item.id === openEncerrar.id)?.laboratorio.nome
+          }?`}
           onConfirm={async () => {
-            try{
-              await apiOnline.put(`/emprestimo/close/${openEncerrar.id}`, {idUsuario: 1})
-              setData(data.filter(item => item.id !== openEncerrar.id));
+            try {
+              await apiOnline.put(`/emprestimo/close/${openEncerrar.id}`);
+              setData(data.filter((item) => item.id !== openEncerrar.id));
               setOpenEncerrar({ status: false, id: 0 });
-            }catch(e){
+            } catch (e) {
               console.error(e);
               setOpenEncerrar({ status: false, id: 0 });
-            }finally{
+            } finally {
               setUpdate(!update);
             }
           }}
