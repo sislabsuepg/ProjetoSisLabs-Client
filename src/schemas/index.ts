@@ -160,10 +160,12 @@ export const edicao_academico = Yup.object().shape(
       .max(40, "O campo 'E-mail' deve ter no máximo 40 caracteres")
       .email("E-mail inválido"),
     telefone: Yup.string()
-      .optional()
       .test("O telefone deve ter no mínimo 10 dígitos", (value) => {
-        if (!value || value == null || value.trim() === "") return true;
-        return value.length >= 10;
+        if (!value || value == null || value.trim() === ""){
+           return true;
+      } else {
+          return value.length >= 10;
+        }
       }),
     anoCurso: Yup.number()
       .required('O campo "Ano/Série" é obrigatório')
