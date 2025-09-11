@@ -11,9 +11,10 @@ export default function AdicionarEventos() {
   const [form, setForm] = useState({
     nome: "",
     data: "",
-    duracao: "",
+    hora: "",
+    duracao: 0,
     responsavel: "",
-    idLab: "", // Mantido como string para o Select
+    idLaboratorio: 0, // Mantido como string para o Select
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -21,29 +22,44 @@ export default function AdicionarEventos() {
     setForm({ ...form, [name]: value });
   };
 
-  const handleSelectChange = (e: SelectChangeEvent<string>) => {
-    setForm({ ...form, idLab: e.target.value });
+  const handleSelectChange = (e: SelectChangeEvent<number>) => {
+    setForm({ ...form, idLaboratorio: Number(e.target.value) });
   };
 
   const isFormValid =
     form.nome.trim().length > 0 &&
     form.data.trim().length > 0 &&
-    form.duracao.trim().length > 0 &&
+    form.duracao > 0 &&
     form.responsavel.trim().length > 0 &&
-    form.idLab.trim().length > 0;
+    form.idLaboratorio > 0 &&
+    form.hora.trim().length > 0;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isFormValid) return;
-    console.log("Evento salvo:", form);
-    toast.success("Evento salvo com sucesso!");
-    // Aqui a lógica
+    async function salvarEvento() {
+      try{
+        await apiOnline.post("/evento", {
+          nome: form.nome,
+          dataEvento: new Date(`${form.data}T${form.hora}:00`),
+          duracao: form.duracao,
+          responsavel: form.responsavel,
+          idLaboratorio: form.idLaboratorio
+        });
+        toast.success("Evento adicionado com sucesso!");
+      } catch (error) {
+        toast.error("Erro ao adicionar evento.");
+      }
+      
+    }
+    salvarEvento();
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const laboratoriosResponse = await apiOnline.get<ILaboratorio[]>("/laboratorio?restrito=true");
+        const laboratoriosResponse = await apiOnline.get<ILaboratorio[]>("/laboratorio");
+        console.log(laboratoriosResponse);
         setLaboratorios(laboratoriosResponse.data ?? []);
       } catch (err: unknown) {
         if (err instanceof AxiosError) {
@@ -98,14 +114,24 @@ export default function AdicionarEventos() {
 
               <TextField
                 id="data-evento"
-                label="Data do evento"
                 variant="filled"
-                type="text"
+                type="date"
                 name="data"
                 value={form.data}
                 onChange={handleChange}
                 className="w-full font-normal p-3 text-[0.9rem] rounded-md"
               />
+
+              <TextField
+                id="hora-evento"
+                variant="filled"
+                type="time"
+                name="hora"
+                value={form.hora}
+                onChange={handleChange}
+                className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              />
+
             </div>
 
             <div className="w-full flex items-center gap-4">
@@ -136,14 +162,14 @@ export default function AdicionarEventos() {
             <FormControl className="w-full" variant="filled">
               <InputLabel>Laboratório</InputLabel>
               <Select
-                name="idLab"
-                value={form.idLab}
+                name="idLaboratorio"
+                value={form.idLaboratorio}
                 onChange={handleSelectChange}
               >
-                <MenuItem value="">-- Selecione uma opção --</MenuItem>
+                <MenuItem value={0}>-- Selecione uma opção --</MenuItem>
                 {laboratorios.map((l) => (
-                  <MenuItem key={l.id} value={String(l.id)}>
-                    {l.nome}
+                  <MenuItem key={l.id} value={l.id}>
+                    {`${l.numero} - ${l.nome}`}
                   </MenuItem>
                 ))}
               </Select>

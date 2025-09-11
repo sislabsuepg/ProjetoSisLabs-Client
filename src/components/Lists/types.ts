@@ -65,6 +65,20 @@ export interface FormUsuario {
   permissaoUsuario?: FormPermissao;
 }
 
+export interface IRecado {
+  id: number;
+  texto: string;
+}
+
+export interface IEvento {
+  id: number;
+  nome: string;
+  data: Date;
+  duracao: number;
+  responsavel: string;
+  idLaboratorio: number;
+}
+
 export type IData =
   | FormAcademico
   | FormProfessor
