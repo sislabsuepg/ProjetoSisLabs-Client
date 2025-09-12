@@ -6,7 +6,7 @@ export interface FormAcademico {
   telefone?: string;
   idCurso: number;
   anoCurso: number;
-  curso?: FormCurso; 
+  curso?: FormCurso;
   ativo?: boolean;
 }
 
@@ -63,6 +63,10 @@ export interface FormUsuario {
   ativo?: boolean;
   idPermissao: number;
   permissaoUsuario?: FormPermissao;
+}
+
+export interface ApiResponse<T> {
+  data: T;
 }
 
 export interface IRecado {

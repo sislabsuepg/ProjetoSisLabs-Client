@@ -1,0 +1,73 @@
+.container {
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  min-height: 300px;
+  padding: 1rem;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.card {
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  height: auto;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.01);
+  }
+}
+
+.divider-purple {
+  background-color: #9000ff;
+}
+
+.divider-orange {
+  background-color: #ffa500;
+}
+
+.divider-yellow {
+  background-color: #ffff00;
+}
+
+.divider-green {
+  background-color: #00a500;
+}
+
+.divider {
+  height: 100%;
+  width: 3px;
+  border-radius: 8px;
+  min-width: 3px;
+  min-height: 20px;
+}
+
+.divider2 {
+  height: 100%;
+  width: 3px;
+  min-width: 3px;
+  border-radius: 8px;
+  min-height: 20px;
+}
+
+.scrollbarContainer::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scrollbarContainer::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+.scrollbarContainer::-webkit-scrollbar-thumb {
+  background: #314a73;
+  border-radius: 5px;
+}
+
+.scrollbarContainer::-webkit-scrollbar-thumb:hover {
+  background: #314a73;
+}

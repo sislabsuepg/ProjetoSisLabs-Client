@@ -1,24 +1,37 @@
-import { apiOnline } from "@/services/services";
-import { CircularProgress } from "@mui/material";
-import { useEffect, useState } from "react";
-import { IEvento, IRecado } from "../Lists/types";
+import { apiOnline } from '@/services/services';
+import { CircularProgress } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { ApiResponse, IEvento, IRecado } from '../Lists/types';
+import style from './EventosAvisos.module.scss';
 
 export default function EventosAvisos() {
   const [eventos, setEventos] = useState<IEvento[]>([]);
   const [recados, setRecados] = useState<IRecado[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const colors = [
+    'divider-green',
+    'divider-orange',
+    'divider-yellow',
+    'divider-purple',
+  ];
+
   useEffect(() => {
     async function fetchData() {
       Promise.allSettled([
-        apiOnline.get<IEvento[]>("/evento"),
-        apiOnline.get<IRecado[]>("/recado"),
+        apiOnline.get<ApiResponse<IEvento[]>>('/evento'),
+        apiOnline.get<ApiResponse<IRecado[]>>('/recado'),
       ]).then(([eventosResponse, recadosResponse]) => {
-        if (eventosResponse.status === "fulfilled") {
+        if (eventosResponse.status === 'fulfilled') {
           setEventos(eventosResponse.value.data);
+        } else {
+          console.error('Erro ao buscar eventos:', eventosResponse.reason);
         }
-        if (recadosResponse.status === "fulfilled") {
+
+        if (recadosResponse.status === 'fulfilled') {
           setRecados(recadosResponse.value.data);
+        } else {
+          console.error('Erro ao buscar recados:', recadosResponse.reason);
         }
         setLoading(false);
       });
@@ -37,55 +50,87 @@ export default function EventosAvisos() {
 
   return (
     <div className="w-full h-full flex flex-col justify-start">
-      <p className="font-semibold text-[1.2rem] text-theme-blue mb-2">
-        📝 Eventos e Avisos
-      </p>
-      {eventos.length === 0 && recados.length === 0 && (
-        <p className="text-theme-gray font-normal">
-          Nenhum evento ou aviso disponível.
-        </p>
-      )}
-      {eventos.length > 0 && (
-        <div className="mb-6">
-          <h2 className="font-semibold text-lg text-theme-darkBlue mb-2">
-            Eventos
-          </h2>
-          <ul>
-            {eventos.map((evento) => (
-              <li key={evento.id} className="text-theme-gray font-normal mb-2">
-                <div className="bg-blue-100 rounded-md p-4 shadow-sm">
-                  {evento.nome} -{" "}
-                  {new Date(evento.data)
-                    .toISOString()
-                    .split("T")[0]
-                    .replace(/-/g, "/")}{" "}
-                  às{" "}
-                  {new Date(evento.data).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </div>
-              </li>
-            ))}
-          </ul>
+      <div className="w-full flex items-center gap-4 h-full">
+        <div className={`${style.container} w-1/2 flex flex-col`}>
+          <p className="text-theme-blue font-medium">Eventos</p>
+          <div
+            className={`${style.scrollbarContainer} flex flex-col gap-2 overflow-y-auto overflow-x-hidden p-1 h-[360px]`}
+          >
+            {eventos.length > 0 ? (
+              eventos.map((evento, index) => {
+                const colorClass = colors[index % colors.length];
+
+                return (
+                  <div
+                    key={evento.id}
+                    className={`${style.card} flex items-center gap-2 rounded-[15px]`}
+                  >
+                    <div
+                      className={`${style.divider} ${style[colorClass]}`}
+                    ></div>
+                    <div>
+                      <p className="font-medium text-[0.9rem] leading-4 mb-1">
+                        {evento.nome}
+                      </p>
+                      <p className="font-normal text-[0.8rem] text-theme-text flex items-center gap-1">
+                        <span>
+                          {new Date(evento.data)
+                            .toISOString()
+                            .split('T')[0]
+                            .replace(/-/g, '/')}
+                        </span>
+                        <span>às</span>
+                        <span>
+                          {new Date(evento.data).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-theme-text font-normal">
+                Nenhum evento disponível.
+              </p>
+            )}
+          </div>
         </div>
-      )}
-      {recados.length > 0 && (
-        <div>
-          <h2 className="font-semibold text-[1.2rem] text-theme-blue mb-2 mt-5">
-            Avisos
-          </h2>
-          <ul>
-            {recados.map((recado) => (
-              <li key={recado.id} className="text-theme-gray font-normal mb-2">
-                <div className="bg-blue-100 rounded-md p-4 shadow-sm">
-                  {recado.texto}
-                </div>
-              </li>
-            ))}
-          </ul>
+
+        <div className={`${style.container} w-1/2 flex flex-col`}>
+          <p className="text-theme-blue font-medium">Avisos</p>
+          <div
+            className={`${style.scrollbarContainer} flex flex-col gap-2 overflow-y-auto p-1 h-[360px]`}
+          >
+            {recados.length > 0 ? (
+              recados.map((recado, index) => {
+                const colorClass = colors[index % colors.length];
+                return (
+                  <div
+                    key={recado.id}
+                    className={`${style.card} flex items-center gap-2 rounded-[15px]`}
+                  >
+                    <div
+                      className={`${style.divider2} ${style[colorClass]}`}
+                    ></div>
+                    <div>
+                      <p className="font-normal text-[0.9rem] text-theme-text">
+                        {recado.texto}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-theme-text font-normal">
+                Nenhum aviso disponível.
+              </p>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
