@@ -24,7 +24,7 @@ export default function Cadastro() {
 
   return (
     <div className="h-full w-full flex flex-col items-start">
-      <div className="w-full flex items-center justify-center gap-2">
+      <div className="w-full flex items-center justify-center gap-2 flex-wrap">
         {listButtons.map((item) => (
           <button
             key={item.id}

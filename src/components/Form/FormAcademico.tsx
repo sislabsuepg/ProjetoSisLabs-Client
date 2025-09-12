@@ -136,7 +136,7 @@ export default function FormAcademico() {
         className="mt-4 space-y-4 flex flex-col justify-between w-full h-full"
       >
         <div className="space-y-4">
-          <div className="w-full flex items-center gap-4">
+          <div className="w-full flex md:flex-row flex-col items-center gap-4">
             <TextField id="filled-basic" label="Nome completo" variant="filled" type="text"
               name="nome"
               value={form.nome ? capitalize(form.nome) : ""}
@@ -149,7 +149,7 @@ export default function FormAcademico() {
               onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
           </div>
 
-          <div className="w-full flex items-center gap-4">
+          <div className="w-full flex items-center gap-4 md:flex-row flex-col">
             <TextField id="filled-basic" label="E-Mail" variant="filled" type="text"
               name="email"
               value={form.email}
@@ -162,7 +162,7 @@ export default function FormAcademico() {
               onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
           </div>
 
-          <div className="w-full flex items-center gap-4">
+          <div className="w-full flex items-center gap-4 md:flex-row flex-col">
             <FormControl className="w-full font-normal p-3 text-[0.9rem] rounded-md" variant="filled" >
               <InputLabel id="demo-simple-select-filled-label">Curso</InputLabel>
               <Select
@@ -194,7 +194,7 @@ export default function FormAcademico() {
               onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
           </div>
 
-          <div className="w-full flex items-center gap-4">
+          <div className="w-full flex items-center gap-4 md:flex-row flex-col">
             <TextField id="filled-basic" label="Senha" variant="filled" type="password"
               name="senha"
               inputProps={{ maxLength: 6 }}
