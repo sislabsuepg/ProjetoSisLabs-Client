@@ -51,6 +51,7 @@ export default function Alterar() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [busca, setBusca] = useState(false);
 
   const listButtons = [
     {
@@ -261,11 +262,17 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/aluno?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"}${filtroTemp ? `&${filtroTemp}` : ""
-            }`
+            `/aluno?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo ? "false" : "true"
+            }${filtroTemp ? `&${filtroTemp}` : ""}`
           );
-          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
-            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          console.log(response);
+          if (
+            response?.data?.total !== undefined &&
+            pages !== Math.ceil(response.data.total / itemsPerPage)
+          ) {
+            setTotalPages(Math.ceil(response.data.total / itemsPerPage));
+            return response.data.alunos as unknown as FormAcademico[];
           }
           return response.data as unknown as FormAcademico[];
         } catch (error) {
@@ -282,12 +289,18 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/professor?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"}${filtro ? `&nome=${filtro}` : ""}`
+            `/professor?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo ? "false" : "true"
+            }${filtro ? `&nome=${filtro}` : ""}`
           );
-          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
-            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          if (
+            response?.data?.total !== undefined &&
+            pages !== Math.ceil(response.data.total / itemsPerPage)
+          ) {
+            setTotalPages(Math.ceil(response.data.total / itemsPerPage));
+            return response.data.professores as unknown as FormProfessor[];
           }
-          return response.data as unknown as FormProfessor[];
+          return response.data.professores as unknown as FormProfessor[];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -301,12 +314,23 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/laboratorio?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"}${filtro ? `&nome=${filtro}` : ""}`
+            `/laboratorio?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo ? "false" : "true"
+            }${filtro ? `&nome=${filtro}` : ""}`
           );
-          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
-            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          if (
+            response?.data?.total !== undefined &&
+            pages !== Math.ceil(response.data.total / itemsPerPage)
+          ) {
+            console.log(response),
+              setTotalPages(Math.ceil(response.data.total / itemsPerPage));
+            return (response.data as any).laboratorios
+              ? ((response.data as any).laboratorios as FormLaboratorio[])
+              : (response.data as FormLaboratorio[]);
           }
-          return response.data as unknown as FormLaboratorio[];
+          return (response.data as any).laboratorios
+            ? ((response.data as any).laboratorios as FormLaboratorio[])
+            : (response.data as FormLaboratorio[]);
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -320,12 +344,22 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/orientacao?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo == true ? "false" : "true"}${filtro ? `&nome=${filtro}` : ""}`
+            `/orientacao?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo == true ? "false" : "true"
+            }${filtro ? `&nome=${filtro}` : ""}`
           );
-          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
-            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          if (
+            response?.data?.total !== undefined &&
+            pages !== Math.ceil(response.data.total / itemsPerPage)
+          ) {
+            setTotalPages(Math.ceil(response.data.total / itemsPerPage));
+            return (response.data as any).orientacoes
+              ? ((response.data as any).orientacoes as FormOrientacao[])
+              : (response.data as FormOrientacao[]);
           }
-          return response.data as unknown as FormOrientacao[];
+          return (response.data as any).orientacoes
+            ? ((response.data as any).orientacoes as FormOrientacao[])
+            : (response.data as FormOrientacao[]);
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -339,12 +373,22 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(Math.ceil(count / itemsPerPage));
           const response: ApiResponse = await apiOnline.get(
-            `/curso?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"}${filtro ? `&nome=${filtro}` : ""}`
+            `/curso?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo ? "false" : "true"
+            }${filtro ? `&nome=${filtro}` : ""}`
           );
-          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
-            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          if (
+            response?.data?.total !== undefined &&
+            pages !== Math.ceil(response.data.total / itemsPerPage)
+          ) {
+            setTotalPages(Math.ceil(response.data.total / itemsPerPage));
+            return (response.data as any).cursos
+              ? ((response.data as any).cursos as FormCurso[])
+              : (response.data as FormCurso[]);
           }
-          return response.data as unknown as FormCurso[];
+          return (response.data as any).cursos
+            ? ((response.data as any).cursos as FormCurso[])
+            : (response.data as FormCurso[]);
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -358,12 +402,23 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/permissao?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"}${filtro ? `&nome=${filtro}` : ""}`
+            `/permissao?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo ? "false" : "true"
+            }${filtro ? `&nome=${filtro}` : ""}`
           );
-          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
-            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          if (
+            response?.data?.total !== undefined &&
+            pages !== Math.ceil(response.data.total / itemsPerPage)
+          ) {
+            console.log(response),
+              setTotalPages(Math.ceil(response.data.total / itemsPerPage));
+            return (response.data as any).permissaoUsuario
+              ? ((response.data as any).permissaoUsuario as FormPermissao[])
+              : (response.data as FormPermissao[]);
           }
-          return response.data as unknown as FormPermissao[];
+          return (response.data as any).permissaoUsuario
+            ? ((response.data as any).permissaoUsuario as FormPermissao[])
+            : (response.data as FormPermissao[]);
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -377,12 +432,22 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/usuario?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"}${filtro ? `&nome=${filtro}` : ""  }`
+            `/usuario?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo ? "false" : "true"
+            }${filtro ? `&nome=${filtro}` : ""}`
           );
-          if (response.data && pages !== response.data.length / itemsPerPage && response.data.length > 0) {
-            setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+          if (
+            response?.data?.total !== undefined &&
+            pages !== Math.ceil(response.data.total / itemsPerPage)
+          ) {
+            setTotalPages(Math.ceil(response.data.total / itemsPerPage));
+            return (response.data as any).usuarios
+              ? ((response.data as any).usuarios as FormUsuario[])
+              : (response.data as FormUsuario[]);
           }
-          return response.data as unknown as FormUsuario[];
+          return (response.data as any).usuarios
+            ? ((response.data as any).usuarios as FormUsuario[])
+            : (response.data as FormUsuario[]);
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -397,7 +462,7 @@ export default function Alterar() {
     setCurrentPage(1);
     setFormData(formMap[activeId]);
     setLoading(false);
-  }, [activeId, Inativo, filtro]);
+  }, [activeId, Inativo, busca]);
 
   useEffect(() => {
     setFormData(formMap[activeId]);
@@ -462,12 +527,18 @@ export default function Alterar() {
             placeholder={placeholderMap[activeId]}
             type="text"
             value={filtro}
-            onChange={(e) => setFiltro(e.target.value)}
+            onChange={(e) => {
+              setFiltro(e.target.value);
+              if (e.target.value === "") {
+                setBusca(!busca);
+              }
+            }}
             className="w-full max-w-[250px] font-normal h-[40px] px-3 py-2 text-[0.9rem] rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
           />
           <button
             type="submit"
             disabled={!filtro.trim()}
+            onClick={() => setBusca(!busca)}
             className={`${
               !filtro.trim()
                 ? "bg-gray-200 cursor-not-allowed text-[#c0c0c0]"
@@ -570,10 +641,9 @@ export default function Alterar() {
           async function ativar() {
             if (openAtivar.id === 0) return;
             try {
-              await apiOnline.put(
-                `/${mapRoutes[activeId]}/${openAtivar.id}`,
-                { ativo: true }
-              );
+              await apiOnline.put(`/${mapRoutes[activeId]}/${openAtivar.id}`, {
+                ativo: true,
+              });
               currentItems.filter((el) => el.id !== openAtivar.id);
             } catch (err) {
               const error = (err as AxiosError).response?.data as ApiResponse;

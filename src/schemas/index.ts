@@ -156,17 +156,18 @@ export const edicao_academico = Yup.object().shape(
       .matches(fullNameRegex, 'O campo "Nome" deve conter nome e sobrenome'),
 
     email: Yup.string()
-      .optional()
       .max(40, "O campo 'E-mail' deve ter no máximo 40 caracteres")
       .email("E-mail inválido"),
-    telefone: Yup.string()
-      .test("O telefone deve ter no mínimo 10 dígitos", (value) => {
-        if (!value || value == null || value.trim() === ""){
-           return true;
-      } else {
+    telefone: Yup.string().test(
+      "O telefone deve ter no mínimo 10 dígitos",
+      (value) => {
+        if (!value || value == null || value.trim() === "") {
+          return true;
+        } else {
           return value.length >= 10;
         }
-      }),
+      }
+    ),
     anoCurso: Yup.number()
       .required('O campo "Ano/Série" é obrigatório')
       .min(1, 'O campo "Ano/Série" deve ser um número válido'),

@@ -1,3 +1,5 @@
+import { IData } from "@/components/Lists/types";
+
 export interface ICurso {
   id?: number;
   nome: string;
@@ -68,6 +70,6 @@ export interface IEmprestimo {
 }
 
 export interface ApiResponse {
-  data?: ICurso[];
+  data?: IData | IData[] | ({ [key: string]: IData[] } & { total: number });
   erros?: string[];
 }
