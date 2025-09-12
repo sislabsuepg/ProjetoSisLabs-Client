@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import ProfessorAutocomplete from "@/components/ProfessorAutocomplete";
 import Loading from "@/app/loading";
 import { apiOnline } from "@/services/services";
-import { IHorario, ILaboratorio } from "@/interfaces/interfaces";
+import { ILaboratorio, IProfessor } from "@/interfaces/interfaces";
 
 const dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const horarios = [
@@ -14,23 +15,39 @@ const horarios = [
 export default function Cronograma() {
   const [activeId, setActiveId] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [aulasHoje, setAulasHoje] = useState<IHorario[]>([]);
   const [laboratorios, setLaboratorios] = useState<ILaboratorio[]>([]);
-  const [tabelas, setTabelas] = useState<{ [id: number]: string[][] }>({ 0: [[]] });
-  const [editando, setEditando] = useState<{ linha: number; coluna: number } | null>(null);
-  const [valorTemp, setValorTemp] = useState("");
-  const tabelaAtiva = tabelas[activeId];
-  const hoje = new Date().getDay();
+  const [professores, setProfessores] = useState<IProfessor[]>([]);
+  const [tabelas, setTabelas] = useState<{ [id: number]: string[][] }>({});
+  const tabelaAtiva = useMemo(() => {
+    // Gera matriz horarios x dias (linhas = horarios, colunas = dias)
+    if (!tabelas[activeId]) {
+      return Array.from({ length: horarios.length }, () => Array(dias.length).fill(""));
+    }
+    return tabelas[activeId];
+  }, [tabelas, activeId]);
 
   useEffect(() => {
-    const buscaHoje = async () => {
+    const buscaProfessores = async () => {
       setLoading(true);
-      const dados = await apiOnline.get<IHorario[]>(`horario/dia/${hoje}`);
-      setAulasHoje(dados);
-      setLoading(false);
+      try {
+        const resp = await apiOnline.get<{ professores: IProfessor[] }>("/professor?ativo=true");
+        const lista = (resp as unknown as { data?: { professores?: IProfessor[] } }).data?.professores || [];
+        const ordenada = Array.isArray(lista)
+          ? [...lista].sort((a, b) => a.nome.localeCompare(b.nome, 'pt', { sensitivity: 'base' }))
+          : [];
+        setProfessores(ordenada);
+      } catch (e) {
+        console.error('Erro ao buscar professores', e);
+        setProfessores([]);
+      } finally {
+        setLoading(false);
+      }
     };
-    buscaHoje();
+    buscaProfessores();
   }, []);
+
+
+  // Futuro: buscar aulas do dia selecionado
 
   useEffect(() => {
     interface WithData<T> { data: T }
@@ -59,41 +76,44 @@ export default function Cronograma() {
     buscaHorarios();
   }, []);
 
-  const handleClickCelula = (linha: number, coluna: number) => {
-    setEditando({ linha, coluna });
-    setValorTemp(tabelaAtiva[linha][coluna]);
-  };
-
-  const salvarEdicao = () => {
-    if (editando) {
-      const novaTabela = [...tabelaAtiva];
-      novaTabela[editando.linha][editando.coluna] = valorTemp;
-      setTabelas(prev => ({
-        ...prev,
-        [activeId]: novaTabela
-      }));
-      setEditando(null);
-    }
-  };
-
-  const cancelarEdicao = () => {
-    setEditando(null);
+  const atualizarCelula = (linha: number, coluna: number, valor: string) => {
+    setTabelas(prev => {
+      const copia = { ...prev };
+      const tabela = copia[activeId]
+        ? copia[activeId].map(l => [...l])
+        : Array.from({ length: horarios.length }, () => Array(dias.length).fill(""));
+      tabela[linha][coluna] = valor;
+      copia[activeId] = tabela;
+      return copia;
+    });
   };
 
   const salvarTabela = () => {
     console.log("Cronograma salvo:", tabelaAtiva);
   };
 
-  const isTabelaVazia = true;
+  const isTabelaVazia = useMemo(() => {
+    return tabelaAtiva.every(linha => linha.every(c => c.trim() === ""));
+  }, [tabelaAtiva]);
+
+  // Garante que ao selecionar um laboratório ainda não inicializado, a tabela seja persistida no estado
+  useEffect(() => {
+    if (activeId && !tabelas[activeId]) {
+      setTabelas(prev => ({
+        ...prev,
+        [activeId]: Array.from({ length: horarios.length }, () => Array(dias.length).fill(""))
+      }));
+    }
+  }, [activeId, tabelas, horarios.length]);
 
   if (loading) {
     return <Loading />;
   }
 
   return (
-    <div className="w-full h-full flex gap-8">
+    <div className="w-full h-2/5 flex-col gap-8">
       {/* Coluna Esquerda */}
-      <div className="w-1/3 flex flex-col">
+      <div className="w-full h-full flex flex-col">
         <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
           Aulas de Hoje
         </p>
@@ -107,8 +127,8 @@ export default function Cronograma() {
       </div>
 
       {/* Coluna Direita */}
-      <div className="w-2/3 flex flex-col">
-        <div className="w-full flex flex-col mb-4 gap-3">
+      <div className="w-full flex flex-col">
+        <div className="w-full h-9/10 flex flex-col mb-4 gap-3">
           <p className="font-semibold text-[1.2rem] text-theme-blue">
             📅 Cronograma de aulas
           </p>
@@ -123,7 +143,7 @@ export default function Cronograma() {
             >
               <option value="" disabled>{Array.isArray(laboratorios) && laboratorios.length ? "Selecione um laboratório" : "Carregando..."}</option>
               {Array.isArray(laboratorios) && laboratorios.map(lab => (
-                <option key={lab.id} value={lab.id}>{lab.nome} - {lab.numero}</option>
+          <option key={lab.id} value={lab.id}>{lab.nome} - {lab.numero}</option>
               ))}
             </select>
           </div>
@@ -152,31 +172,13 @@ export default function Cronograma() {
                     {hora}
                   </td>
                   {dias.map((_, coluna) => (
-                    editando?.linha === linha && editando?.coluna === coluna ? (
-                      <td key={coluna} className="border border-gray-400 p-0 cursor-pointer w-[120px]">
-                        <div className="flex flex-col p-1">
-                          <textarea
-                            value={valorTemp}
-                            onChange={(e) => setValorTemp(e.target.value)}
-                            className="w-full font-normal leading-4 h-[50px] p-1 text-center bg-transparent resize-none focus:outline-none"
-                          />
-                          <div className="flex justify-center gap-2 mt-1">
-                            <button onClick={salvarEdicao} className="bg-theme-green font-normal text-white px-2 rounded">OK</button>
-                            <button onClick={cancelarEdicao} className="bg-theme-red font-normal text-white px-2 rounded">Cancelar</button>
-                          </div>
-                        </div>
-                      </td>
-                    ) : (
-                      <td
-                        key={coluna}
-                        className="hover:bg-theme-lightBlue hover:text-theme-white border border-gray-400 p-0 cursor-pointer w-[120px]"
-                        onClick={() => handleClickCelula(linha, coluna)}
-                      >
-                        <div className="h-full w-full text-center leading-4 flex items-center justify-center font-normal p-1">
-                          {/* {tabelaAtiva[linha][coluna] || "Aula"} */}
-                        </div>
-                      </td>
-                    )
+                    <td key={coluna} className="border border-gray-400 p-0 w-[120px]">
+                      <ProfessorAutocomplete
+                        value={tabelaAtiva[linha][coluna]}
+                        onChange={(val) => atualizarCelula(linha, coluna, val)}
+                        professores={professores}
+                      />
+                    </td>
                   ))}
                 </tr>
               ))}
