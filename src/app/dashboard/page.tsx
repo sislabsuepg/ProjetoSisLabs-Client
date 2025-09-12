@@ -25,7 +25,7 @@ export default function Inicio() {
     async function fetchData() {
       try {
         const countResponse = await apiOnline.get<{ count: number }>(
-          "/emprestimo/count"
+          "/emprestimo/count?ativo=true"
         );
         const count = countResponse?.count ?? 0;
         const response = await apiOnline.get(
