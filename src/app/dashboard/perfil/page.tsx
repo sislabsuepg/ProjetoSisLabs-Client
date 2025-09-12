@@ -7,13 +7,11 @@ import { useCookies } from 'react-cookie';
 export default function Perfil() {
   const [cookies] = useCookies(['usuario']);
 
-  console.log(cookies);
-
   return (
     <div className="h-full w-full flex flex-col items-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">👤 Perfil</p>
-      <div className="flex h-full w-full px-10">
-        <div className="bg-theme-container flex flex-col justify-between items-center w-[40%] px-5 pt-8 pb-5 h-full rounded-[15px]">
+      <div className="flex md:flex-row flex-col h-full w-full md:px-10">
+        <div className="bg-theme-container flex flex-col justify-between items-center md:w-[40%] w-full px-5 pt-8 pb-5 h-full rounded-[15px]">
           <div className="flex items-center justify-center">
             <div className="border bg-theme-white p-5 border-theme-blue rounded-full w-fit">
               <PersonIcon
@@ -45,7 +43,7 @@ export default function Perfil() {
           </div>
         </div>
 
-        <div className="flex flex-col justify-between items-center w-[60%] p-5 h-full">
+        <div className="flex flex-col justify-between items-center md:w-[60%] w-full py-5 md:px-5 h-full">
           <div className="w-full">
             <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
               Editar perfil

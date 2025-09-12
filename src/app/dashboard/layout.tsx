@@ -52,9 +52,8 @@ export default function DashboardLayout({
     <div className="w-full flex items-start">
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
       <section
-        className={`transition-all duration-500 flex-1 m-5 border-4 p-5 border-[#F3F3F3] rounded-[20px] box-border ${isOpen ? 'ml-0 md:ml-[400px]' : 'ml-0 md:ml-[60px]'
+        className={`transition-all duration-500 flex-1 md:h-[calc(100vh-2.5rem)] m-5 border-4 p-5 border-[#F3F3F3] rounded-[20px] box-border ${isOpen ? 'ml-0 md:ml-[400px]' : 'ml-5 md:ml-[60px]'
           }`}
-        style={{ height: 'calc(100vh - 2.5rem)' }}
       >
         {children}
       </section>
