@@ -2,9 +2,10 @@ import { apiOnline } from '@/services/services';
 import { CircularProgress } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { ApiResponse, IEvento, IRecado } from '../Lists/types';
-import style from './EventosAvisos.module.scss';
+import { maskDate } from '@/utils/maskDate';
+import style from './EventosRecados.module.scss';
 
-export default function EventosAvisos() {
+export default function EventosRecados() {
   const [eventos, setEventos] = useState<IEvento[]>([]);
   const [recados, setRecados] = useState<IRecado[]>([]);
   const [loading, setLoading] = useState(true);
@@ -15,6 +16,17 @@ export default function EventosAvisos() {
     'divider-yellow',
     'divider-purple',
   ];
+
+  function parseDuracao(duracao: number): string {
+    if (duracao > 60) {
+      const horas = Math.floor(duracao / 60);
+      const minutos = duracao % 60;
+      return `${horas} hora(s) e ${minutos} minuto(s)`;
+    }else{
+      return `${duracao} minuto(s)`;
+    }
+  
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -74,10 +86,10 @@ export default function EventosAvisos() {
                       </p>
                       <p className="font-normal text-[0.8rem] text-theme-text flex items-center gap-1">
                         <span>
-                          {new Date(evento.data)
+                          {maskDate(new Date(evento.data)
                             .toISOString()
                             .split('T')[0]
-                            .replace(/-/g, '/')}
+                            .replace(/-/g, '/'))}
                         </span>
                         <span>às</span>
                         <span>
@@ -86,6 +98,15 @@ export default function EventosAvisos() {
                             minute: '2-digit',
                           })}
                         </span>
+                      </p>
+                      <p className="font-normal text-[0.8rem] text-theme-text">
+                        <span>Duração: {parseDuracao(evento.duracao)}</span>
+                      </p>
+                      <p className='font-normal text-[0.8rem] text-theme-text'>
+                        <span>Responsável: {evento.responsavel}</span>
+                      </p>
+                      <p className="font-normal text-[0.9rem] text-theme-text mt-1">
+                        <span>Local: {evento.laboratorio?.numero} - {evento.laboratorio?.nome}</span>
                       </p>
                     </div>
                   </div>

@@ -69,6 +69,17 @@ export interface IEmprestimo {
   dataHoraEntrada: Date;
 }
 
+export interface IHorario {
+  id?: number;
+  horario: string;
+  diaSemana: number;
+  idProfessor?: number;
+  idLaboratorio?: number;
+  professor?: IProfessor;
+  laboratorio?: ILaboratorio;
+}
+
+
 export interface ApiResponse {
   data?: IData | IData[] | ({ [key: string]: IData[] } & { total: number });
   erros?: string[];

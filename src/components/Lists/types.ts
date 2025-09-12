@@ -1,3 +1,5 @@
+import { ILaboratorio } from "@/interfaces/interfaces";
+
 export interface FormAcademico {
   id: number;
   ra: string;
@@ -81,6 +83,7 @@ export interface IEvento {
   duracao: number;
   responsavel: string;
   idLaboratorio: number;
+  laboratorio?: ILaboratorio;
 }
 
 export type IData =
