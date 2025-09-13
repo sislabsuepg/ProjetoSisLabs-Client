@@ -4,7 +4,6 @@ import { IPermissao } from "@/interfaces/interfaces";
 import { cadastro_usuario } from "@/schemas";
 import { apiOnline } from "@/services/services";
 import { capitalize } from "@/utils/capitalize";
-import { removeLetters } from "@/utils/removeLetters";
 import { ApiError } from "@/utils/tipos";
 import {
   CircularProgress,
@@ -189,7 +188,7 @@ export default function FormUsuario() {
               type="password"
               name="senha"
               inputProps={{ minLength: 6, maxLength: 12 }}
-              value={removeLetters(form.senha)}
+              value={form.senha}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
             />

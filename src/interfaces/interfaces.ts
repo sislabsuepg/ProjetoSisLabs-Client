@@ -15,6 +15,7 @@ export interface IAcademico {
   idCurso: number;
   anoCurso: number;
   senha?: string;
+  curso?: ICurso;
 }
 
 export interface IProfessor {
@@ -78,7 +79,6 @@ export interface IHorario {
   professor?: IProfessor;
   laboratorio?: ILaboratorio;
 }
-
 
 export interface ApiResponse {
   data?: IData | IData[] | ({ [key: string]: IData[] } & { total: number });
