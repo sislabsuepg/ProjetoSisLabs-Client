@@ -31,11 +31,20 @@ export default function Inicio() {
         const response = await apiOnline.get(
           `/emprestimo?page=${currentPage}&items=${itemsPerPage}`
         );
-        const data: IEmprestimo[] = Array.isArray(response)
+        let lista: unknown = Array.isArray(response)
           ? response
-          : (response as ApiResponse).data || [];
+          : (response as ApiResponse).data;
+        if (lista && typeof lista === "object" && !Array.isArray(lista)) {
+          const possivel = (lista as Record<string, unknown>)["emprestimos"];
+          if (Array.isArray(possivel)) lista = possivel;
+        }
+        if (!Array.isArray(lista)) lista = [];
+        const emprestimos = (lista as unknown[]).filter(
+          (x): x is IEmprestimo =>
+            !!x && typeof x === "object" && "laboratorio" in x && "aluno" in x
+        );
         setTotalPages(Math.ceil(count / itemsPerPage));
-        setData(data);
+        setData(emprestimos);
       } catch (e) {
         console.error(e);
       } finally {
@@ -64,12 +73,14 @@ export default function Inicio() {
           data?.map((item) => (
             <div
               key={item?.id}
-              className={`w-full flex items-center gap-2 ${
+              className={`w-full ${
                 Number(item?.id) % 2 == 0 ? "bg-transparent" : "bg-[#F3F3F3]"
-              } h-12 py-2 px-4 rounded-[10px]`}
+              } px-4 py-2 rounded-[10px]`}
             >
-              <div className="h-2 w-2 bg-[#22FF00] rounded-full"></div>
-              <p className="text-theme-text text-[0.9rem] font-normal">
+              {/* Layout em linha: ponto, texto (cresce), ícone logo após o texto */}
+              <div className="flex items-start gap-2">
+                <div className="h-2 w-2 bg-[#22FF00] rounded-full mt-[6px]"></div>
+                <p className="text-theme-text text-[0.9rem] font-normal leading-relaxed">
                 {item.posseChave ? (
                   <>
                     Laboratório{" "}
@@ -85,10 +96,6 @@ export default function Inicio() {
                     {item?.dataHoraEntrada
                       ? new Date(item.dataHoraEntrada).toLocaleString()
                       : ""}
-                    <Cancel
-                      className="text-theme-red"
-                      sx={{ width: 22, height: 22 }}
-                    />
                   </>
                 ) : (
                   <>
@@ -104,16 +111,17 @@ export default function Inicio() {
                     {item?.dataHoraEntrada
                       ? new Date(item.dataHoraEntrada).toLocaleString()
                       : ""}
-                    <Cancel
-                      className="text-theme-red ml-2"
-                      sx={{ width: 22, height: 22 }}
-                      onClick={() =>
-                        setOpenEncerrar({ status: true, id: item.id })
-                      }
-                    />
                   </>
                 )}
-              </p>
+                </p>
+                {item.id != null && (
+                  <Cancel
+                    className="text-theme-red cursor-pointer hover:scale-110 transition-transform mt-[4px]"
+                    sx={{ width: 20, height: 20 }}
+                    onClick={() => setOpenEncerrar({ status: true, id: item.id! })}
+                  />
+                )}
+              </div>
             </div>
           ))
         ) : (

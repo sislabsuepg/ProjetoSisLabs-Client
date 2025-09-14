@@ -67,6 +67,13 @@ export interface FormUsuario {
   permissaoUsuario?: FormPermissao;
 }
 
+export interface ILog {
+  id: number;
+  idUsuario: number;
+  dataHora: Date;
+  descricao: string;
+}
+
 export interface ApiResponse<T> {
   data: T;
 }

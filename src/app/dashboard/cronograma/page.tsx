@@ -144,8 +144,10 @@ export default function Cronograma() {
         });
         setTabelas((prev) => ({ ...prev, [activeId]: matriz }));
         if (activeId) {
-          setLabsCarregados(prev => {
-            const novo = new Set(prev); novo.add(activeId); return novo;
+          setLabsCarregados((prev) => {
+            const novo = new Set(prev);
+            novo.add(activeId);
+            return novo;
           });
         }
       } catch (e) {
@@ -160,7 +162,9 @@ export default function Cronograma() {
   // Pré-carrega horários dos demais laboratórios para que apareçam em "Aulas de Hoje" sem precisar selecionar
   useEffect(() => {
     if (!laboratorios.length) return;
-    const faltando = laboratorios.filter(l => l.id != null && !labsCarregados.has(l.id));
+    const faltando = laboratorios.filter(
+      (l) => l.id != null && !labsCarregados.has(l.id)
+    );
     if (!faltando.length) return;
     let cancelado = false;
     (async () => {
@@ -168,27 +172,57 @@ export default function Cronograma() {
       for (const lab of faltando) {
         if (cancelado) break;
         try {
-          const resp = await apiOnline.get<{ horarios?: IHorario[]; data?: IHorario[] }>(`/horario/laboratorio/${lab.id}`);
-          const listaRaw: IHorario[] = (resp.data && Array.isArray(resp.data) ? resp.data : resp.horarios) || [];
+          const resp = await apiOnline.get<{
+            horarios?: IHorario[];
+            data?: IHorario[];
+          }>(`/horario/laboratorio/${lab.id}`);
+          const listaRaw: IHorario[] =
+            (resp.data && Array.isArray(resp.data)
+              ? resp.data
+              : resp.horarios) || [];
           if (!listaRaw.length) {
-            setLabsCarregados(prev => { const n = new Set(prev); n.add(lab.id!); return n; });
+            setLabsCarregados((prev) => {
+              const n = new Set(prev);
+              n.add(lab.id!);
+              return n;
+            });
             continue;
           }
-          const lista = listaRaw.map(h => ({ ...h, horario: normalizeHorario(h.horario) }));
-          setTodosHorarios(prev => {
-            const key = (h: IHorario) => `${h.idLaboratorio}-${h.diaSemana}-${h.horario}`;
+          const lista = listaRaw.map((h) => ({
+            ...h,
+            horario: normalizeHorario(h.horario),
+          }));
+          setTodosHorarios((prev) => {
+            const key = (h: IHorario) =>
+              `${h.idLaboratorio}-${h.diaSemana}-${h.horario}`;
             const existentes = new Set(prev.map(key));
-            const add = lista.filter(h => h.idLaboratorio && !existentes.has(key(h)));
+            const add = lista.filter(
+              (h) => h.idLaboratorio && !existentes.has(key(h))
+            );
             return add.length ? [...prev, ...add] : prev;
           });
-          setLabsCarregados(prev => { const n = new Set(prev); n.add(lab.id!); return n; });
+          setLabsCarregados((prev) => {
+            const n = new Set(prev);
+            n.add(lab.id!);
+            return n;
+          });
         } catch (e) {
-          console.error('Erro ao pré-carregar horários do laboratório', lab.id, e);
-          setLabsCarregados(prev => { const n = new Set(prev); n.add(lab.id!); return n; });
+          console.error(
+            "Erro ao pré-carregar horários do laboratório",
+            lab.id,
+            e
+          );
+          setLabsCarregados((prev) => {
+            const n = new Set(prev);
+            n.add(lab.id!);
+            return n;
+          });
         }
       }
     })();
-    return () => { cancelado = true; };
+    return () => {
+      cancelado = true;
+    };
   }, [laboratorios, labsCarregados]);
 
   // Tabela ativa derivada
@@ -309,7 +343,10 @@ export default function Cronograma() {
   );
 
   const dadosIncompletos = useMemo(
-    () => laboratoriosUnificados.some(l => l.id != null && !labsCarregados.has(l.id!)),
+    () =>
+      laboratoriosUnificados.some(
+        (l) => l.id != null && !labsCarregados.has(l.id!)
+      ),
     [laboratoriosUnificados, labsCarregados]
   );
 
@@ -443,14 +480,21 @@ export default function Cronograma() {
             horario: n.horario,
             idProfessor: n.idProfessor,
           };
-          const resp = await apiOnline.post(
-            "/horario",
-            payloadCreate
-          );
+          const resp = await apiOnline.post("/horario", payloadCreate);
           // Tenta extrair o objeto criado em formatos diferentes
-          interface RespLaboratorio { id?: number; nome?: string; numero?: string; restrito?: boolean }
-          type RespHorario = Partial<IHorario> & { laboratorio?: RespLaboratorio };
-          const raw = (resp as { data?: RespHorario; horario?: RespHorario; })?.data ?? (resp as { horario?: RespHorario; }).horario ?? (resp as RespHorario);
+          interface RespLaboratorio {
+            id?: number;
+            nome?: string;
+            numero?: string;
+            restrito?: boolean;
+          }
+          type RespHorario = Partial<IHorario> & {
+            laboratorio?: RespLaboratorio;
+          };
+          const raw =
+            (resp as { data?: RespHorario; horario?: RespHorario })?.data ??
+            (resp as { horario?: RespHorario }).horario ??
+            (resp as RespHorario);
           if (raw && typeof raw === "object") {
             const horarioObj: IHorario = {
               id: raw.id,
@@ -458,7 +502,9 @@ export default function Cronograma() {
               diaSemana: (raw.diaSemana as number) ?? n.diaSemana,
               horario: normalizeHorario((raw.horario as string) ?? n.horario),
               idProfessor: (raw.idProfessor as number) ?? n.idProfessor,
-              professor: professores.find(p => p.id === ((raw.idProfessor as number) ?? n.idProfessor)),
+              professor: professores.find(
+                (p) => p.id === ((raw.idProfessor as number) ?? n.idProfessor)
+              ),
               laboratorio: raw.laboratorio,
             } as IHorario;
             novosCriados.push(horarioObj);
@@ -469,7 +515,7 @@ export default function Cronograma() {
               diaSemana: n.diaSemana,
               horario: n.horario,
               idProfessor: n.idProfessor,
-              professor: professores.find(p => p.id === n.idProfessor),
+              professor: professores.find((p) => p.id === n.idProfessor),
             } as IHorario);
           }
           created++;
@@ -507,19 +553,25 @@ export default function Cronograma() {
       }
 
       if (created || novosCriados.length) {
-        setTodosHorarios(prev => {
+        setTodosHorarios((prev) => {
           // evita duplicar (usa chave dia-horario-lab)
-          const key = (h: IHorario) => `${h.idLaboratorio}-${h.diaSemana}-${h.horario}`;
+          const key = (h: IHorario) =>
+            `${h.idLaboratorio}-${h.diaSemana}-${h.horario}`;
           const existentes = new Set(prev.map(key));
-          const add = novosCriados.filter(nc => !existentes.has(key(nc)));
+          const add = novosCriados.filter((nc) => !existentes.has(key(nc)));
           return add.length ? [...prev, ...add] : prev;
         });
       }
 
       if (fail && (ok || okRem || created))
-        toast.warn(`Atualizados ${ok}, criados ${created}, limpos ${okRem}, falharam ${fail}.`);
+        toast.warn(
+          `Atualizados ${ok}, criados ${created}, limpos ${okRem}, falharam ${fail}.`
+        );
       else if (fail) toast.error("Falha ao salvar alterações.");
-      else toast.success(`Salvo ${ok} atualização(ões), ${created} criação(ões) e ${okRem} limpeza(s).`);
+      else
+        toast.success(
+          `Salvo ${ok} atualização(ões), ${created} criação(ões) e ${okRem} limpeza(s).`
+        );
     } catch (e) {
       console.error("Erro ao salvar cronograma", e);
       toast.error("Erro inesperado ao salvar.");
