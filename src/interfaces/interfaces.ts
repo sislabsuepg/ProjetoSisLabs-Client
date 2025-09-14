@@ -81,6 +81,14 @@ export interface IHorario {
   laboratorio?: ILaboratorio;
 }
 
+export interface IRegistro {
+  id: number;
+  idUsuario: number;
+  dataHora: Date;
+  descricao: string;
+  usuario?: IUsuario;
+}
+
 export interface ApiResponse {
   data?: IData | IData[] | ({ [key: string]: IData[] } & { total: number });
   erros?: string[];
