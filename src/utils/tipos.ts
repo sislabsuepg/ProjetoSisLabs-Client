@@ -13,3 +13,16 @@ export interface Curso {
   anosMaximo: number;
   ativo: boolean;
 }
+
+export interface Aluno {
+  id: number;
+  ra: string;
+  nome: string;
+  idCurso: number;
+}
+
+export interface Laboratorio {
+  id: number;
+  nome: string;
+  numero: string;
+}

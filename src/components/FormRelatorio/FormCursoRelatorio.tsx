@@ -18,6 +18,7 @@ export default function FormCursoRelatorio() {
         setIsFetchingCursos(true);
         const response = await apiOnline.get<{ data: Curso[] }>("/curso");
         setCursos(response.data || []);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         toast.error("Falha ao carregar a lista de cursos.");
       } finally {

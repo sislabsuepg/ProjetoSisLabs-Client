@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import {
+  CircularProgress,
   FormControl,
   FormControlLabel,
   InputLabel,
@@ -14,19 +15,36 @@ import {
 import { DateField, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
+import { apiOnline } from "@/services/services";
+import { Laboratorio } from "@/utils/tipos";
 
-export default function FormAcademicoRelatorio() {
-  const [form, setForm] = useState({
-    laboratorio: "",
-    tipoEntrada: "",
-    periodo: { de: null as Dayjs | null, ate: null as Dayjs | null },
-  });
+const initialState = {
+  laboratorioId: "",
+  tipoEntrada: "",
+  periodo: { de: null as Dayjs | null, ate: null as Dayjs | null },
+};
 
-  const isFormValid =
-    form.tipoEntrada !== "" &&
-    form.laboratorio !== "" &&
-    form.periodo.de !== null &&
-    form.periodo.ate !== null;
+export default function FormLaboratorioRelatorio() {
+  const [form, setForm] = useState(initialState);
+  const [laboratorios, setLaboratorios] = useState<Laboratorio[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingLabs, setIsFetchingLabs] = useState(true);
+
+  useEffect(() => {
+    const fetchLaboratorios = async () => {
+      try {
+        setIsFetchingLabs(true);
+        const response = await apiOnline.get<{ data: Laboratorio[] }>("/laboratorio");
+        setLaboratorios(response.data || []);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (err) {
+        toast.error("Falha ao carregar a lista de laboratórios.");
+      } finally {
+        setIsFetchingLabs(false);
+      }
+    };
+    fetchLaboratorios();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,16 +52,46 @@ export default function FormAcademicoRelatorio() {
       toast.error("Preencha todos os campos corretamente.");
       return;
     }
-    toast.success("Relatório gerado com sucesso!");
-    setForm({ laboratorio: "", tipoEntrada: "", periodo: { de: null, ate: null } });
+
+    setIsLoading(true);
+    try {
+      //Formatação das datas
+      const dataInicio = form.periodo.de?.format('YYYY-MM-DD');
+      const dataFim = form.periodo.ate?.format('YYYY-MM-DD');
+
+      const endpoint = `/relatorio/emprestimo?laboratorioId=${form.laboratorioId}&tipoEntrada=${form.tipoEntrada}&dataInicio=${dataInicio}&dataFim=${dataFim}`;
+
+      const response = await apiOnline.get<Blob>(endpoint, { responseType: "blob" });
+
+      const url = window.URL.createObjectURL(new Blob([response]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `relatorio_laboratorio_${form.laboratorioId}_${dataInicio}_a_${dataFim}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      toast.success("Download do relatório iniciado!");
+      setForm(initialState);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      toast.error("Erro ao gerar o relatório.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const laboratorios = [
-    'Laboratório de Redes',
-    'Laboratório de IA',
-    'Laboratório de Programação',
-    'Laboratório de Robótica',
-  ];
+  const isFormValid =
+    form.tipoEntrada !== "" &&
+    form.laboratorioId !== "" &&
+    form.periodo.de !== null &&
+    form.periodo.ate !== null &&
+    form.periodo.de.isValid() &&
+    form.periodo.ate.isValid() &&
+    form.periodo.ate.isAfter(form.periodo.de);
+
 
   return (
     <div className="w-full flex flex-col h-full">
@@ -53,93 +101,60 @@ export default function FormAcademicoRelatorio() {
 
       <form onSubmit={handleSubmit} className="h-full space-y-6 w-full flex flex-col justify-between">
         <div className="w-full flex flex-col gap-4">
-          {/* Tipo de Entrada */}
-          <div className={`w-full bg-theme-container py-3 px-5 rounded-[10px] relative`}>
-            <p className="font-semibold text-theme-blue mb-2">
-              Tipo de entrada
-            </p>
+          <div className="w-full bg-theme-container py-3 px-5 rounded-[10px] relative">
+            <p className="font-semibold text-theme-blue mb-2">Tipo de entrada</p>
             <FormControl className="w-full">
               <RadioGroup
-                aria-labelledby="tipo-entrada-label"
                 value={form.tipoEntrada}
                 onChange={(e) => setForm(f => ({ ...f, tipoEntrada: e.target.value }))}
               >
                 <FormControlLabel value="emprestimo" control={<Radio />} label="Empréstimo de chave" />
-                <FormControlLabel value="pesquisa" control={<Radio />} label="Pesquisa" />
+                <FormControlLabel value="pesquisa" control={<Radio />} label="Orientação/Pesquisa" />
                 <FormControlLabel value="ambos" control={<Radio />} label="Ambos" />
               </RadioGroup>
             </FormControl>
           </div>
 
-          {/* Laboratório + Datas */}
           <div className="w-full flex flex-col gap-4">
-
-            {/* Select Laboratório */}
-            <FormControl
-              className="w-full relative"
-              variant="filled"
-            >
+            <FormControl className="w-full" variant="filled" disabled={isFetchingLabs || isLoading}>
               <InputLabel>Laboratório</InputLabel>
               <Select
-                value={form.laboratorio}
-                onChange={(e) => setForm(f => ({ ...f, laboratorio: e.target.value }))}
+                value={form.laboratorioId}
+                onChange={(e) => setForm(f => ({ ...f, laboratorioId: e.target.value }))}
               >
-                <MenuItem value="">-- Selecione uma opção --</MenuItem>
-                {laboratorios.map(el => (
-                  <MenuItem key={el} value={el}>{el}</MenuItem>
+                <MenuItem value=""><em>-- Selecione uma opção --</em></MenuItem>
+                {laboratorios.map(lab => (
+                  <MenuItem key={lab.id} value={lab.id}>{lab.nome}</MenuItem>
                 ))}
               </Select>
             </FormControl>
 
-
-            {/* Datas lado a lado */}
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-
               <div className="flex gap-4 w-full">
                 <DateField
                   label="Data inicial"
                   value={form.periodo.de}
                   onChange={(newValue) => setForm(f => ({ ...f, periodo: { ...f.periodo, de: newValue } }))}
                   format="DD/MM/YYYY"
-                  slotProps={{
-                    textField: {
-                      variant: "filled",
-                      className: `w-full`,
-                    }
-                  }}
-
+                  slotProps={{ textField: { variant: "filled", className: "w-full" } }}
                 />
-
                 <DateField
                   label="Data final"
                   value={form.periodo.ate}
                   onChange={(newValue) => setForm(f => ({ ...f, periodo: { ...f.periodo, ate: newValue } }))}
                   format="DD/MM/YYYY"
-                  slotProps={{
-                    textField: {
-                      variant: "filled",
-                      className: `w-full`,
-                    }
-                  }}
-
+                  slotProps={{ textField: { variant: "filled", className: "w-full" } }}
                 />
               </div>
             </LocalizationProvider>
           </div>
         </div>
 
-        {/* Botão */}
         <div className="w-full flex justify-end">
-          <button
-            type="submit"
-            disabled={!isFormValid}
-            className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] 
-              ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            Gerar relatório
+          <button type="submit" disabled={!isFormValid || isLoading} className={`bg-theme-blue font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] ${!isFormValid || isLoading ? "opacity-50 cursor-not-allowed" : ""}`}>
+            {isLoading ? <CircularProgress size={24} color="inherit" /> : "Gerar relatório"}
           </button>
         </div>
-
       </form>
     </div>
   );
