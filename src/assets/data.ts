@@ -12,7 +12,7 @@ import logo_uepg_desktop from "../assets/images/logosUEPG/logo_uepg_desktop.webp
 import logo_uepg_desktop_white from "../assets/images/logosUEPG/logo_uepg_desktop_white.webp";
 import logo_uepg_mobile from "../assets/images/logosUEPG/logo_uepg_mobile.png";
 import user_login from "../assets/images/user_login.webp";
-import icon_logs from "../assets/images/icon_logs.webp";
+import icon_logs from "../assets/images/icon_logs.png";
 
 export const data_images = {
   logo_uepg_desktop: logo_uepg_desktop.src,
