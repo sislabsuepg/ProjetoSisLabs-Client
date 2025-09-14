@@ -1,11 +1,11 @@
-'use client';
-import { data_images } from '@/assets/data';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import PersonIcon from '@mui/icons-material/Person';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useCookies } from 'react-cookie';
+"use client";
+import { data_images } from "@/assets/data";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import PersonIcon from "@mui/icons-material/Person";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useCookies } from "react-cookie";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -31,7 +31,7 @@ function SidebarItem({
     <li
       className={`relative flex items-center p-3 my-2 cursor-pointer
         rounded-[10px] transition-colors duration-200 hover:bg-[#5679b1]
-        ${active ? 'bg-theme-blue text-theme-white' : 'bg-[#4F6B98]'}
+        ${active ? "bg-theme-blue text-theme-white" : "bg-[#4F6B98]"}
       `}
       onClick={onClick}
     >
@@ -51,9 +51,9 @@ function SidebarItem({
 }
 
 export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
-  const [activeItem, setActiveItem] = useState('Início');
+  const [activeItem, setActiveItem] = useState("Início");
   const router = useRouter();
-  const [cookies, , removeCookie] = useCookies(['usuario']);
+  const [cookies, , removeCookie] = useCookies(["usuario"]);
 
   const user = cookies.usuario;
 
@@ -72,15 +72,15 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         className={`h-screen bg-theme-blue flex flex-col p-4 shadow-lg transition-transform duration-500 z-50
             fixed left-0 top-0
             ${
-              isOpen ? 'translate-x-0 w-[380px]' : '-translate-x-full w-[380px]'
+              isOpen ? "translate-x-0 w-[380px]" : "-translate-x-full w-[380px]"
             }
           `}
       >
         <div className="flex items-center justify-between gap-2 px-2 border-b border-theme-blue/70">
           <div
             onClick={() => {
-              setActiveItem('');
-              router.push('/dashboard/perfil');
+              setActiveItem("");
+              router.push("/dashboard/perfil");
             }}
             className="cursor-pointer flex items-center gap-2"
           >
@@ -108,80 +108,90 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           <SidebarItem
             icon={data_images?.icon_inicio}
             text="Início"
-            active={activeItem === 'Início'}
+            active={activeItem === "Início"}
             onClick={() => {
-              setActiveItem('Início');
-              router.push('/dashboard/');
+              setActiveItem("Início");
+              router.push("/dashboard/");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_cadastro}
             text="Cadastro"
-            active={activeItem === 'Cadastro'}
+            active={activeItem === "Cadastro"}
             onClick={() => {
-              setActiveItem('Cadastro');
-              router.push('/dashboard/cadastro');
+              setActiveItem("Cadastro");
+              router.push("/dashboard/cadastro");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_alterar_excluir}
             text="Listas"
-            active={activeItem === 'Alterar ou excluir'}
+            active={activeItem === "Alterar ou excluir"}
             onClick={() => {
-              setActiveItem('Alterar ou excluir');
-              router.push('/dashboard/alterar');
+              setActiveItem("Alterar ou excluir");
+              router.push("/dashboard/alterar");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_relatorio}
             text="Relatórios"
-            active={activeItem === 'Relatórios'}
+            active={activeItem === "Relatórios"}
             onClick={() => {
-              setActiveItem('Relatórios');
-              router.push('/dashboard/relatorios');
+              setActiveItem("Relatórios");
+              router.push("/dashboard/relatorios");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_advertencia}
             text="Emitir advertência"
-            active={activeItem === 'Emitir advertência'}
+            active={activeItem === "Emitir advertência"}
             onClick={() => {
-              setActiveItem('Emitir advertência');
-              router.push('/dashboard/advertencia');
+              setActiveItem("Emitir advertência");
+              router.push("/dashboard/advertencia");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_chave}
             text="Empréstimo"
-            active={activeItem === 'Empréstimo'}
+            active={activeItem === "Empréstimo"}
             onClick={() => {
-              setActiveItem('Empréstimo');
-              router.push('/dashboard/emprestimo');
+              setActiveItem("Empréstimo");
+              router.push("/dashboard/emprestimo");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_aulas}
             text="Cronograma de aulas"
-            active={activeItem === 'Cronograma de aulas'}
+            active={activeItem === "Cronograma de aulas"}
             onClick={() => {
-              setActiveItem('Cronograma de aulas');
-              router.push('/dashboard/cronograma');
+              setActiveItem("Cronograma de aulas");
+              router.push("/dashboard/cronograma");
             }}
             isOpen={isOpen}
           />
           <SidebarItem
             icon={data_images?.icon_agenda}
             text="Eventos e Avisos"
-            active={activeItem === 'Eventos e Avisos'}
+            active={activeItem === "Eventos e Avisos"}
             onClick={() => {
-              setActiveItem('Eventos e Avisos');
-              router.push('/dashboard/agenda');
+              setActiveItem("Eventos e Avisos");
+              router.push("/dashboard/agenda");
+            }}
+            isOpen={isOpen}
+          />
+          <SidebarItem
+            icon={data_images?.icon_logs}
+            text="Registros"
+            active={activeItem === "Registros"}
+            onClick={() => {
+              setActiveItem("Registros");
+              router.push("/dashboard/registros");
             }}
             isOpen={isOpen}
           />
@@ -199,8 +209,8 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             icon={data_images?.icon_sair}
             text="Sair"
             onClick={() => {
-              removeCookie('usuario', { path: '/' });
-              router.push('/login');
+              removeCookie("usuario", { path: "/" });
+              router.push("/login");
             }}
             isOpen={isOpen}
           />
