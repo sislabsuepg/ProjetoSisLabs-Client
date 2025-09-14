@@ -18,6 +18,7 @@ export interface Aluno {
   id: number;
   ra: string;
   nome: string;
+  email: string;
   idCurso: number;
 }
 

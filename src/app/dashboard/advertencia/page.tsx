@@ -1,161 +1,176 @@
 'use client'
 
-import { FormControl, FormControlLabel, InputLabel, MenuItem, Radio, RadioGroup, Select, SelectChangeEvent, TextField } from "@mui/material"
-import { useState, ChangeEvent } from "react"
+import { FormControl, FormControlLabel, InputLabel, MenuItem, Radio, RadioGroup, Select, SelectChangeEvent, TextField, CircularProgress } from "@mui/material"
+import { useState, useEffect, ChangeEvent } from "react"
+import { toast } from "react-toastify"
+import { apiOnline } from "@/services/services"
+import { Aluno, Laboratorio } from "@/utils/tipos"
 
-interface FormState {
-    id: number | null
-    nome: string
-    ra: string
-    laboratorio: string
-    motivo: string
-    motivoEspecifico: string
+interface EmprestimoAtivo {
+    id: number;
+    aluno: Aluno;
+    laboratorio: Laboratorio;
 }
 
+const initialState = {
+    emprestimoId: '',
+    motivo: '',
+    assuntoOutro: '',
+    corpoOutro: '',
+};
+
 export default function Advertencia() {
-    const [form, setForm] = useState<FormState>({
-        id: null,
-        nome: '',
-        ra: '',
-        laboratorio: '',
-        motivo: '',
-        motivoEspecifico: ''
-    })
-    const [outroMotivo, setOutroMotivo] = useState(false)
+    const [form, setForm] = useState(initialState);
+    const [emprestimos, setEmprestimos] = useState<EmprestimoAtivo[]>([]);
+    const [outroMotivo, setOutroMotivo] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isFetchingData, setIsFetchingData] = useState(true);
 
-    const listaRA = [
-        { id: 1, nome: "Teste 1", ra: '123456' },
-        { id: 2, nome: "Teste 2", ra: '654321' },
-        { id: 3, nome: "Teste 3", ra: '789012' },
-    ]
+    //Buscar empréstimos ativos
+    useEffect(() => {
+        const fetchEmprestimosAbertos = async () => {
+            try {
+                setIsFetchingData(true);
+                const response = await apiOnline.get<{ data: EmprestimoAtivo[] }>("/emprestimo?ativo=true");
+                setEmprestimos(response.data || []);
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (error) {
+                toast.error("Falha ao carregar alunos com empréstimos em aberto.");
+            } finally {
+                setIsFetchingData(false);
+            }
+        };
 
-    const listaLab = [
-        { id: 1, lab: "Lab A" },
-        { id: 2, lab: "Lab B" },
-        { id: 3, lab: "Lab C" },
-    ]
+        fetchEmprestimosAbertos();
+    }, []);
 
-    const listaEmails = [
-        { ra: '123456', email: 'teste1@example.com' },
-        { ra: '654321', email: 'teste2@example.com' },
-        { ra: '789012', email: 'teste3@example.com' }
-    ]
-
-    const handleRAChange = (e: SelectChangeEvent<string>) => {
-        const raSelecionado = e.target.value
-        const aluno = listaRA.find(a => a.ra === raSelecionado)
-        setForm(f => ({
-            ...f,
-            ra: raSelecionado,
-            nome: aluno ? aluno.nome : ''
-        }))
-    }
-
-    const handleLaboratorioChange = (e: SelectChangeEvent<string>) => {
-        setForm(f => ({ ...f, laboratorio: e.target.value }))
-    }
+    const handleEmprestimoChange = (e: SelectChangeEvent<string>) => {
+        setForm(f => ({ ...f, emprestimoId: e.target.value }));
+    };
 
     const handleRadioChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value
-        if (value === "outro") {
-            setOutroMotivo(true)
-            setForm(f => ({ ...f, motivo: "outro" }))
-        } else {
-            setOutroMotivo(false)
-            setForm(f => ({ ...f, motivo: value, motivoEspecifico: "" })) // limpa motivoEspecifico
-        }
-    }
+        const value = e.target.value;
+        setOutroMotivo(value === "outro");
+        setForm(f => ({ ...f, motivo: value, assuntoOutro: "", corpoOutro: "" }));
+    };
+    
+    const emprestimoSelecionado = emprestimos.find(e => e.id === Number(form.emprestimoId));
 
-    const handleOutroMotivoChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setForm(f => ({ ...f, motivoEspecifico: e.target.value }))
-    }
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!isFormValid || !emprestimoSelecionado) return;
+
+        setIsLoading(true);
+
+        let subject = '';
+        let text = '';
+
+        switch (form.motivo) {
+            case "naoDevolucaoChave":
+                subject = "Advertência: Não Devolução da Chave";
+                text = `Olá, ${emprestimoSelecionado.aluno.nome}.\n\nEste é um aviso formal sobre a não devolução da chave do ${emprestimoSelecionado.laboratorio.nome} referente ao seu último empréstimo.\n\nPor favor, realize a devolução o mais breve possível.\n\nAtenciosamente,\nCoordenação SISLABS.`;
+                break;
+            case "naoApresentouSaida":
+                subject = "Advertência: Não Apresentou Saída";
+                text = `Olá, ${emprestimoSelecionado.aluno.nome}.\n\nConstatamos que você não registrou sua saída do ${emprestimoSelecionado.laboratorio.nome} no seu último acesso.\n\nÉ fundamental registrar tanto a entrada quanto a saída para o controle do laboratório. Pedimos sua atenção para os próximos acessos.\n\nAtenciosamente,\nCoordenação SISLABS.`;
+                break;
+            case "outro":
+                subject = form.assuntoOutro;
+                text = form.corpoOutro;
+                break;
+        }
+
+        try {
+            await apiOnline.post('/email/', {
+                to: emprestimoSelecionado.aluno.email,
+                subject,
+                text,
+            });
+
+            toast.success("Advertência enviada com sucesso!");
+            setForm(initialState);
+            setOutroMotivo(false);
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+            toast.error("Falha ao enviar a advertência. Tente novamente.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const isFormValid =
-        form.ra !== '' &&
-        form.laboratorio !== '' &&
+        form.emprestimoId !== '' &&
         form.motivo !== '' &&
-        (form.motivo !== 'outro' || form.motivoEspecifico.trim() !== '')
+        (form.motivo !== 'outro' || (form.assuntoOutro.trim() !== '' && form.corpoOutro.trim() !== ''));
 
     return (
         <div className="w-full flex flex-col h-full items-start">
             <p className="text-theme-blue font-semibold text-[1.2rem] w-full text-start">
-            ⚠️ Emitir advertência
+                ⚠️ Emitir advertência
             </p>
+            {/* ... Funciona pls ... */}
+            <form onSubmit={handleSubmit} className="mt-4 space-y-4 w-full h-full flex flex-col justify-between">
+                <div className="flex flex-col space-y-4 w-full">
+                    {/* Select de Alunos/Empréstimos */}
+                    <FormControl className="w-full" variant="filled" disabled={isFetchingData || isLoading}>
+                        <InputLabel>Acadêmico com empréstimo em aberto</InputLabel>
+                        <Select value={form.emprestimoId} onChange={handleEmprestimoChange}>
+                            <MenuItem value="">-- Selecione uma opção --</MenuItem>
+                            {emprestimos.map(emp => (
+                                <MenuItem key={emp.id} value={emp.id}>
+                                    {emp.aluno.ra} - {emp.aluno.nome} (Lab: {emp.laboratorio.nome})
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
 
-            <p className="text-[0.9rem] italic font-medium mb-10 text-theme-red">
-                Observação: a advertência é recorrente ao dia atual do empréstimo.
-            </p>
-
-            <div className="w-full h-full flex flex-col justify-between">
-                <form className="mt-4 space-y-4 w-full h-full flex flex-col justify-between">
-                    <div className="flex flex-col space-y-4 w-full">
-                        <div className="w-full flex items-center gap-4">
-                            <FormControl className="w-full font-normal p-3 text-[0.9rem] rounded-md" variant="filled">
-                                <InputLabel>RA do acadêmico</InputLabel>
-                                <Select name="ra" value={form.ra} onChange={handleRAChange}>
-                                    <MenuItem value="">-- Selecione uma opção --</MenuItem>
-                                    {listaRA.map(el => (
-                                        <MenuItem key={el.id} value={el.ra}>{el.ra}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-
-                            <FormControl className="w-full font-normal p-3 text-[0.9rem] rounded-md" variant="filled">
-                                <InputLabel>Laboratório usado</InputLabel>
-                                <Select name="laboratorio" value={form.laboratorio} onChange={handleLaboratorioChange}>
-                                    <MenuItem value="">-- Selecione uma opção --</MenuItem>
-                                    {listaLab.map(el => (
-                                        <MenuItem key={el.id} value={el.lab}>{el.lab}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </div>
-
-                        <div className="w-full flex flex-col items-center gap-4">
-                            <div className="w-full bg-theme-container py-3 px-5 rounded-[10px] relative">
-                                <p className="font-semibold text-theme-blue mb-2">Motivo da advertência</p>
-                                <FormControl className="w-full">
-                                    <RadioGroup value={form.motivo} onChange={handleRadioChange}>
-                                        <FormControlLabel value="naoDevolucaoChave" control={<Radio />} label="Não devolução da chave" />
-                                        <FormControlLabel value="naoApresentouSaida" control={<Radio />} label="Não apresentou a saída" />
-                                        <FormControlLabel value="outro" control={<Radio />} label="Outro" />
-                                    </RadioGroup>
-                                </FormControl>
-                            </div>
-
-                            {outroMotivo && (
-                                <div className="w-full flex flex-col">
-                                    {outroMotivo && (
-                                        <TextField
-                                            label="Especifique o motivo"
-                                            variant="filled"
-                                            value={form.motivoEspecifico}
-                                            onChange={handleOutroMotivoChange}
-                                            className="w-full font-normal p-3 text-[0.9rem] rounded-md"
-                                        />
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
-                        {form?.ra && <p className="font-normal">
-                            <span className="font-medium mb-10 text-theme-blue">E-mail a ser enviado a advertência: </span>
-                            <span className="text-theme-red">{listaEmails.find(e => e.ra === form.ra)?.email ?? ''}</span>
-                        </p>}
+                    {/* Motivos da advertência */}
+                    <div className="w-full bg-theme-container py-3 px-5 rounded-[10px] relative">
+                        <p className="font-semibold text-theme-blue mb-2">Motivo da advertência</p>
+                        <FormControl className="w-full">
+                            <RadioGroup value={form.motivo} onChange={handleRadioChange}>
+                                <FormControlLabel value="naoDevolucaoChave" control={<Radio />} label="Não devolução da chave" />
+                                <FormControlLabel value="naoApresentouSaida" control={<Radio />} label="Não apresentou a saída" />
+                                <FormControlLabel value="outro" control={<Radio />} label="Outro" />
+                            </RadioGroup>
+                        </FormControl>
                     </div>
 
-                    <div className="w-full flex items-center justify-end">
-                        <button
-                            type="submit"
-                            disabled={!isFormValid}
-                            className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[170px] text-white rounded-[10px] 
-                             ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
-                        >
-                            Emitir advertência
-                        </button>
-                    </div>
-                </form>
-            </div>
+                    {/* Campos condicionais para outro motivo */}
+                    {outroMotivo && (
+                        <div className="w-full flex flex-col gap-4">
+                            <TextField
+                                label="Especifique o Assunto do E-mail"
+                                variant="filled"
+                                value={form.assuntoOutro}
+                                onChange={(e) => setForm(f => ({ ...f, assuntoOutro: e.target.value }))}
+                                className="w-full"
+                            />
+                            <TextField
+                                label="Escreva o Corpo do E-mail"
+                                variant="filled"
+                                multiline
+                                rows={4}
+                                value={form.corpoOutro}
+                                onChange={(e) => setForm(f => ({ ...f, corpoOutro: e.target.value }))}
+                                className="w-full"
+                            />
+                        </div>
+                    )}
+
+                    {emprestimoSelecionado && <p className="font-normal">
+                        <span className="font-medium text-theme-blue">E-mail do destinatário: </span>
+                        <span className="text-theme-red">{emprestimoSelecionado.aluno.email ?? 'E-mail não cadastrado'}</span>
+                    </p>}
+                </div>
+
+                <div className="w-full flex items-center justify-end">
+                    <button type="submit" disabled={!isFormValid || isLoading} className={`bg-theme-blue font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-full max-w-[170px] text-white rounded-[10px] ${!isFormValid || isLoading ? "opacity-50 cursor-not-allowed" : ""}`}>
+                        {isLoading ? <CircularProgress size={24} color="inherit" /> : "Emitir advertência"}
+                    </button>
+                </div>
+            </form>
         </div>
     )
 }
