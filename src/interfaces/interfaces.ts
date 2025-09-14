@@ -29,6 +29,7 @@ export interface ILaboratorio {
   nome: string;
   numero: string;
   restrito: boolean;
+  horarios?: IHorario[];
 }
 
 export interface IPermissao {
