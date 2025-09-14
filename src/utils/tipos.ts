@@ -6,3 +6,10 @@ export interface ApiError {
   };
   message?: string;
 }
+
+export interface Curso {
+  id: number;
+  nome: string;
+  anosMaximo: number;
+  ativo: boolean;
+}
