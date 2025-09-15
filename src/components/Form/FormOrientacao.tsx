@@ -48,8 +48,12 @@ export default function FormOrientacao() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const alunosResponse = await apiOnline.get<IAcademico[]>(`/aluno?ra=${ra}&ativo=true`);
-      const alunos: IAcademico[] = (alunosResponse as unknown as {data: IAcademico[]}).data;
+      const alunosResponse = await apiOnline.get<IAcademico[]>(
+        `/aluno?ra=${ra}&ativo=true`
+      );
+      const alunos: IAcademico[] = (
+        alunosResponse as unknown as { data: IAcademico[] }
+      ).data;
       console.log(alunos);
       if (!alunos?.[0]?.id) {
         toast.error("RA não encontrado.");
@@ -93,8 +97,17 @@ export default function FormOrientacao() {
           apiOnline.get<IProfessor[]>("/professor?ativo=true"),
           apiOnline.get<ILaboratorio[]>("/laboratorio?restrito=true"),
         ]);
-        setProfessores((professoresResponse as unknown as { data: IProfessor[] }).data ?? []);
-        setLaboratorios((laboratoriosResponse as unknown as { data: ILaboratorio[] }).data ?? []);
+        setProfessores(
+          (
+            professoresResponse as unknown as {
+              data: { professores: IProfessor[] };
+            }
+          ).data.professores ?? []
+        );
+        setLaboratorios(
+          (laboratoriosResponse as unknown as { data: ILaboratorio[] }).data ??
+            []
+        );
       } catch (err: unknown) {
         if (err instanceof AxiosError) {
           const data = err.response?.data as { erros?: string[] } | undefined;
