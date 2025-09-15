@@ -54,8 +54,8 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const [activeItem, setActiveItem] = useState("Início");
   const router = useRouter();
   const [cookies, , removeCookie] = useCookies(["usuario"]);
-
   const user = cookies.usuario;
+  const isAcademico = user && !isNaN(user.login);
 
   return (
     <>
@@ -71,9 +71,8 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       <aside
         className={`h-screen bg-theme-blue flex flex-col p-4 shadow-lg transition-transform duration-500 z-50
             fixed left-0 top-0
-            ${
-              isOpen ? "translate-x-0 w-[380px]" : "-translate-x-full w-[380px]"
-            }
+            ${isOpen ? "translate-x-0 w-[380px]" : "-translate-x-full w-[380px]"
+          }
           `}
       >
         <div className="flex items-center justify-between gap-2 px-2 border-b border-theme-blue/70">
@@ -104,7 +103,20 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           </button>
         </div>
 
-        <ul className="flex-grow">
+        {isAcademico ? (
+          <ul className="flex-grow">
+            <SidebarItem
+              icon={data_images?.icon_academico}
+              text="Acadêmico"
+              active={activeItem === "Acadêmico"}
+              onClick={() => {
+                setActiveItem("Acadêmico");
+                router.push("/dashboard/academico");
+              }}
+              isOpen={isOpen}
+            />
+          </ul>
+        ) : (<ul className="flex-grow">
           <SidebarItem
             icon={data_images?.icon_inicio}
             text="Início"
@@ -195,7 +207,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             }}
             isOpen={isOpen}
           />
-        </ul>
+        </ul>)}
 
         <div className="mt-auto">
           <div className="flex justify-center">

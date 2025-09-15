@@ -70,11 +70,11 @@ export default function Inicio() {
 
       <div className="w-full flex flex-col h-full mt-5">
         {data.length > 0 ? (
-          data?.map((item) => (
+          data?.map((item,index) => (
             <div
               key={item?.id}
               className={`w-full ${
-                Number(item?.id) % 2 == 0 ? "bg-transparent" : "bg-[#F3F3F3]"
+                Number(index) % 2 == 0 ? "bg-[#F3F3F3]" : "bg-transparent"
               } px-4 py-2 rounded-[10px]`}
             >
               {/* Layout em linha: ponto, texto (cresce), ícone logo após o texto */}
