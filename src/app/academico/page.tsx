@@ -20,7 +20,6 @@ import { useCookies } from "react-cookie";
 import DefaultButton from "@/components/DefaultButton";
 import { data_images } from "@/assets/data";
 import { removeLetters } from "@/utils/removeLetters";
-import { atualizarPerfil } from "@/schemas";
 import { maskPhone } from "@/utils/maskPhone";
 
 export default function Cronograma() {
@@ -51,19 +50,21 @@ export default function Cronograma() {
 
   const handleSolicitarSala = async () => {
     try {
-      const response = await apiOnline.post("/academico/solicitacao", {
+      await apiOnline.post("/academico/solicitacao", {
         idAluno: cookies.aluno.id,
         idLaboratorio: form.idLaboratorio,
       });
 
       toast.success("Sala solicitada com sucesso!");
     } catch (err: unknown) {
-      if (err.response?.data?.erros) {
-        err.response.data.erros.forEach((e: string) => toast.error(e));
-        return;
-      } else {
-        toast.error("Erro ao solicitar sala.");
+      if (err instanceof AxiosError) {
+        const erros = err.response?.data?.erros as string[] | undefined;
+        if (Array.isArray(erros)) {
+          erros.forEach((e) => toast.error(e));
+          return;
+        }
       }
+      toast.error("Erro ao solicitar sala.");
     }
   };
 
@@ -83,9 +84,7 @@ export default function Cronograma() {
     const fetchData = async () => {
       try {
         const laboratoriosResponse: AxiosResponse<ILaboratorio[]> =
-          await apiOnline.get(
-            `/academico/laboratorio?idAluno=${cookies.aluno.id}`
-          );
+          await apiOnline.get(`/aluno/laboratorios/${cookies.aluno.id}`);
         setLaboratorios(laboratoriosResponse.data);
       } catch (err: unknown) {
         if (err instanceof AxiosError) {
@@ -138,136 +137,173 @@ export default function Cronograma() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col gap-10">
-      <div className="h-full w-full flex flex-col items-start">
-        <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-          👤 Perfil
-        </p>
-        <div className="flex md:flex-row flex-col h-full w-full md:px-10">
-          <div className="bg-theme-container flex flex-col justify-between items-center md:w-[40%] w-full px-5 pt-8 pb-5 h-full rounded-[15px]">
-            <div className="flex items-center justify-center">
-              <div className="border bg-theme-white p-5 border-theme-blue rounded-full w-fit">
-                <PersonIcon
-                  className="text-theme-blue"
-                  sx={{ fontSize: "5rem" }}
-                />
-              </div>
-            </div>
+    <div className="w-full h-full flex flex-col gap-8 pb-10">
+      {/* Breadcrumb / Header */}
+      <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h1 className="text-theme-blue font-semibold text-xl flex items-center gap-2">
+            <span className="text-2xl">👨‍🎓</span> Área do Acadêmico
+          </h1>
+          <p className="text-theme-text text-sm mt-1">
+            Gerencie seu perfil, senha e solicite o uso de laboratórios.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-theme-text/70">
+          <span
+            className="hover:text-theme-blue cursor-pointer transition-colors"
+            onClick={() => router.push("/dashboard")}
+          >
+            Início
+          </span>
+          <span>/</span>
+          <span className="text-theme-blue font-medium">Acadêmico</span>
+        </div>
+      </div>
 
-            <div className="flex flex-col items-center gap-1 justify-center">
-              <p className="font-medium">{cookies?.usuario?.nome}</p>
-              <p className="text-theme-text font-normal text-[0.9rem]">
+      {/* Grid principal */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Card Perfil */}
+        <div className="bg-theme-container rounded-2xl p-6 flex flex-col shadow-sm border border-theme-blue/10">
+          <div className="flex flex-col items-center gap-4 mb-4">
+            <div className="border bg-theme-white p-4 border-theme-blue rounded-full">
+              <PersonIcon
+                className="text-theme-blue"
+                sx={{ fontSize: "4rem" }}
+              />
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <p className="font-medium text-sm md:text-base text-theme-blue/90">
+                {cookies?.usuario?.nome}
+              </p>
+              <p className="text-theme-text text-xs md:text-sm">
                 {cookies?.aluno?.nome}
               </p>
               {cookies?.aluno?.telefone && (
-                <p className="text-theme-text font-normal text-[0.9rem]">
+                <p className="text-theme-text text-xs md:text-sm">
                   {cookies?.aluno?.telefone}
                 </p>
               )}
             </div>
-
-            <div className="flex flex-col items-center justify-center">
-              <p className="bg-[#d1d1d1] text-theme-blue font-medium px-4 py-2 rounded-[5px]">
-                {cookies?.aluno?.email}
-              </p>
-              <p className="text-theme-text text-[0.9rem] font-medium mt-5">
-                Curso: {cookies?.aluno?.curso?.nome}
-              </p>
-              <p className="text-theme-text text-[0.9rem] font-medium mt-5">
-                Login: {cookies?.aluno?.lastLogin}
-              </p>
+          </div>
+          <div className="flex flex-col gap-3 text-center">
+            <p className="bg-[#d1d1d1] text-theme-blue font-medium px-3 py-2 rounded-md text-xs md:text-sm break-all">
+              {cookies?.aluno?.email}
+            </p>
+            <p className="text-theme-text text-xs md:text-sm">
+              <span className="font-semibold">Curso:</span>{" "}
+              {cookies?.aluno?.curso?.nome}
+            </p>
+            <p className="text-theme-text text-xs md:text-sm">
+              <span className="font-semibold">Último login:</span>{" "}
+              {cookies?.aluno?.lastLogin}
+            </p>
+          </div>
+          <div className="mt-6 flex flex-col gap-3">
+            <button
+              className="bg-theme-blue/90 hover:bg-theme-blue transition-colors font-medium h-9 text-xs md:text-sm w-full text-white rounded-lg"
+              onClick={() => {
+                removeCookie("aluno", { path: "/" });
+                router.push("/login");
+              }}
+            >
+              Sair
+            </button>
+            <div className="flex justify-center mt-2">
+              <img
+                className="w-full max-w-[120px] opacity-80"
+                src={data_images?.logo_uepg_desktop_white}
+                alt="Logo UEPG"
+              />
             </div>
           </div>
+        </div>
 
-          <div className="flex flex-col justify-between items-center md:w-[60%] w-full py-5 md:px-5 h-full">
-            <div className="w-full">
-              <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-                Editar perfil
-              </p>
-              <form
-                onSubmit={handlePerfilUpdate}
-                noValidate
-                className="flex flex-col gap-2"
-              >
+        {/* Forms Perfil e Senha */}
+        <div className="xl:col-span-2 flex flex-col gap-6">
+          <div className="bg-theme-container rounded-2xl p-6 shadow-sm border border-theme-blue/10">
+            <h2 className="font-semibold text-theme-blue text-lg mb-4 flex items-center gap-2">
+              ✏️ Editar perfil
+            </h2>
+            <form
+              onSubmit={handlePerfilUpdate}
+              noValidate
+              className="flex flex-col gap-4"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextField
-                  id="filled-basic"
                   label="Email"
                   variant="filled"
                   type="email"
                   name="email"
                   value={form.email}
                   onChange={handleChange}
-                  className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+                  className="w-full"
+                  size="small"
                 />
                 <TextField
-                  id="filled-basic"
                   label="Telefone"
                   variant="filled"
                   type="text"
                   name="telefone"
                   value={maskPhone(form.telefone) || ""}
                   onChange={handleChange}
-                  className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+                  className="w-full"
+                  size="small"
                 />
-                <div className="w-full flex items-center justify-end mt-3">
-                  <DefaultButton
-                    text={"Atualizar perfil"}
-                    disabled={
-                      (form.email === "" || form.email.length > 40) &&
-                      (form.telefone === "" || form.telefone.length < 11)
-                    }
-                  />
-                </div>
-              </form>
-            </div>
+              </div>
+              <div className="flex items-center justify-end">
+                <DefaultButton
+                  text="Atualizar perfil"
+                  disabled={
+                    (form.email === "" || form.email.length > 40) &&
+                    (form.telefone === "" || form.telefone.length < 11)
+                  }
+                />
+              </div>
+            </form>
+          </div>
 
-            <div className="w-full">
-              <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-                Senha
-              </p>
-
-              <form
-                noValidate
-                onSubmit={handleSenhaUpdate}
-                className="flex flex-col gap-2"
-              >
+          <div className="bg-theme-container rounded-2xl p-6 shadow-sm border border-theme-blue/10">
+            <h2 className="font-semibold text-theme-blue text-lg mb-4 flex items-center gap-2">
+              🔐 Alterar senha
+            </h2>
+            <form
+              noValidate
+              onSubmit={handleSenhaUpdate}
+              className="flex flex-col gap-4"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <TextField
-                  id="filled-basic"
                   label="Senha atual"
                   variant="filled"
                   type="password"
                   name="senha_atual"
                   value={form.senha_atual}
                   onChange={handleChange}
-                  className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+                  size="small"
                 />
-
                 <TextField
-                  id="filled-basic"
                   label="Nova senha"
                   variant="filled"
                   type="password"
                   name="nova_senha"
                   value={form.nova_senha}
                   onChange={handleChange}
-                  className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+                  size="small"
                 />
-
                 <TextField
-                  id="filled-basic"
                   label="Confirmar nova senha"
                   variant="filled"
                   type="password"
                   name="confirmar_nova_senha"
                   value={form.confirmar_nova_senha}
                   onChange={handleChange}
-                  className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+                  size="small"
                 />
-              </form>
-
-              <div className="w-full flex items-center justify-end mt-3">
+              </div>
+              <div className="flex items-center justify-end">
                 <DefaultButton
-                  text={"Atualizar senha"}
+                  text="Atualizar senha"
                   disabled={
                     form.senha_atual.length >= 4 &&
                     form.senha_atual.length <= 6 &&
@@ -279,60 +315,46 @@ export default function Cronograma() {
                   }
                 />
               </div>
+            </form>
+          </div>
+
+          <div className="bg-theme-container rounded-2xl p-6 shadow-sm border border-theme-blue/10">
+            <h2 className="font-semibold text-theme-blue text-lg mb-4 flex items-center gap-2">
+              🧪 Solicitar sala
+            </h2>
+            <div className="flex flex-col gap-4">
+              <FormControl className="w-full" variant="filled" size="small">
+                <InputLabel>Laboratório</InputLabel>
+                <Select
+                  name="idLaboratorio"
+                  value={form.idLaboratorio}
+                  onChange={handleSelectChange}
+                >
+                  <MenuItem value={0}>-- Selecione uma opção --</MenuItem>
+                  {laboratorios.map((l) => (
+                    <MenuItem key={l.id} value={l.id}>{`${l.numero} - ${
+                      l.nome
+                    }${l.restrito ? "(Orientação)" : ""}`}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <div className="flex items-center justify-end">
+                <button
+                  type="button"
+                  onClick={handleSolicitarSala}
+                  disabled={!isFormValid}
+                  className={`bg-theme-blue font-medium h-9 flex items-center justify-center text-sm px-6 text-white rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 ${
+                    !isFormValid
+                      ? "opacity-50 cursor-not-allowed hover:shadow-none hover:translate-y-0"
+                      : ""
+                  }`}
+                >
+                  Solicitar sala
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="w-full h-full flex flex-col justify-start">
-        <p className="font-semibold text-[1.2rem] text-theme-blue mb-2">
-          Solicitar sala
-        </p>
-
-        <FormControl className="w-full" variant="filled">
-          <InputLabel>Laboratório</InputLabel>
-          <Select
-            name="idLaboratorio"
-            value={form.idLaboratorio}
-            onChange={handleSelectChange}
-          >
-            <MenuItem value={0}>-- Selecione uma opção --</MenuItem>
-            {laboratorios.map((l) => (
-              <MenuItem key={l.id} value={l.id}>
-                {`${l.numero} - ${l.nome}`}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <div className="w-full mt-10 flex items-center justify-end">
-          <button
-            type="submit"
-            onClick={handleSolicitarSala}
-            disabled={!isFormValid}
-            className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] 
-          ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            Solicitar sala
-          </button>
-        </div>
-      </div>
-      <div className="mt-auto">
-        <div className="flex justify-center">
-          <img
-            className="w-full max-w-[150px]"
-            src={data_images?.logo_uepg_desktop_white}
-            alt="Logo UEPG"
-          />
-        </div>
-        <button
-          className="bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]"
-          onClick={() => {
-            removeCookie("aluno", { path: "/" });
-          }}
-        >
-          Sair
-        </button>
       </div>
     </div>
   );
