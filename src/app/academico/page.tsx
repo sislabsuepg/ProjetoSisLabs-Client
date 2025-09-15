@@ -137,18 +137,21 @@ export default function Cronograma() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col gap-8 pb-10">
+    //Padding geral p-6 em telas pequenas, p-8 em médias e maiores
+    <div className="w-full h-full flex flex-col gap-8 p-6 md:p-8">
       {/* Breadcrumb / Header */}
       <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
           <h1 className="text-theme-blue font-semibold text-xl flex items-center gap-2">
             <span className="text-2xl">👨‍🎓</span> Área do Acadêmico
           </h1>
-          <p className="text-theme-text text-sm mt-1">
+          {/* Tentativa de alterar a cor, modificar depois */}
+          <p className="text-gray-500 text-sm mt-1 font-medium">
             Gerencie seu perfil, senha e solicite o uso de laboratórios.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-theme-text/70">
+        {/* Tentativa de alterar a cor, modificar depois */}
+        <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
           <span
             className="hover:text-theme-blue cursor-pointer transition-colors"
             onClick={() => router.push("/dashboard")}
@@ -156,7 +159,7 @@ export default function Cronograma() {
             Início
           </span>
           <span>/</span>
-          <span className="text-theme-blue font-medium">Acadêmico</span>
+          <span className="text-theme-blue font-semibold">Acadêmico</span>
         </div>
       </div>
 
@@ -175,11 +178,13 @@ export default function Cronograma() {
               <p className="font-medium text-sm md:text-base text-theme-blue/90">
                 {cookies?.usuario?.nome}
               </p>
-              <p className="text-theme-text text-xs md:text-sm">
+              {/* Tentativa de alterar a cor, modificar depois */}
+              <p className="text-gray-600 text-xs md:text-sm font-medium">
                 {cookies?.aluno?.nome}
               </p>
               {cookies?.aluno?.telefone && (
-                <p className="text-theme-text text-xs md:text-sm">
+                // Tentativa de alterar a cor, modificar depois
+                <p className="text-gray-600 text-xs md:text-sm font-medium">
                   {cookies?.aluno?.telefone}
                 </p>
               )}
@@ -193,8 +198,9 @@ export default function Cronograma() {
               <span className="font-semibold">Curso:</span>{" "}
               {cookies?.aluno?.curso?.nome}
             </p>
-            <p className="text-theme-text text-xs md:text-sm">
-              <span className="font-semibold">Último login:</span>{" "}
+            {/* Tentativa de alterar a cor, modificar depois */}
+            <p className="text-gray-600 text-xs md:text-sm font-medium">
+              <span className="font-semibold text-theme-text">Último login:</span>{" "}
               {cookies?.aluno?.lastLogin}
             </p>
           </div>
@@ -210,8 +216,8 @@ export default function Cronograma() {
             </button>
             <div className="flex justify-center mt-2">
               <img
-                className="w-full max-w-[120px] opacity-80"
-                src={data_images?.logo_uepg_desktop_white}
+                className="w-full max-w-[255px] opacity-85"
+                src={data_images?.logo_uepg_desktop}
                 alt="Logo UEPG"
               />
             </div>
