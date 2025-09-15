@@ -9,9 +9,9 @@ export default function Cronograma() {
   const [activeId, setActiveId] = useState(1);
 
   const listButtons = [
-    { id: 1, title: 'Eventos e Recados', component: <EventosRecados /> },
-    { id: 2, title: 'Adicionar eventos', component: <AdicionarEventos /> },
-    { id: 3, title: 'Adicionar recados', component: <AdicionarRecados /> },
+    { id: 1, title: "Eventos e Recados", component: <EventosRecados /> },
+    { id: 2, title: "Adicionar eventos", component: <AdicionarEventos /> },
+    { id: 3, title: "Adicionar recados", component: <AdicionarRecados /> },
   ];
 
   return (
@@ -22,7 +22,7 @@ export default function Cronograma() {
             key={item.id}
             onClick={() => setActiveId(item.id)}
             className={`${
-              item.id === activeId ? 'bg-theme-lightBlue' : 'bg-theme-blue'
+              item.id === activeId ? "bg-theme-lightBlue" : "bg-theme-blue"
             } h-12 px-4 rounded-[10px] text-theme-white font-semibold`}
           >
             {item.title}
