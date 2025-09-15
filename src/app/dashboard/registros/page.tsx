@@ -170,7 +170,7 @@ export default function RegistrosPage() {
         <div className="h-full overflow-y-auto rounded-lg bg-theme-white">
           <ListaRegistros list={registros} />
         </div>
-        {registros.length > 0 && (
+        {registros && registros.length > 0 && (
           <Pagination
             currentPage={paginaAtual}
             totalPages={totalPaginas}

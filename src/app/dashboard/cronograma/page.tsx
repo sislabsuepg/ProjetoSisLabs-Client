@@ -78,7 +78,7 @@ export default function Cronograma() {
     fetchProfessores();
   }, []);
 
-  // Laboratórios (fallback simples caso a API seja diferente)
+  // Laboratórios
   useEffect(() => {
     const fetchLaboratorios = async () => {
       try {
@@ -89,7 +89,7 @@ export default function Cronograma() {
         const lista =
           (resp.data && Array.isArray(resp.data)
             ? resp.data
-            : resp.laboratorios) || [];
+            : (resp as { laboratorios?: ILaboratorio[] }).laboratorios) || [];
         if (lista.length) setLaboratorios(lista.filter((l) => l?.id != null));
       } catch (e) {
         console.error("Erro ao buscar laboratórios", e);
@@ -366,6 +366,24 @@ export default function Cronograma() {
     return { horarios: hrs, laboratorios: labs, mapa };
   }, [aulasOrdenadas, laboratorios]);
 
+  // Índice do primeiro horário considerado "noite" (>= 18:00)
+  const firstNightIndex = useMemo(() => {
+    const alvo = horarios.findIndex((h) => {
+      const [hh] = h.split(":");
+      return Number(hh) >= 18;
+    });
+    return alvo === -1 ? undefined : alvo;
+  }, []);
+
+  // Índice do primeiro horário considerado "tarde" (>= 13:00)
+  const firstAfternoonIndex = useMemo(() => {
+    const alvo = horarios.findIndex((h) => {
+      const [hh] = h.split(":");
+      return Number(hh) >= 13; // depois do bloco da manhã
+    });
+    return alvo === -1 ? undefined : alvo;
+  }, []);
+
   const compactMode = useMemo(
     () => tabelaAulasHoje.laboratorios.length > 6,
     [tabelaAulasHoje.laboratorios]
@@ -563,7 +581,7 @@ export default function Cronograma() {
         select#labSelect optgroup { color:#0f172a; background:#ffffff; }
       `}</style>
       {/* Aulas de Hoje */}
-      <div className="w-full h-full flex flex-col">
+      <div className="w-full flex flex-col">
         <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
           Aulas de Hoje
         </p>
@@ -626,53 +644,83 @@ export default function Cronograma() {
                   </tr>
                 </thead>
                 <tbody>
-                  {tabelaAulasHoje.horarios.map((hora, idxHora) => (
-                    <tr
-                      key={hora}
-                      className={
-                        idxHora % 2 === 0 ? "bg-theme-blue/5" : "bg-white"
-                      }
-                    >
-                      <td
-                        className={`sticky left-0 z-10 bg-theme-blue/90 text-theme-white font-semibold ${
-                          compactMode ? "px-2" : "px-3"
-                        } py-2 border border-theme-blue/20 whitespace-nowrap`}
-                      >
-                        {hora}
-                      </td>
-                      {tabelaAulasHoje.laboratorios.map((labObj) => {
-                        const chave = `${hora}__${labObj.id}`;
-                        const professor = tabelaAulasHoje.mapa[chave];
-                        return (
+                  {tabelaAulasHoje.horarios.map((hora, idxHora) => {
+                    const isNightSeparator =
+                      firstNightIndex !== undefined &&
+                      horarios[firstNightIndex] === hora &&
+                      idxHora !== 0; // evita separador topo
+                    const isAfternoonSeparator =
+                      firstAfternoonIndex !== undefined &&
+                      horarios[firstAfternoonIndex] === hora &&
+                      idxHora !== 0;
+                    return (
+                      <>
+                        {isAfternoonSeparator && (
+                          <tr key={hora + "_sep_tarde"}>
+                            <td
+                              colSpan={1 + tabelaAulasHoje.laboratorios.length}
+                              className="bg-gradient-to-r from-transparent via-amber-300/40 to-transparent h-[6px] p-0"
+                              title="Intervalo"
+                            />
+                          </tr>
+                        )}
+                        {isNightSeparator && (
+                          <tr key={hora + "_sep"}>
+                            <td
+                              colSpan={1 + tabelaAulasHoje.laboratorios.length}
+                              className="bg-gradient-to-r from-transparent via-theme-blue/20 to-transparent h-[6px] p-0"
+                              title="Intervalo"
+                            />
+                          </tr>
+                        )}
+                        <tr
+                          key={hora}
+                          className={
+                            idxHora % 2 === 0 ? "bg-theme-blue/5" : "bg-white"
+                          }
+                        >
                           <td
-                            key={labObj.id + "_" + hora}
-                            className={`border border-theme-blue/15 align-top ${
-                              compactMode
-                                ? "px-1 py-1 text-[0.55rem]"
-                                : "px-2 py-1"
-                            } ${
-                              compactMode ? "min-w-[90px]" : "min-w-[140px]"
-                            }`}
+                            className={`sticky left-0 z-10 bg-theme-blue/90 text-theme-white font-semibold ${
+                              compactMode ? "px-2" : "px-3"
+                            } py-2 border border-theme-blue/20 whitespace-nowrap`}
                           >
-                            {professor ? (
-                              <div className="flex flex-col gap-1">
-                                <span
-                                  className="font-medium text-theme-blue truncate"
-                                  title={professor}
-                                >
-                                  {professor}
-                                </span>
-                              </div>
-                            ) : (
-                              <span className="text-theme-blue/30 select-none">
-                                —
-                              </span>
-                            )}
+                            {hora}
                           </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
+                          {tabelaAulasHoje.laboratorios.map((labObj) => {
+                            const chave = `${hora}__${labObj.id}`;
+                            const professor = tabelaAulasHoje.mapa[chave];
+                            return (
+                              <td
+                                key={labObj.id + "_" + hora}
+                                className={`border border-theme-blue/15 align-top ${
+                                  compactMode
+                                    ? "px-1 py-1 text-[0.55rem]"
+                                    : "px-2 py-1"
+                                } ${
+                                  compactMode ? "min-w-[90px]" : "min-w-[140px]"
+                                }`}
+                              >
+                                {professor ? (
+                                  <div className="flex flex-col gap-1">
+                                    <span
+                                      className="font-medium text-theme-blue truncate"
+                                      title={professor}
+                                    >
+                                      {professor}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <span className="text-theme-blue/30 select-none">
+                                    —
+                                  </span>
+                                )}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      </>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -731,56 +779,87 @@ export default function Cronograma() {
               </tr>
             </thead>
             <tbody>
-              {horarios.map((hora, linha) => (
-                <tr key={linha}>
-                  <td className="border border-gray-400 px-2 py-1 font-bold bg-theme-blue text-theme-white text-center w-[90px]">
-                    {hora}
-                  </td>
-                  {dias.map((_, coluna) => {
-                    const isSabado = coluna === 5;
-                    const horaNum = Number(hora.split(":")[0]);
-                    const sabadoBloqueado = isSabado && horaNum >= 12;
-                    const podeEditar = !!editaveis[activeId]?.[linha]?.[coluna];
-                    if (sabadoBloqueado || !podeEditar) {
-                      return (
+              {horarios.map((hora, linha) => {
+                const isNightSeparator =
+                  firstNightIndex !== undefined &&
+                  linha === firstNightIndex &&
+                  linha !== 0;
+                const isAfternoonSeparator =
+                  firstAfternoonIndex !== undefined &&
+                  linha === firstAfternoonIndex &&
+                  linha !== 0;
+                return (
+                  <>
+                    {isAfternoonSeparator && (
+                      <tr key={linha + "_sep_tarde"}>
                         <td
-                          key={coluna}
-                          className="border border-gray-400 p-0 w-[120px] bg-gray-100/60 text-center text-[0.55rem] text-gray-400 align-middle select-none"
-                          title={
-                            sabadoBloqueado
-                              ? "Sábado somente período da manhã"
-                              : !podeEditar
-                              ? "Horário não disponível para edição"
-                              : undefined
-                          }
-                        >
-                          —
-                        </td>
-                      );
-                    }
-                    return (
-                      <td
-                        key={coluna}
-                        className="border border-gray-400 p-0 w-[120px] relative"
-                      >
-                        {loadingTabela && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-white/60 text-[0.55rem] text-theme-blue animate-pulse z-10">
-                            Carregando...
-                          </div>
-                        )}
-                        <ProfessorAutocomplete
-                          value={tabelaAtiva[linha][coluna]}
-                          onChange={(val) =>
-                            atualizarCelula(linha, coluna, val)
-                          }
-                          professores={professores}
-                          disabled={loadingTabela}
+                          colSpan={1 + dias.length}
+                          className="bg-gradient-to-r from-transparent via-amber-300/40 to-transparent h-[6px] p-0"
+                          title="Intervalo"
                         />
+                      </tr>
+                    )}
+                    {isNightSeparator && (
+                      <tr key={linha + "_sep_noite"}>
+                        <td
+                          colSpan={1 + dias.length}
+                          className="bg-gradient-to-r from-transparent via-theme-blue/20 to-transparent h-[6px] p-0"
+                          title="Intervalo"
+                        />
+                      </tr>
+                    )}
+                    <tr key={linha}>
+                      <td className="border border-gray-400 px-2 py-1 font-bold bg-theme-blue text-theme-white text-center w-[90px]">
+                        {hora}
                       </td>
-                    );
-                  })}
-                </tr>
-              ))}
+                      {dias.map((_, coluna) => {
+                        const isSabado = coluna === 5;
+                        const horaNum = Number(hora.split(":")[0]);
+                        const sabadoBloqueado = isSabado && horaNum >= 12;
+                        const podeEditar =
+                          !!editaveis[activeId]?.[linha]?.[coluna];
+                        if (sabadoBloqueado || !podeEditar) {
+                          return (
+                            <td
+                              key={coluna}
+                              className="border border-gray-400 p-0 w-[120px] bg-gray-100/60 text-center text-[0.55rem] text-gray-400 align-middle select-none"
+                              title={
+                                sabadoBloqueado
+                                  ? "Sábado somente período da manhã"
+                                  : !podeEditar
+                                  ? "Horário não disponível para edição"
+                                  : undefined
+                              }
+                            >
+                              —
+                            </td>
+                          );
+                        }
+                        return (
+                          <td
+                            key={coluna}
+                            className="border border-gray-400 p-0 w-[120px] relative"
+                          >
+                            {loadingTabela && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-white/60 text-[0.55rem] text-theme-blue animate-pulse z-10">
+                                Carregando...
+                              </div>
+                            )}
+                            <ProfessorAutocomplete
+                              value={tabelaAtiva[linha][coluna]}
+                              onChange={(val) =>
+                                atualizarCelula(linha, coluna, val)
+                              }
+                              professores={professores}
+                              disabled={loadingTabela}
+                            />
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  </>
+                );
+              })}
             </tbody>
           </table>
         </div>

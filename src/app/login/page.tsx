@@ -77,11 +77,7 @@ export default function Login() {
       const user = cookies.usuario;
       if (user && user.id && user.nome && user.id > 0) {
         console.log("Usuário já autenticado, redirecionando para dashboard");
-        if (isAcademico) {
-          return router.push("/dashboard/academico");
-        } else {
-          return router.push("/dashboard");
-        }
+        return router.push("/dashboard");
       }
       // Caso contrário, limpa cookie inválido se existir
       if (user) {
@@ -90,8 +86,8 @@ export default function Login() {
       }
       const aluno = cookies.aluno;
       if (aluno && aluno.id && aluno.nome && aluno.id > 0) {
-        console.log("Aluno já autenticado, redirecionando para alunoTela");
-        router.push("/alunoTela");
+        console.log("Aluno já autenticado, redirecionando para acadêmico");
+        router.push("/academico");
         return;
       }
       // Caso contrário, limpa cookie inválido se existir
@@ -194,7 +190,7 @@ export default function Login() {
           router.push("/dashboard");
         } else {
           if (data.data && isAcademico(data.data)) {
-            router.push("/dashboard/academico");
+            router.push("/academico");
           }
         }
       }, 100);
@@ -314,10 +310,11 @@ export default function Login() {
               type="submit"
               disabled={loading}
               className={`w-full px-3 py-2 text-base font-normal rounded-md border-none text-theme-white text-[0.9rem] transition-colors duration-200
-              ${loading
+              ${
+                loading
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-theme-blue cursor-pointer"
-                }
+              }
             `}
             >
               {loading ? "Entrando..." : "Entrar"}

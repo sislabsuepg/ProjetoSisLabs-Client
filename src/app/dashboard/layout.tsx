@@ -1,9 +1,9 @@
-'use client';
-import Sidebar from '@/components/SideBarMenu';
-import { CircularProgress } from '@mui/material';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
+"use client";
+import Sidebar from "@/components/SideBarMenu";
+import { CircularProgress } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
 
 export default function DashboardLayout({
   children,
@@ -13,7 +13,7 @@ export default function DashboardLayout({
   const [isOpen, setIsOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const [cookies] = useCookies(['usuario']);
+  const [cookies] = useCookies(["usuario", "aluno"]);
 
   useEffect(() => {
     setMounted(true);
@@ -22,9 +22,10 @@ export default function DashboardLayout({
   useEffect(() => {
     if (mounted) {
       const user = cookies.usuario;
-      if (!user || !user.id || !user.nome || user.id <= 0) {
-        console.log('Usuário não autenticado, redirecionando para login');
-        router.push('/login');
+      const aluno = cookies.aluno;
+      if (!user || !user.id || !user.nome || user.id <= 0 || aluno) {
+        console.log("Usuário não autenticado, redirecionando para login");
+        router.push("/login");
       }
     }
   }, [mounted, cookies.usuario, router]);
@@ -32,7 +33,7 @@ export default function DashboardLayout({
   if (!mounted) {
     return (
       <div className="w-full h-screen flex-col gap-2 flex items-center justify-center">
-        <p className='font-normal'>Carregando...</p>
+        <p className="font-normal">Carregando...</p>
         <CircularProgress size={40} />
       </div>
     );
@@ -42,7 +43,7 @@ export default function DashboardLayout({
   if (!user || !user.id || !user.nome || user.id <= 0) {
     return (
       <div className="w-full h-screen flex flex-col gap-2 items-center justify-center">
-        <p className='font-normal'>Redirecionando...</p>
+        <p className="font-normal">Redirecionando...</p>
         <CircularProgress size={40} />
       </div>
     );
@@ -52,8 +53,9 @@ export default function DashboardLayout({
     <div className="w-full flex items-start">
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
       <section
-        className={`transition-all duration-500 flex-1 md:h-[calc(100vh-2.5rem)] m-5 border-4 p-5 border-[#F3F3F3] rounded-[20px] box-border ${isOpen ? 'ml-0 md:ml-[400px]' : 'ml-5 md:ml-[60px]'
-          }`}
+        className={`transition-all duration-500 flex-1 min-h-screen md:min-h-[calc(100vh-2.5rem)] m-5 border-4 p-5 border-[#F3F3F3] rounded-[20px] box-border overflow-x-auto overflow-y-auto ${
+          isOpen ? "ml-0 md:ml-[400px]" : "ml-5 md:ml-[60px]"
+        }`}
       >
         {children}
       </section>
