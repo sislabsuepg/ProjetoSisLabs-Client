@@ -70,7 +70,7 @@ export default function Inicio() {
 
       <div className="w-full flex flex-col h-full mt-5">
         {data.length > 0 ? (
-          data?.map((item,index) => (
+          data?.map((item, index) => (
             <div
               key={item?.id}
               className={`w-full ${
@@ -78,47 +78,51 @@ export default function Inicio() {
               } px-4 py-2 rounded-[10px]`}
             >
               {/* Layout em linha: ponto, texto (cresce), ícone logo após o texto */}
-              <div className="flex items-start gap-2">
-                <div className="h-2 w-2 bg-[#22FF00] rounded-full mt-[6px]"></div>
-                <p className="text-theme-text text-[0.9rem] font-normal leading-relaxed">
-                {item.posseChave ? (
-                  <>
-                    Laboratório{" "}
-                    <span className="font-semibold">
-                      {item?.laboratorio.nome}
-                    </span>{" "}
-                    - Chave do Laboratório {item?.laboratorio.nome} foi
-                    emprestado pelo(a) aluno(a){" "}
-                    <span className="font-semibold">
-                      {item?.aluno?.nome || "-"}
-                    </span>{" "}
-                    -{" "}
-                    {item?.dataHoraEntrada
-                      ? new Date(item.dataHoraEntrada).toLocaleString()
-                      : ""}
-                  </>
-                ) : (
-                  <>
-                    Laboratório{" "}
-                    <span className="font-semibold">
-                      Laboratório {item?.laboratorio.nome}
-                    </span>{" "}
-                    foi aberto pelo(a) aluno(a){" "}
-                    <span className="font-semibold">
-                      {item?.aluno?.nome || "-"} para pesquisa
-                    </span>{" "}
-                    - :{" "}
-                    {item?.dataHoraEntrada
-                      ? new Date(item.dataHoraEntrada).toLocaleString()
-                      : ""}
-                  </>
-                )}
-                </p>
+              <div className="flex w-full items-start gap-2">
+                <div className="flex items-start gap-2 flex-1">
+                  <div className="h-2 w-2 bg-[#22FF00] rounded-full mt-[6px]"></div>
+                  <p className="text-theme-text text-[0.9rem] font-normal leading-relaxed">
+                    {item.posseChave ? (
+                      <>
+                        Laboratório{" "}
+                        <span className="font-semibold">
+                          {item?.laboratorio.nome}
+                        </span>{" "}
+                        - Chave do Laboratório {item?.laboratorio.nome} foi
+                        emprestado pelo(a) aluno(a){" "}
+                        <span className="font-semibold">
+                          {item?.aluno?.nome || "-"}
+                        </span>{" "}
+                        -{" "}
+                        {item?.dataHoraEntrada
+                          ? new Date(item.dataHoraEntrada).toLocaleString()
+                          : ""}
+                      </>
+                    ) : (
+                      <>
+                        Laboratório{" "}
+                        <span className="font-semibold">
+                          Laboratório {item?.laboratorio.nome}
+                        </span>{" "}
+                        foi aberto pelo(a) aluno(a){" "}
+                        <span className="font-semibold">
+                          {item?.aluno?.nome || "-"} para pesquisa
+                        </span>{" "}
+                        - :{" "}
+                        {item?.dataHoraEntrada
+                          ? new Date(item.dataHoraEntrada).toLocaleString()
+                          : ""}
+                      </>
+                    )}
+                  </p>
+                </div>
                 {item.id != null && (
                   <Cancel
                     className="text-theme-red cursor-pointer hover:scale-110 transition-transform mt-[4px]"
                     sx={{ width: 20, height: 20 }}
-                    onClick={() => setOpenEncerrar({ status: true, id: item.id! })}
+                    onClick={() =>
+                      setOpenEncerrar({ status: true, id: item.id! })
+                    }
                   />
                 )}
               </div>
