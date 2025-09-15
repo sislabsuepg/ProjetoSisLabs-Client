@@ -152,8 +152,8 @@ export default function FormEntregaPesquisa() {
                     return;
                   }
                   const valido = await apiOnline
-                    .post("/aluno/login", {
-                      ra: form.ra,
+                    .post("/aluno/verificasenha", {
+                      login: form.ra,
                       senha: form.senha,
                     })
                     .then((res) => {

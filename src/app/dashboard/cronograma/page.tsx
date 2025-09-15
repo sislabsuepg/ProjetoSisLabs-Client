@@ -424,7 +424,8 @@ export default function Cronograma() {
       const updates: { id: number; idProfessor: number }[] = [];
       const desconhecidos: string[] = [];
       // Como não criamos mais novos horários, apenas atualizamos ou limpamos.
-      const removidos: { id: number; diaSemana: number; horario: string }[] = [];
+      const removidos: { id: number; diaSemana: number; horario: string }[] =
+        [];
 
       tabelaAtiva.forEach((linhaValores, idxLinha) => {
         const horario = horarios[idxLinha];
@@ -517,11 +518,9 @@ export default function Cronograma() {
         );
       }
       if (fail && (ok || okRem))
-        toast.warn(
-          `Atualizados ${ok}, limpos ${okRem}, falharam ${fail}.`
-        );
+        toast.warn(`Atualizados ${ok}, limpos ${okRem}, falharam ${fail}.`);
       else if (fail) toast.error("Falha ao salvar alterações.");
-  else toast.success(`Salvo ${ok} atualização(ões) e ${okRem} limpeza(s).`);
+      else toast.success(`Salvo ${ok} atualização(ões) e ${okRem} limpeza(s).`);
     } catch (e) {
       console.error("Erro ao salvar cronograma", e);
       toast.error("Erro inesperado ao salvar.");
@@ -747,7 +746,13 @@ export default function Cronograma() {
                         <td
                           key={coluna}
                           className="border border-gray-400 p-0 w-[120px] bg-gray-100/60 text-center text-[0.55rem] text-gray-400 align-middle select-none"
-                          title={sabadoBloqueado ? "Sábado somente período da manhã" : !podeEditar ? "Horário não disponível para edição" : undefined}
+                          title={
+                            sabadoBloqueado
+                              ? "Sábado somente período da manhã"
+                              : !podeEditar
+                              ? "Horário não disponível para edição"
+                              : undefined
+                          }
                         >
                           —
                         </td>

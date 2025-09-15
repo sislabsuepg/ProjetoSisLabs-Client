@@ -31,8 +31,7 @@ export default function FormEntregaChave() {
   const [aluno, setAluno] = useState<IAcademico | null>(null);
   const [validado, setValidado] = useState(false);
   const [orientacao, setOrientacao] = useState<IOrientacao | null>(null);
-  const isFormValid =
-    validado
+  const isFormValid = validado;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,10 +47,11 @@ export default function FormEntregaChave() {
       toast.success("Entrega de chave realizada com sucesso!");
       setForm({ ra: "", senha: "", idLaboratorio: 0, idAluno: 0 });
     } catch (err: unknown) {
-        if(err?.response?.data?.erros){
-          err.response.data.erros.forEach((err: string) => { toast.error(err) });
-        }
-      else toast.error("Erro ao enviar formulário");
+      if (err?.response?.data?.erros) {
+        err.response.data.erros.forEach((err: string) => {
+          toast.error(err);
+        });
+      } else toast.error("Erro ao enviar formulário");
     }
   };
 
@@ -76,24 +76,34 @@ export default function FormEntregaChave() {
               name="ra"
               value={form.ra}
               inputProps={{ maxLength: 13 }}
-              onChange={(e)=>{
+              onChange={(e) => {
                 const { name, value } = e.target;
-                let ra = value.replace(/\D/g, '');
+                let ra = value.replace(/\D/g, "");
                 if (ra.length > 13) ra = ra.slice(0, 13);
                 setForm((prev) => ({ ...prev, [name]: ra }));
               }}
               onKeyDown={async (e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
-                  try{
+                  try {
                     const buscaAluno = await apiOnline.get(`/aluno/${form.ra}`);
-                    setForm((prev) => ({ ...prev, idAluno: buscaAluno.data.id }));
+                    setForm((prev) => ({
+                      ...prev,
+                      idAluno: buscaAluno.data.id,
+                    }));
                     setAluno(buscaAluno.data);
-                    const buscaOrientacao = await apiOnline.get<IOrientacao>(`/orientacao/aluno/${buscaAluno.data.id}`);
+                    const buscaOrientacao = await apiOnline.get<IOrientacao>(
+                      `/orientacao/aluno/${buscaAluno.data.id}`
+                    );
                     setOrientacao(buscaOrientacao.data);
-                    setForm((prev) => ({ ...prev, idLaboratorio: buscaOrientacao.data.laboratorio?.id || 0 }));
+                    setForm((prev) => ({
+                      ...prev,
+                      idLaboratorio: buscaOrientacao.data.laboratorio?.id || 0,
+                    }));
                   } catch (error) {
-                    error?.response?.data?.erros?.forEach((err: string) => toast.error(err));
+                    error?.response?.data?.erros?.forEach((err: string) =>
+                      toast.error(err)
+                    );
                   }
                 }
               }}
@@ -108,14 +118,14 @@ export default function FormEntregaChave() {
               name="senha"
               disabled={form.idAluno === 0}
               value={form.senha}
-              onChange={(e)=>{
+              onChange={(e) => {
                 const { name, value } = e.target;
-                const senha = value.replace(/\D/g, '');
-                if (senha.length > 6){
+                const senha = value.replace(/\D/g, "");
+                if (senha.length > 6) {
                   toast.error("A senha deve ter até 6 dígitos.");
                   return;
-                } 
-                  
+                }
+
                 setForm((prev) => ({ ...prev, [name]: senha }));
               }}
               onKeyDown={async (e) => {
@@ -125,17 +135,22 @@ export default function FormEntregaChave() {
                     toast.error("Senha deve ter pelo menos 4 caracteres");
                     return;
                   }
-                  try{
-                    const valido = await apiOnline.post("/aluno/login", {
-                      ra: form.ra,
-                      senha: form.senha,
-                    });
+                  try {
+                    const valido = await apiOnline.post(
+                      "/aluno/verificasenha",
+                      {
+                        login: form.ra,
+                        senha: form.senha,
+                      }
+                    );
                     setValidado(valido.data != null);
                     if (valido.data) {
                       toast.success("Aluno validado com sucesso");
                     }
                   } catch (error) {
-                    error?.response?.data?.erros?.forEach((err: string) => toast.error(err));
+                    error?.response?.data?.erros?.forEach((err: string) =>
+                      toast.error(err)
+                    );
                     setValidado(false);
                   }
                 }
@@ -154,10 +169,18 @@ export default function FormEntregaChave() {
                 id="lab-select"
                 value={orientacao?.laboratorio?.id || 0}
                 onChange={(e: SelectChangeEvent) => {
-                  setForm((prev) => ({ ...prev, idLaboratorio: Number(e.target.value) }));
+                  setForm((prev) => ({
+                    ...prev,
+                    idLaboratorio: Number(e.target.value),
+                  }));
                 }}
               >
-                <MenuItem value={form.idLaboratorio || 0}> {form.idLaboratorio !== 0 ? orientacao?.laboratorio?.numero : "-- Selecione uma opção --"}</MenuItem>
+                <MenuItem value={form.idLaboratorio || 0}>
+                  {" "}
+                  {form.idLaboratorio !== 0
+                    ? orientacao?.laboratorio?.numero
+                    : "-- Selecione uma opção --"}
+                </MenuItem>
               </Select>
             </FormControl>
           </div>
@@ -186,7 +209,9 @@ export default function FormEntregaChave() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="font-normal text-theme-blue">Ano:</span>
-                  <span className="font-normal text-theme-text">{aluno?.anoCurso? `${aluno.anoCurso}º ano` : "N/A"}</span>
+                  <span className="font-normal text-theme-text">
+                    {aluno?.anoCurso ? `${aluno.anoCurso}º ano` : "N/A"}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-2">
