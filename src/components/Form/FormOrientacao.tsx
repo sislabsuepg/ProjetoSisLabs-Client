@@ -52,8 +52,12 @@ export default function FormOrientacao() {
         `/aluno?ra=${ra}&ativo=true`
       );
       const alunos: IAcademico[] = (
-        alunosResponse as unknown as { data: IAcademico[] }
-      ).data;
+        alunosResponse as unknown as {
+          data: {
+            alunos: IAcademico[];
+          };
+        }
+      ).data.alunos;
       console.log(alunos);
       if (!alunos?.[0]?.id) {
         toast.error("RA não encontrado.");
