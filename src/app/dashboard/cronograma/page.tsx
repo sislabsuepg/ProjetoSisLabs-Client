@@ -42,6 +42,8 @@ export default function Cronograma() {
   const [salvando, setSalvando] = useState(false);
   // Controle de quais laboratórios já tiveram horários carregados (para Aulas de Hoje)
   const [labsCarregados, setLabsCarregados] = useState<Set<number>>(new Set());
+  // Mapa de células editáveis por laboratório (true = existe slot e pode atribuir professor)
+  const [editaveis, setEditaveis] = useState<Record<number, boolean[][]>>({});
 
   const diaSemanaAtual = new Date().getDay();
 
@@ -121,9 +123,12 @@ export default function Cronograma() {
           const add = lista.filter((h) => h.idLaboratorio && !seen.has(key(h)));
           return add.length ? [...prev, ...add] : prev;
         });
-        // Monta tabela ativa
+        // Monta tabela ativa e mapa de células editáveis. Agora SOMENTE células com horário existente podem receber professor.
         const matriz = Array.from({ length: horarios.length }, () =>
           Array(dias.length).fill("")
+        );
+        const matrizEdit = Array.from({ length: horarios.length }, () =>
+          Array(dias.length).fill(false)
         );
         lista.forEach((h) => {
           if (!h.horario || h.diaSemana == null) return;
@@ -141,8 +146,10 @@ export default function Cronograma() {
             professores.find((p) => p.id === h.idProfessor)?.nome ||
             "";
           matriz[lin][col] = nome;
+          matrizEdit[lin][col] = true; // existe slot, pode editar
         });
         setTabelas((prev) => ({ ...prev, [activeId]: matriz }));
+        setEditaveis((prev) => ({ ...prev, [activeId]: matrizEdit }));
         if (activeId) {
           setLabsCarregados((prev) => {
             const novo = new Set(prev);
@@ -200,6 +207,28 @@ export default function Cronograma() {
               (h) => h.idLaboratorio && !existentes.has(key(h))
             );
             return add.length ? [...prev, ...add] : prev;
+          });
+          // Não montamos tabela aqui pois só precisamos saber que slots existem para "Aulas de Hoje". Entretanto, guardamos editáveis caso o usuário selecione depois.
+          setEditaveis((prev) => {
+            if (!lab.id) return prev;
+            if (prev[lab.id]) return prev; // já existe
+            const matrizEdit = Array.from({ length: horarios.length }, () =>
+              Array(dias.length).fill(false)
+            );
+            lista.forEach((h) => {
+              if (!h.horario || h.diaSemana == null) return;
+              if (h.diaSemana === 0) return;
+              if (h.diaSemana === 6) {
+                const hr = Number(h.horario.split(":")[0]);
+                if (hr >= 12) return;
+              }
+              const lin = horarios.findIndex((hr) => hr === h.horario);
+              if (lin === -1) return;
+              const col = h.diaSemana === 6 ? 5 : h.diaSemana - 1;
+              if (col < 0 || col >= dias.length) return;
+              matrizEdit[lin][col] = true;
+            });
+            return { ...prev, [lab.id]: matrizEdit };
           });
           setLabsCarregados((prev) => {
             const n = new Set(prev);
@@ -394,13 +423,8 @@ export default function Cronograma() {
       );
       const updates: { id: number; idProfessor: number }[] = [];
       const desconhecidos: string[] = [];
-      const novos: {
-        diaSemana: number;
-        horario: string;
-        idProfessor: number;
-      }[] = [];
-      const removidos: { id: number; diaSemana: number; horario: string }[] =
-        [];
+      // Como não criamos mais novos horários, apenas atualizamos ou limpamos.
+      const removidos: { id: number; diaSemana: number; horario: string }[] = [];
 
       tabelaAtiva.forEach((linhaValores, idxLinha) => {
         const horario = horarios[idxLinha];
@@ -420,17 +444,13 @@ export default function Cronograma() {
             if (!desconhecidos.includes(nome)) desconhecidos.push(nome);
             return;
           }
-          if (original?.id) {
-            if (original.idProfessor !== idProfessor) {
-              updates.push({ id: original.id, idProfessor });
-            }
-          } else {
-            novos.push({ diaSemana, horario, idProfessor });
+          if (original?.id && original.idProfessor !== idProfessor) {
+            updates.push({ id: original.id, idProfessor });
           }
         });
       });
 
-      if (!updates.length && !novos.length && !removidos.length) {
+      if (!updates.length && !removidos.length) {
         toast.info("Nenhuma alteração para salvar.");
         return;
       }
@@ -469,61 +489,6 @@ export default function Cronograma() {
           })
         );
       }
-      // Criação de novos horários
-      let created = 0;
-      const novosCriados: IHorario[] = [];
-      for (const n of novos) {
-        try {
-          const payloadCreate = {
-            idLaboratorio: activeId,
-            diaSemana: n.diaSemana,
-            horario: n.horario,
-            idProfessor: n.idProfessor,
-          };
-          const resp = await apiOnline.post("/horario", payloadCreate);
-          // Tenta extrair o objeto criado em formatos diferentes
-          interface RespLaboratorio {
-            id?: number;
-            nome?: string;
-            numero?: string;
-            restrito?: boolean;
-          }
-          type RespHorario = Partial<IHorario> & {
-            laboratorio?: RespLaboratorio;
-          };
-          const raw =
-            (resp as { data?: RespHorario; horario?: RespHorario })?.data ??
-            (resp as { horario?: RespHorario }).horario ??
-            (resp as RespHorario);
-          if (raw && typeof raw === "object") {
-            const horarioObj: IHorario = {
-              id: raw.id,
-              idLaboratorio: raw.idLaboratorio ?? activeId,
-              diaSemana: (raw.diaSemana as number) ?? n.diaSemana,
-              horario: normalizeHorario((raw.horario as string) ?? n.horario),
-              idProfessor: (raw.idProfessor as number) ?? n.idProfessor,
-              professor: professores.find(
-                (p) => p.id === ((raw.idProfessor as number) ?? n.idProfessor)
-              ),
-              laboratorio: raw.laboratorio,
-            } as IHorario;
-            novosCriados.push(horarioObj);
-          } else {
-            novosCriados.push({
-              id: undefined,
-              idLaboratorio: activeId,
-              diaSemana: n.diaSemana,
-              horario: n.horario,
-              idProfessor: n.idProfessor,
-              professor: professores.find((p) => p.id === n.idProfessor),
-            } as IHorario);
-          }
-          created++;
-        } catch (e) {
-          console.error("Falha ao criar horário", n, e);
-          fail++;
-        }
-      }
       // Limpeza (idProfessor: null)
       let okRem = 0;
       for (const r of removidos) {
@@ -551,27 +516,12 @@ export default function Cronograma() {
           })
         );
       }
-
-      if (created || novosCriados.length) {
-        setTodosHorarios((prev) => {
-          // evita duplicar (usa chave dia-horario-lab)
-          const key = (h: IHorario) =>
-            `${h.idLaboratorio}-${h.diaSemana}-${h.horario}`;
-          const existentes = new Set(prev.map(key));
-          const add = novosCriados.filter((nc) => !existentes.has(key(nc)));
-          return add.length ? [...prev, ...add] : prev;
-        });
-      }
-
-      if (fail && (ok || okRem || created))
+      if (fail && (ok || okRem))
         toast.warn(
-          `Atualizados ${ok}, criados ${created}, limpos ${okRem}, falharam ${fail}.`
+          `Atualizados ${ok}, limpos ${okRem}, falharam ${fail}.`
         );
       else if (fail) toast.error("Falha ao salvar alterações.");
-      else
-        toast.success(
-          `Salvo ${ok} atualização(ões), ${created} criação(ões) e ${okRem} limpeza(s).`
-        );
+  else toast.success(`Salvo ${ok} atualização(ões) e ${okRem} limpeza(s).`);
     } catch (e) {
       console.error("Erro ao salvar cronograma", e);
       toast.error("Erro inesperado ao salvar.");
@@ -580,10 +530,16 @@ export default function Cronograma() {
     }
   };
 
-  const isTabelaVazia = useMemo(
-    () => tabelaAtiva.every((linha) => linha.every((c) => c.trim() === "")),
-    [tabelaAtiva]
-  );
+  const isTabelaVazia = useMemo(() => {
+    const matrizEdit = editaveis[activeId];
+    if (!matrizEdit) return true;
+    for (let i = 0; i < tabelaAtiva.length; i++) {
+      for (let j = 0; j < tabelaAtiva[i].length; j++) {
+        if (matrizEdit[i]?.[j] && tabelaAtiva[i][j].trim() !== "") return false;
+      }
+    }
+    return true;
+  }, [tabelaAtiva, editaveis, activeId]);
 
   // Inicializa tabela vazia se seleciona laboratório ainda não carregado
   useEffect(() => {
@@ -785,12 +741,13 @@ export default function Cronograma() {
                     const isSabado = coluna === 5;
                     const horaNum = Number(hora.split(":")[0]);
                     const sabadoBloqueado = isSabado && horaNum >= 12;
-                    if (sabadoBloqueado) {
+                    const podeEditar = !!editaveis[activeId]?.[linha]?.[coluna];
+                    if (sabadoBloqueado || !podeEditar) {
                       return (
                         <td
                           key={coluna}
                           className="border border-gray-400 p-0 w-[120px] bg-gray-100/60 text-center text-[0.55rem] text-gray-400 align-middle select-none"
-                          title="Sábado somente período da manhã"
+                          title={sabadoBloqueado ? "Sábado somente período da manhã" : !podeEditar ? "Horário não disponível para edição" : undefined}
                         >
                           —
                         </td>
