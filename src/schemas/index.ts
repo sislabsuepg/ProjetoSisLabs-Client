@@ -259,3 +259,21 @@ export const edicao_usuario = Yup.object().shape(
       .min(1, 'O campo "Permissão" deve ser um número válido'),
   })
 );
+
+export const atualizarPerfil = Yup.object().shape(
+  createNewSchema({
+    email: Yup.string()
+      .optional()
+      .max(40, "O campo 'E-mail' deve ter no máximo 40 caracteres")
+      .email("E-mail inválido"),
+    telefone: Yup.string()
+      .optional()
+      .test("O telefone deve ter no mínimo 11 e maximo 15 dígitos", (value) => {
+        if (!value || value == null || value.trim() === "") {
+          return true;
+        } else {
+          return value.length >= 11 && value.length <= 15;
+        }
+      }),
+  })
+);
