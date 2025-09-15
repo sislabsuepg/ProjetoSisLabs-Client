@@ -19,6 +19,15 @@ export default function Inicio() {
     status: boolean;
     id: number;
   }>({ status: false, id: 0 });
+  const [solicitacoes, setSolicitacoes] = useState<
+    {
+      id: string;
+      idAluno: number;
+      idLaboratorio: number;
+      aluno: { id: number; nome: string; ra: string };
+      laboratorio: { id: number; nome: string; numero: string };
+    }[]
+  >([]);
   //const [cookies] = useCookies(["usuario"]);
   const [data, setData] = useState<IEmprestimo[]>([]);
   useEffect(() => {
@@ -61,6 +70,15 @@ export default function Inicio() {
       </div>
     );
   }
+
+  setInterval(async () => {
+    const response = await apiOnline.get("/solicitacoes");
+    const responseData = response.data;
+    if (responseData.length !== solicitacoes.length) {
+      setSolicitacoes(responseData);
+    }
+    console.log(responseData);
+  }, 5000);
 
   return (
     <div className="w-full flex flex-col h-full items-start">

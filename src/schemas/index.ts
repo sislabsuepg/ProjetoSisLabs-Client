@@ -263,7 +263,6 @@ export const edicao_usuario = Yup.object().shape(
 export const atualizarPerfil = Yup.object().shape(
   createNewSchema({
     email: Yup.string()
-      .optional()
       .max(40, "O campo 'E-mail' deve ter no máximo 40 caracteres")
       .email("E-mail inválido"),
     telefone: Yup.string()

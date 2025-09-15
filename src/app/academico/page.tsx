@@ -21,20 +21,21 @@ import DefaultButton from "@/components/DefaultButton";
 import { data_images } from "@/assets/data";
 import { removeLetters } from "@/utils/removeLetters";
 import { maskPhone } from "@/utils/maskPhone";
+import { atualizarPerfil } from "@/schemas";
 
 export default function Cronograma() {
   const router = useRouter();
   const [laboratorios, setLaboratorios] = useState<ILaboratorio[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cookies, , removeCookie] = useCookies(["aluno", "usuario"]);
   const [form, setForm] = useState({
     idLaboratorio: 0,
     senha_atual: "",
     nova_senha: "",
     confirmar_nova_senha: "",
-    telefone: "",
-    email: "",
+    telefone: cookies.aluno?.telefone || "",
+    email: cookies.aluno?.email || "",
   });
-  const [cookies, , removeCookie] = useCookies(["aluno", "usuario"]);
 
   // Determine redirect condition outside of render side-effects.
   // IMPORTANT: We no longer perform router.push() directly inside the render body
@@ -50,7 +51,7 @@ export default function Cronograma() {
 
   const handleSolicitarSala = async () => {
     try {
-      await apiOnline.post("/academico/solicitacao", {
+      await apiOnline.post("/solicitacoes", {
         idAluno: cookies.aluno.id,
         idLaboratorio: form.idLaboratorio,
       });
@@ -106,10 +107,50 @@ export default function Cronograma() {
 
   const handlePerfilUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      const teste = await atualizarPerfil.validate({
+        email: form.email,
+        telefone: form.telefone,
+      });
+      console.log(teste);
+      await apiOnline.put(`/aluno/perfil/${cookies.aluno.id}`, {
+        email: form.email,
+        telefone: form.telefone,
+      });
+      toast.success("Perfil atualizado com sucesso!");
+    } catch (error) {
+      if (error.response?.data?.erros) {
+        error.response.data.erros.forEach((e: string) => toast.error(e));
+        return;
+      } else {
+        toast.error("Erro ao atualizar perfil. Tente novamente.");
+      }
+    }
   };
-
   const handleSenhaUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await apiOnline.post("aluno/verificasenha", {
+        login: cookies.aluno.ra,
+        senha: form.senha_atual,
+      });
+      console.log(validado);
+      await apiOnline.put(`/aluno/senha/${cookies.aluno.id}`, {
+        novaSenha: form.nova_senha,
+      });
+      toast.success("Senha alterada com sucesso!");
+      setForm({
+        ...form,
+        senha_atual: "",
+        nova_senha: "",
+        confirmar_nova_senha: "",
+      });
+    } catch (error) {
+      if (error.response.data.erros) {
+        error.response.data.erros.forEach((e: string) => toast.error(e));
+        return;
+      }
+    }
   };
 
   function handleChange(
@@ -138,73 +179,64 @@ export default function Cronograma() {
 
   return (
     //Padding geral p-6 em telas pequenas, p-8 em médias e maiores
-    <div className="w-full h-full flex flex-col gap-8 p-6 md:p-8">
+    <div className="w-full min-h-screen flex flex-col gap-8 p-6 md:p-8 bg-theme-blue ">
       {/* Breadcrumb / Header */}
       <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
-          <h1 className="text-theme-blue font-semibold text-xl flex items-center gap-2">
+          <h1 className="text-theme-white font-semibold text-xl flex items-center gap-2">
             <span className="text-2xl">👨‍🎓</span> Área do Acadêmico
           </h1>
           {/* Tentativa de alterar a cor, modificar depois */}
-          <p className="text-gray-500 text-sm mt-1 font-medium">
+          <p className="text-white text-sm mt-1 font-medium">
             Gerencie seu perfil, senha e solicite o uso de laboratórios.
           </p>
-        </div>
-        {/* Tentativa de alterar a cor, modificar depois */}
-        <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
-          <span
-            className="hover:text-theme-blue cursor-pointer transition-colors"
-            onClick={() => router.push("/dashboard")}
-          >
-            Início
-          </span>
-          <span>/</span>
-          <span className="text-theme-blue font-semibold">Acadêmico</span>
         </div>
       </div>
 
       {/* Grid principal */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Card Perfil */}
-        <div className="bg-theme-container rounded-2xl p-6 flex flex-col shadow-sm border border-theme-blue/10">
-          <div className="flex flex-col items-center gap-4 mb-4">
-            <div className="border bg-theme-white p-4 border-theme-blue rounded-full">
-              <PersonIcon
-                className="text-theme-blue"
-                sx={{ fontSize: "4rem" }}
-              />
+        <div className="bg-theme-container rounded-2xl p-6 flex flex-col h-full shadow-sm border border-theme-blue/10">
+          <div className="wrapper">
+            <div className="flex flex-col items-center gap-4 mb-4">
+              <div className="border bg-theme-white p-4 border-theme-blue rounded-full">
+                <PersonIcon
+                  className="text-theme-blue"
+                  sx={{ fontSize: "4rem" }}
+                />
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <p className="font-medium text-sm md:text-base text-theme-blue/90">
+                  {cookies?.usuario?.nome}
+                </p>
+                {/* Tentativa de alterar a cor, modificar depois */}
+                <p className="text-gray-600 text-xs md:text-sm font-medium">
+                  {cookies?.aluno?.nome}
+                </p>
+                {cookies?.aluno?.telefone && (
+                  // Tentativa de alterar a cor, modificar depois
+                  <p className="text-gray-600 text-xs md:text-sm font-medium">
+                    {cookies?.aluno?.telefone}
+                  </p>
+                )}
+              </div>
             </div>
-            <div className="flex flex-col items-center gap-1">
-              <p className="font-medium text-sm md:text-base text-theme-blue/90">
-                {cookies?.usuario?.nome}
+            <div className="flex flex-col gap-3 text-center">
+              <p className="bg-[#d1d1d1] text-theme-blue font-medium px-3 py-2 rounded-md text-xs md:text-sm break-all">
+                {cookies?.aluno?.email}
+              </p>
+              <p className="text-theme-text font-semibold text-xs md:text-sm">
+                <span className="font-bold">Curso:</span>{" "}
+                {cookies?.aluno?.curso?.nome}
               </p>
               {/* Tentativa de alterar a cor, modificar depois */}
               <p className="text-gray-600 text-xs md:text-sm font-medium">
-                {cookies?.aluno?.nome}
+                <span className="font-bold text-theme-text">Último login:</span>{" "}
+                {cookies?.aluno?.lastLogin}
               </p>
-              {cookies?.aluno?.telefone && (
-                // Tentativa de alterar a cor, modificar depois
-                <p className="text-gray-600 text-xs md:text-sm font-medium">
-                  {cookies?.aluno?.telefone}
-                </p>
-              )}
             </div>
           </div>
-          <div className="flex flex-col gap-3 text-center">
-            <p className="bg-[#d1d1d1] text-theme-blue font-medium px-3 py-2 rounded-md text-xs md:text-sm break-all">
-              {cookies?.aluno?.email}
-            </p>
-            <p className="text-theme-text text-xs md:text-sm">
-              <span className="font-semibold">Curso:</span>{" "}
-              {cookies?.aluno?.curso?.nome}
-            </p>
-            {/* Tentativa de alterar a cor, modificar depois */}
-            <p className="text-gray-600 text-xs md:text-sm font-medium">
-              <span className="font-semibold text-theme-text">Último login:</span>{" "}
-              {cookies?.aluno?.lastLogin}
-            </p>
-          </div>
-          <div className="mt-6 flex flex-col gap-3">
+          <div className="flex flex-col gap-3 mt-auto pt-8">
             <button
               className="bg-theme-blue/90 hover:bg-theme-blue transition-colors font-medium h-9 text-xs md:text-sm w-full text-white rounded-lg"
               onClick={() => {
