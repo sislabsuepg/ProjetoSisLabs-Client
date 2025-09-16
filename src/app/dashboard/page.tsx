@@ -4,7 +4,7 @@ import Pagination from "@/components/Pagination";
 import { ApiResponse, IEmprestimo } from "@/interfaces/interfaces";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-//import { useCookies } from "react-cookie";
+import { useCookies } from "react-cookie";
 import { apiOnline } from "@/services/services";
 import { CircularProgress } from "@mui/material";
 import { Cancel } from "@mui/icons-material";
@@ -34,7 +34,10 @@ export default function Inicio() {
   >({});
   // Ref para evitar repetir toast de advertência para o mesmo aluno
   const alunosAdvertenciaAvisadosRef = useRef<Set<number>>(new Set());
-  //const [cookies] = useCookies(["usuario"]);
+  const [cookies] = useCookies(["usuario"]);
+  const permissions = cookies?.usuario?.permissao || {};
+  // Ações de emprestimo (aprovar/recusar/encerrar) podem ser feitas por 'geral' ou 'cadastro'
+  const canAcao = permissions?.geral === true || permissions?.cadastro === true;
   const [data, setData] = useState<IEmprestimo[]>([]);
   // Handlers para aprovar / recusar solicitações
   const handleAprovar = async (id: string) => {
@@ -240,20 +243,22 @@ export default function Inicio() {
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleAprovar(s.id)}
-                    className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md font-medium transition-colors"
-                  >
-                    Aprovar
-                  </button>
-                  <button
-                    onClick={() => handleRecusar(s.id)}
-                    className="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md font-medium transition-colors"
-                  >
-                    Recusar
-                  </button>
-                </div>
+                {canAcao && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleAprovar(s.id)}
+                      className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md font-medium transition-colors"
+                    >
+                      Aprovar
+                    </button>
+                    <button
+                      onClick={() => handleRecusar(s.id)}
+                      className="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md font-medium transition-colors"
+                    >
+                      Recusar
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -308,7 +313,7 @@ export default function Inicio() {
                     )}
                   </p>
                 </div>
-                {item.id != null && (
+                {item.id != null && canAcao && (
                   <Cancel
                     className="text-theme-red cursor-pointer hover:scale-110 transition-transform mt-[4px]"
                     sx={{ width: 20, height: 20 }}

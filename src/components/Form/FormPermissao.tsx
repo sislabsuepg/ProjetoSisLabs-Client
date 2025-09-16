@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { cadastro_permissao } from '@/schemas';
-import { apiOnline } from '@/services/services';
-import { capitalize } from '@/utils/capitalize';
-import { ApiError } from '@/utils/tipos';
-import { styled, TextField } from '@mui/material';
-import Switch from '@mui/material/Switch';
-import { useState } from 'react';
-import { toast } from 'react-toastify';
-import * as Yup from 'yup';
+import { cadastro_permissao } from "@/schemas";
+import { apiOnline } from "@/services/services";
+import { capitalize } from "@/utils/capitalize";
+import { ApiError } from "@/utils/tipos";
+import { styled, TextField } from "@mui/material";
+import Switch from "@mui/material/Switch";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
 
 export default function FormPermissao() {
   const [form, setForm] = useState({
-    nomePermissao: '',
+    nomePermissao: "",
     geral: false,
     cadastro: false,
     alteracao: false,
@@ -25,18 +25,18 @@ export default function FormPermissao() {
     try {
       await cadastro_permissao.validate(form);
 
-      await apiOnline.post('/permissao', form);
+      await apiOnline.post("/permissao", form);
 
-      toast.success('Cadastro da permissao realizado com sucesso!');
+      toast.success("Cadastro da permissao realizado com sucesso!");
       setForm({
-        nomePermissao: '',
+        nomePermissao: "",
         geral: false,
         cadastro: false,
         alteracao: false,
         relatorio: false,
         advertencia: false,
       });
-      console.log('✅ Dados válidos:', form);
+      console.log("✅ Dados válidos:", form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
@@ -51,43 +51,43 @@ export default function FormPermissao() {
     }
   };
 
-  const isFormValid = form.nomePermissao.trim() !== '';
+  const isFormValid = form.nomePermissao.trim() !== "";
 
   const CustomSwitch = styled(Switch)(({ theme }) => ({
     width: 42,
     height: 26,
     padding: 0,
-    '& .MuiSwitch-switchBase': {
+    "& .MuiSwitch-switchBase": {
       padding: 0,
       margin: 2,
-      transitionDuration: '300ms',
-      '&.Mui-checked': {
-        transform: 'translateX(16px)',
-        color: '#fff',
-        '& + .MuiSwitch-track': {
-          backgroundColor: '#65C466',
+      transitionDuration: "300ms",
+      "&.Mui-checked": {
+        transform: "translateX(16px)",
+        color: "#fff",
+        "& + .MuiSwitch-track": {
+          backgroundColor: "#65C466",
           opacity: 1,
           border: 0,
-          ...theme.applyStyles('dark', {
-            backgroundColor: '#2ECA45',
+          ...theme.applyStyles("dark", {
+            backgroundColor: "#2ECA45",
           }),
         },
       },
     },
-    '& .MuiSwitch-thumb': {
-      boxSizing: 'border-box',
+    "& .MuiSwitch-thumb": {
+      boxSizing: "border-box",
       width: 22,
       height: 22,
     },
-    '& .MuiSwitch-track': {
+    "& .MuiSwitch-track": {
       borderRadius: 26 / 2,
-      backgroundColor: '#E9E9EA',
+      backgroundColor: "#E9E9EA",
       opacity: 1,
-      transition: theme.transitions.create(['background-color'], {
+      transition: theme.transitions.create(["background-color"], {
         duration: 500,
       }),
-      ...theme.applyStyles('dark', {
-        backgroundColor: '#39393D',
+      ...theme.applyStyles("dark", {
+        backgroundColor: "#39393D",
       }),
     },
   }));
@@ -95,7 +95,7 @@ export default function FormPermissao() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-       📝 Cadastro de permissão de usuário
+        📝 Cadastro de permissão de usuário
       </p>
 
       <form
@@ -105,42 +105,50 @@ export default function FormPermissao() {
       >
         <div className="space-y-4">
           <div className="w-full flex items-center gap-4">
-            <TextField id="filled-basic" label="Nome da permissão" variant="filled" type="text"
+            <TextField
+              id="filled-basic"
+              label="Nome da permissão"
+              variant="filled"
+              type="text"
               name="nomePermissao"
-              value={form.nomePermissao ? capitalize(form.nomePermissao) : ''}
+              value={form.nomePermissao ? capitalize(form.nomePermissao) : ""}
               onChange={(e) =>
-                setForm((prev) => ({ ...prev, nomePermissao: capitalize(e.target.value) }))
-              } className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+                setForm((prev) => ({
+                  ...prev,
+                  nomePermissao: capitalize(e.target.value),
+                }))
+              }
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+            />
           </div>
 
           <div className="wrapper grid grid-cols-5 gap-4 mt-2">
             <label className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-700">Geral</span>
               <CustomSwitch
-              checked={form.geral}
-              onChange={() => {
-                setForm((prev) => {
-                const newGeral = !prev.geral;
-                if (newGeral) {
-                  const nome = form.nomePermissao
-                  return {
-                    nomePermissao: nome,
-                    geral: true,
-                    cadastro: true,
-                    alteracao: true,
-                    relatorio: true,
-                    advertencia: true,
-                  };
-                } else {
-                  return {
-                    ...prev,
-                    geral: false,
-                    
-                  };
-                }
-                });
-              }}
-              name="geral"
+                checked={form.geral}
+                onChange={() => {
+                  setForm((prev) => {
+                    const newGeral = !prev.geral;
+                    if (newGeral) {
+                      const nome = form.nomePermissao;
+                      return {
+                        nomePermissao: nome,
+                        geral: true,
+                        cadastro: true,
+                        alteracao: true,
+                        relatorio: true,
+                        advertencia: true,
+                      };
+                    } else {
+                      return {
+                        ...prev,
+                        geral: false,
+                      };
+                    }
+                  });
+                }}
+                name="geral"
               />
             </label>
 
@@ -151,7 +159,10 @@ export default function FormPermissao() {
               <CustomSwitch
                 checked={form.cadastro}
                 onChange={() =>
-                  setForm((prev) => ({ ...prev, cadastro: !prev.cadastro }))
+                  setForm((prev) => ({
+                    ...prev,
+                    cadastro: prev.geral || !prev.cadastro,
+                  }))
                 }
                 name="cadastro"
               />
@@ -164,7 +175,10 @@ export default function FormPermissao() {
               <CustomSwitch
                 checked={form.alteracao}
                 onChange={() =>
-                  setForm((prev) => ({ ...prev, alteracao: !prev.alteracao }))
+                  setForm((prev) => ({
+                    ...prev,
+                    alteracao: prev.geral || !prev.alteracao,
+                  }))
                 }
                 name="alteracao"
               />
@@ -177,7 +191,10 @@ export default function FormPermissao() {
               <CustomSwitch
                 checked={form.relatorio}
                 onChange={() =>
-                  setForm((prev) => ({ ...prev, relatorio: !prev.relatorio }))
+                  setForm((prev) => ({
+                    ...prev,
+                    relatorio: prev.geral || !prev.relatorio,
+                  }))
                 }
                 name="relatorio"
               />
@@ -192,7 +209,7 @@ export default function FormPermissao() {
                 onChange={() =>
                   setForm((prev) => ({
                     ...prev,
-                    advertencia: !prev.advertencia,
+                    advertencia: prev.geral || !prev.advertencia,
                   }))
                 }
                 name="advertencia"
@@ -206,7 +223,7 @@ export default function FormPermissao() {
             type="submit"
             disabled={!isFormValid}
             className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] 
-              ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+              ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             Cadastrar
           </button>

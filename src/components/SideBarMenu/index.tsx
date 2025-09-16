@@ -18,6 +18,8 @@ interface SidebarItemProps {
   active?: boolean;
   onClick?: () => void;
   isOpen?: boolean;
+  disabled?: boolean;
+  title?: string;
 }
 
 function SidebarItem({
@@ -26,20 +28,35 @@ function SidebarItem({
   active,
   onClick,
   isOpen,
+  disabled = false,
+  title,
 }: SidebarItemProps) {
   return (
     <li
-      className={`relative flex items-center p-3 my-2 cursor-pointer
-        rounded-[10px] transition-colors duration-200 hover:bg-[#5679b1]
-        ${active ? "bg-theme-blue text-theme-white" : "bg-[#4F6B98]"}
+      className={`relative flex items-center p-3 my-2 rounded-[10px] transition-colors duration-200
+        ${
+          disabled
+            ? "cursor-not-allowed opacity-40 bg-[#4F6B98]"
+            : "cursor-pointer hover:bg-[#5679b1]"
+        }
+        ${
+          active && !disabled
+            ? "bg-theme-blue text-theme-white"
+            : !active
+            ? "bg-[#4F6B98]"
+            : ""
+        }
       `}
-      onClick={onClick}
+      onClick={() => {
+        if (!disabled && onClick) onClick();
+      }}
+      title={title || (disabled ? "Sem permissão" : text)}
     >
       <div className={`mr-4 text-theme-white`}>
         <img className="w-full max-w-[20px]" src={icon} alt="Menu" />
       </div>
       <span className="text-[0.9rem] font-medium text-theme-white">{text}</span>
-      {active && isOpen && (
+      {active && isOpen && !disabled && (
         <div
           className="absolute -right-7 top-1/2 -translate-y-1/2 w-0 h-0
                         border-t-[15px] border-b-[15px] border-l-[15px]
@@ -56,6 +73,28 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const [cookies, , removeCookie] = useCookies(["usuario"]);
   const user = cookies.usuario;
   const isAcademico = user && !isNaN(user.login);
+  const permissions = user?.permissao || {};
+  // Matriz de regras:
+  // geral: pode listar e cadastrar usuários, permissões, cursos, professores, laboratórios e acessar registros
+  // advertencia: somente emitir advertência
+  // relatorio: somente relatórios
+  // cadastro: realizar cadastros NÃO inclusos no geral (ex: orientação?) e realizar/fechar empréstimos
+  // alteracao: realizar alterações nos demais que não são do geral
+  // cronograma de aulas e eventos: livre
+  const can = {
+    geral: permissions.geral === true,
+    cadastro: permissions.cadastro === true,
+    alteracao: permissions.alteracao === true,
+    advertencia: permissions.advertencia === true,
+    relatorio: permissions.relatorio === true,
+    // Derivações
+    registros: permissions.geral === true, // apenas geral
+    menuCadastro: permissions.geral === true || permissions.cadastro === true, // acesso a aba Cadastro
+    menuListas: permissions.geral === true || permissions.alteracao === true, // acesso a aba Listas/Alterar
+    menuRelatorios: permissions.relatorio === true, // apenas relatorio
+    menuAdvertencia: permissions.advertencia === true, // apenas advertencia
+    menuEmprestimo: permissions.geral === true || permissions.cadastro === true, // emprestimo requer geral ou cadastro
+  };
 
   return (
     <>
@@ -138,6 +177,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 router.push("/dashboard/cadastro");
               }}
               isOpen={isOpen}
+              disabled={!can.menuCadastro}
             />
             <SidebarItem
               icon={data_images?.icon_alterar_excluir}
@@ -148,6 +188,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 router.push("/dashboard/alterar");
               }}
               isOpen={isOpen}
+              disabled={!can.menuListas}
             />
             <SidebarItem
               icon={data_images?.icon_relatorio}
@@ -158,6 +199,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 router.push("/dashboard/relatorios");
               }}
               isOpen={isOpen}
+              disabled={!can.menuRelatorios}
             />
             <SidebarItem
               icon={data_images?.icon_advertencia}
@@ -168,6 +210,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 router.push("/dashboard/advertencia");
               }}
               isOpen={isOpen}
+              disabled={!can.menuAdvertencia}
             />
             <SidebarItem
               icon={data_images?.icon_chave}
@@ -178,6 +221,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 router.push("/dashboard/emprestimo");
               }}
               isOpen={isOpen}
+              disabled={!can.menuEmprestimo}
             />
             <SidebarItem
               icon={data_images?.icon_aulas}
@@ -208,6 +252,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 router.push("/dashboard/registros");
               }}
               isOpen={isOpen}
+              disabled={!can.registros}
             />
           </ul>
         )}

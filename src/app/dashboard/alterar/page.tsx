@@ -32,7 +32,9 @@ import {
   edicao_usuario,
 } from "@/schemas";
 import Pagination from "@/components/Pagination";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useCookies } from "react-cookie";
+import { getUserPermissions } from "@/utils/permissions";
 import { toast } from "react-toastify";
 import { CircularProgress } from "@mui/material";
 import { ApiResponse, IPermissao } from "@/interfaces/interfaces";
@@ -83,21 +85,34 @@ export default function Alterar() {
   const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState(false);
 
-  const listButtons = [
-    {
-      id: 1,
-      title: "Acadêmico",
-    },
-    {
-      id: 2,
-      title: "Professor",
-    },
-    { id: 3, title: "Laboratório" },
-    { id: 4, title: "Orientação/Mestrado" },
-    { id: 5, title: "Curso" },
-    { id: 6, title: "Permissão" },
-    { id: 7, title: "Usuário" },
-  ];
+  const [cookies] = useCookies(["usuario"]);
+  const perms = getUserPermissions(cookies);
+  const podeGeral = perms.geral === true;
+  const podeAlterar = perms.alteracao === true || podeGeral;
+
+  // Regras: geral pode listar usuários, permissões, cursos, professores, laboratórios.
+  // alteracao pode alterar os demais que não são do geral (ex: orientação?) + editar onde necessário.
+  const allButtons = [
+    { id: 1, title: "Acadêmico", need: "alteracao" },
+    { id: 2, title: "Professor", need: "geral" },
+    { id: 3, title: "Laboratório", need: "geral" },
+    { id: 4, title: "Orientação/Mestrado", need: "alteracao" },
+    { id: 5, title: "Curso", need: "geral" },
+    { id: 6, title: "Permissão", need: "geral" },
+    { id: 7, title: "Usuário", need: "geral" },
+  ] as const;
+
+  const listButtons = useMemo(
+    () =>
+      allButtons.filter((b) => (b.need === "geral" ? podeGeral : podeAlterar)),
+    [podeGeral, podeAlterar]
+  );
+
+  useEffect(() => {
+    if (!listButtons.some((b) => b.id === activeId)) {
+      setActiveId(listButtons[0]?.id || 0);
+    }
+  }, [listButtons, activeId]);
 
   const mapRoutes: Record<number, string> = {
     1: "aluno",

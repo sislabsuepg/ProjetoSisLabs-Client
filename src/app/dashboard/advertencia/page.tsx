@@ -13,6 +13,8 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useState, useEffect, ChangeEvent } from "react";
+import { useCookies } from "react-cookie";
+import { canAccessPage } from "@/utils/permissions";
 import { toast } from "react-toastify";
 import { apiOnline } from "@/services/services";
 import { Aluno, Laboratorio } from "@/utils/tipos";
@@ -31,6 +33,17 @@ const initialState = {
 };
 
 export default function Advertencia() {
+  const [cookies] = useCookies(["usuario"]);
+  const permitido = canAccessPage("advertencia", cookies);
+  if (!permitido) {
+    return (
+      <div className="w-full flex flex-col h-full items-center justify-center">
+        <p className="text-theme-text text-sm">
+          Sem permissão para emitir advertências.
+        </p>
+      </div>
+    );
+  }
   const [form, setForm] = useState(initialState);
   const [emprestimos, setEmprestimos] = useState<EmprestimoAtivo[]>([]);
   const [outroMotivo, setOutroMotivo] = useState(false);

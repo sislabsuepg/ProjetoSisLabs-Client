@@ -4,6 +4,8 @@ import Loading from "@/app/loading";
 import { IRegistro, IUsuario } from "@/interfaces/interfaces";
 import { apiOnline } from "@/services/services";
 import { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
+import { canAccessPage } from "@/utils/permissions";
 import { toast } from "react-toastify";
 import Pagination from "@/components/Pagination";
 import ListaRegistros from "@/components/Registros";
@@ -18,6 +20,17 @@ interface FiltroDatas {
 }
 
 export default function RegistrosPage() {
+  const [cookies] = useCookies(["usuario"]);
+  const permitido = canAccessPage("registros", cookies);
+  if (!permitido) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <p className="text-sm text-theme-text">
+          Sem permissão para acessar registros.
+        </p>
+      </div>
+    );
+  }
   const [usuarios, setUsuarios] = useState<IUsuario[]>([]);
   const [registros, setRegistros] = useState<IRegistro[]>([]);
   const [usuarioSelecionado, setUsuarioSelecionado] = useState<number>(0);
