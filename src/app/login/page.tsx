@@ -320,49 +320,6 @@ export default function Login() {
               {loading ? "Entrando..." : "Entrar"}
             </button>
           </form>
-
-          {/* Botão de teste - apenas para desenvolvimento */}
-          <div className="mt-4 pt-4 border-t border-gray-300">
-            <p className="text-center text-sm text-gray-500 mb-2">
-              Modo de teste (desenvolvimento)
-            </p>
-            <button
-              onClick={() => {
-                setCookie(
-                  "usuario",
-                  {
-                    id: 999,
-                    nome: "Usuário Teste",
-                    login: "usuario.teste",
-                    permissao: {
-                      nomePermissao: "Administrador",
-                      geral: true,
-                      cadastro: true,
-                      alteracao: true,
-                      relatorio: true,
-                      advertencia: true,
-                    },
-                    lastLogin: formatDateTime(new Date()),
-                  },
-                  {
-                    path: "/",
-                    expires: new Date(Date.now() + 4 * 60 * 60 * 1000), // Expira em 4 horas
-                  }
-                );
-                toast.success("Login de teste realizado!");
-                setTimeout(() => {
-                  if (isAcademico) {
-                    return router.push("/dashboard/academico");
-                  } else {
-                    return router.push("/dashboard");
-                  }
-                }, 100);
-              }}
-              className="w-full px-3 py-2 text-base font-normal rounded-md border border-gray-300 text-gray-700 text-[0.9rem] transition-colors duration-200 hover:bg-gray-50"
-            >
-              Entrar como usuário teste
-            </button>
-          </div>
         </div>
       </div>
 
