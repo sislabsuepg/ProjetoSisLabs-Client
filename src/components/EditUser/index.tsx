@@ -3,7 +3,8 @@ import { apiOnline } from "@/services/services";
 import { maskPhone } from "@/utils/maskPhone";
 import { removeMaskPhone } from "@/utils/removeMaskPhone";
 import { Modal, styled, Switch } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useContext } from "react";
+import { ToastContext } from "@/context/ToastContext";
 
 interface EditUserModalProps<T extends object> {
   open: boolean;
@@ -23,6 +24,7 @@ function EditUserModal<T extends object>({
   title,
 }: EditUserModalProps<T>) {
   const [options, setOptions] = useState<IPermissao[]>([]);
+  const { showToast } = useContext(ToastContext);
 
   // Detecta se o formData parece ser um usuário (existem campos típicos de usuário)
   const isUserForm = useMemo(() => {
@@ -31,6 +33,12 @@ function EditUserModal<T extends object>({
       f &&
       ("permissaoUsuario" in f || "idPermissao" in f || "login" in f)
     );
+  }, [formData]);
+
+  // Detecta se é um acadêmico (campos típicos RA / anoCurso)
+  const isAcademicoForm = useMemo(() => {
+    const f = formData as unknown as Record<string, unknown> | null;
+    return !!(f && ("ra" in f || "anoCurso" in f));
   }, [formData]);
 
   useEffect(() => {
@@ -387,6 +395,46 @@ function EditUserModal<T extends object>({
         </div>
 
         <div className="flex items-center justify-between w-full gap-4">
+          {(isUserForm || isAcademicoForm) && (
+            <button
+              onClick={async () => {
+                try {
+                  const anyForm = formData as unknown as Record<
+                    string,
+                    unknown
+                  >;
+                  const id = anyForm?.id as number | undefined;
+                  if (!id) {
+                    showToast({
+                      message: "ID inválido para resetar senha",
+                      status: "error",
+                    });
+                    return;
+                  }
+                  const endpoint = isAcademicoForm
+                    ? `/aluno/resetarsenha/${id}`
+                    : `/usuario/resetarsenha/${id}`;
+
+                  await apiOnline.post(endpoint);
+                  showToast({
+                    message: "Senha resetada com sucesso!",
+                    status: "success",
+                  });
+                } catch (error) {
+                  console.error("Erro ao resetar senha", error);
+                  showToast({
+                    message:
+                      "Erro ao resetar senha. Verifique e tente novamente.",
+                    status: "error",
+                  });
+                }
+              }}
+              className="bg-theme-blue/70 hover:bg-theme-blue text-theme-white font-normal text-[0.8rem] h-[40px] w-full max-w-[180px] rounded-[8px] transition-colors"
+              type="button"
+            >
+              Resetar senha
+            </button>
+          )}
           <button
             onClick={onClose}
             className="bg-theme-blue text-theme-white font-normal text-[0.9rem] h-[40px] w-full max-w-[200px] rounded-[8px]"
