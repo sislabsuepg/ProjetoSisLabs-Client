@@ -115,7 +115,7 @@ export default function Inicio() {
         };
         const responseData: ISolicitacao[] = Array.isArray(raw.data)
           ? (raw.data as ISolicitacao[])
-          : ((raw.data as { data?: ISolicitacao[] }).data || []);
+          : (raw.data as { data?: ISolicitacao[] }).data || [];
         setSolicitacoes(() => {
           const prevIds = solicitacoesPrevRef.current;
           const novas = responseData.filter((s) => !prevIds.has(s.id));

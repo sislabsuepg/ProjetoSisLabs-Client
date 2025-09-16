@@ -7,7 +7,15 @@ import { apiOnline } from "@/services/services";
 import { ICurso } from "@/interfaces/interfaces";
 import { maskPhone } from "@/utils/maskPhone";
 import { removeLetters } from "@/utils/removeLetters";
-import { CircularProgress, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import {
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+} from "@mui/material";
 import { capitalize } from "@/utils/capitalize";
 import { ApiError } from "@/utils/tipos";
 
@@ -27,7 +35,11 @@ export default function FormAcademico() {
 
   const [loading, setLoading] = useState(true);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
 
     let newValue: string | number = value;
@@ -41,7 +53,8 @@ export default function FormAcademico() {
     } else if (name === "idCurso") {
       newValue = parseInt(value) || 0;
     } else if (name === "anoCurso") {
-      const anoMax = cursos.find((c) => c.id === Number(form.idCurso))?.anosMaximo || 0;
+      const anoMax =
+        cursos.find((c) => c.id === Number(form.idCurso))?.anosMaximo || 0;
       newValue = Math.min(parseInt(value) || 0, anoMax);
     }
 
@@ -100,15 +113,18 @@ export default function FormAcademico() {
   useEffect(() => {
     const fetchCursos = async () => {
       try {
-        const response = await apiOnline.get<ICurso[] | { data: ICurso[] }>("/curso");
-        const respWrapped = response as { data: ICurso[] | { data?: ICurso[] } };
+        const response = await apiOnline.get<ICurso[] | { data: ICurso[] }>(
+          "/curso"
+        );
+        const respWrapped = response as {
+          data: ICurso[] | { data?: ICurso[] };
+        };
         const inner = respWrapped.data;
         const data: ICurso[] = Array.isArray(inner)
           ? inner
-          : ((inner as { data?: ICurso[] }).data || []);
+          : (inner as { data?: ICurso[] }).data || [];
         setCursos(data);
         setLoading(false);
-
       } catch (error) {
         console.error("Erro ao buscar cursos:", error);
         toast.error("Erro ao buscar cursos. Tente novamente.");
@@ -123,13 +139,13 @@ export default function FormAcademico() {
       <div className="w-full h-full flex items-center justify-center">
         <CircularProgress size={40} />
       </div>
-    )
+    );
   }
 
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-       📝 Cadastro do acadêmico
+        📝 Cadastro do acadêmico
       </p>
 
       <form
@@ -139,75 +155,123 @@ export default function FormAcademico() {
       >
         <div className="space-y-4">
           <div className="w-full flex md:flex-row flex-col items-center gap-4">
-            <TextField id="filled-basic" label="Nome completo" variant="filled" type="text"
+            <TextField
+              id="filled-basic"
+              label="Nome completo"
+              variant="filled"
+              type="text"
               name="nome"
               value={form.nome ? capitalize(form.nome) : ""}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+            />
 
-            <TextField id="filled-basic" label="RA" variant="filled" type="text"
+            <TextField
+              id="filled-basic"
+              label="RA"
+              variant="filled"
+              type="text"
               name="ra"
               value={removeLetters(form.ra)}
               inputProps={{ maxLength: 13 }}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+            />
           </div>
 
           <div className="w-full flex items-center gap-4 md:flex-row flex-col">
-            <TextField id="filled-basic" label="E-Mail" variant="filled" type="text"
+            <TextField
+              id="filled-basic"
+              label="E-Mail"
+              variant="filled"
+              type="text"
               name="email"
               value={form.email}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+            />
 
-            <TextField id="filled-basic" label="Telefone" variant="filled" type="text"
+            <TextField
+              id="filled-basic"
+              label="Telefone"
+              variant="filled"
+              type="text"
               name="telefone"
               value={form.telefone ? maskPhone(form.telefone) : ""}
               inputProps={{ maxLength: 15 }}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+            />
           </div>
 
           <div className="w-full flex items-center gap-4 md:flex-row flex-col">
-            <FormControl className="w-full font-normal p-3 text-[0.9rem] rounded-md" variant="filled" >
-              <InputLabel id="demo-simple-select-filled-label">Curso</InputLabel>
+            <FormControl
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              variant="filled"
+            >
+              <InputLabel id="demo-simple-select-filled-label">
+                Curso
+              </InputLabel>
               <Select
                 labelId="demo-simple-select-filled-label"
                 id="demo-simple-select-filled"
                 name="idCurso"
                 value={form.idCurso}
                 onChange={(e: SelectChangeEvent<number>) =>
-                  setForm(f => ({ ...f, idCurso: Number(e.target.value) }))
+                  setForm((f) => ({ ...f, idCurso: Number(e.target.value) }))
                 }
               >
-                <MenuItem value="">
-                  -- Selecione uma opção --
-                </MenuItem>
+                <MenuItem value="">-- Selecione uma opção --</MenuItem>
                 {cursos?.map((el) => (
-                  <MenuItem key={el?.id} value={el?.id}>{el?.nome}</MenuItem>
+                  <MenuItem key={el?.id} value={el?.id}>
+                    {el?.nome}
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>
 
-            <TextField id="filled-basic" label="Ano/Série" variant="filled" type="number"
+            <TextField
+              id="filled-basic"
+              label="Ano/Série"
+              variant="filled"
+              type="number"
               name="anoCurso"
               value={form.anoCurso}
               inputProps={{
-                max: cursos.find((c) => c.id === Number(form.idCurso))?.anosMaximo || 0,
-                min: 1
+                max:
+                  cursos.find((c) => c.id === Number(form.idCurso))
+                    ?.anosMaximo || 0,
+                min: 1,
               }}
-
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+            />
           </div>
 
           <div className="w-full flex items-center gap-4 md:flex-row flex-col">
-            <TextField id="filled-basic" label="Senha" variant="filled" type="password"
+            <TextField
+              id="filled-basic"
+              label="Senha"
+              variant="filled"
+              type="password"
               name="senha"
               inputProps={{ maxLength: 6 }}
               value={removeLetters(form.senha)}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+            />
 
-            <TextField id="filled-basic" label="Repetir Senha" variant="filled" type="password"
+            <TextField
+              id="filled-basic"
+              label="Repetir Senha"
+              variant="filled"
+              type="password"
               name="repetirSenha"
               inputProps={{ maxLength: 6 }}
               value={removeLetters(form.repetirSenha)}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+            />
           </div>
         </div>
 

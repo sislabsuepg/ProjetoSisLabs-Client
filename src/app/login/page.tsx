@@ -208,7 +208,7 @@ export default function Login() {
     } catch (err: unknown) {
       if (isCustomAxiosError(err)) {
         const apiErrors = err.response?.data?.erros || [];
-  apiErrors.forEach((erro) => toast.error(erro.mensagem));
+        apiErrors.forEach((erro) => toast.error(erro.mensagem));
 
         if (apiErrors.length > 0) {
           const apiErrObj: { [key: string]: string } = {};

@@ -87,7 +87,9 @@ export default function FormEntregaChave() {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   try {
-                    const buscaAluno = await apiOnline.get<IAcademico | { data: IAcademico }>(`/aluno/${form.ra}`);
+                    const buscaAluno = await apiOnline.get<
+                      IAcademico | { data: IAcademico }
+                    >(`/aluno/${form.ra}`);
                     const alunoResp = (buscaAluno as { data: IAcademico }).data
                       ? (buscaAluno as { data: IAcademico }).data
                       : (buscaAluno as IAcademico);
@@ -96,10 +98,12 @@ export default function FormEntregaChave() {
                       idAluno: alunoResp.id,
                     }));
                     setAluno(alunoResp);
-                    const buscaOrientacao = await apiOnline.get<IOrientacao | { data: IOrientacao }>(
-                      `/orientacao/aluno/${alunoResp.id}`
-                    );
-                    const orientResp = (buscaOrientacao as { data: IOrientacao }).data
+                    const buscaOrientacao = await apiOnline.get<
+                      IOrientacao | { data: IOrientacao }
+                    >(`/orientacao/aluno/${alunoResp.id}`);
+                    const orientResp = (
+                      buscaOrientacao as { data: IOrientacao }
+                    ).data
                       ? (buscaOrientacao as { data: IOrientacao }).data
                       : (buscaOrientacao as IOrientacao);
                     setOrientacao(orientResp);
@@ -108,7 +112,9 @@ export default function FormEntregaChave() {
                       idLaboratorio: orientResp.laboratorio?.id || 0,
                     }));
                   } catch (error: unknown) {
-                    const errObj = error as { response?: { data?: { erros?: string[] } } };
+                    const errObj = error as {
+                      response?: { data?: { erros?: string[] } };
+                    };
                     errObj?.response?.data?.erros?.forEach((err: string) =>
                       toast.error(err)
                     );
@@ -144,20 +150,22 @@ export default function FormEntregaChave() {
                     return;
                   }
                   try {
-                    const valido = await apiOnline.post<unknown | { data?: unknown }>(
-                      "/aluno/verificasenha",
-                      {
-                        login: form.ra,
-                        senha: form.senha,
-                      }
-                    );
-                    const validoData = (valido as { data?: unknown }).data ?? valido;
+                    const valido = await apiOnline.post<
+                      unknown | { data?: unknown }
+                    >("/aluno/verificasenha", {
+                      login: form.ra,
+                      senha: form.senha,
+                    });
+                    const validoData =
+                      (valido as { data?: unknown }).data ?? valido;
                     setValidado(validoData != null);
                     if (validoData) {
                       toast.success("Aluno validado com sucesso");
                     }
                   } catch (error: unknown) {
-                    const errObj = error as { response?: { data?: { erros?: string[] } } };
+                    const errObj = error as {
+                      response?: { data?: { erros?: string[] } };
+                    };
                     errObj?.response?.data?.erros?.forEach((err: string) =>
                       toast.error(err)
                     );

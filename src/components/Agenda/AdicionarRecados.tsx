@@ -10,7 +10,7 @@ export default function AdicionarRecados() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log("clicado")
+    console.log("clicado");
     try {
       await apiOnline.post("/recado", { texto });
       toast.success("Recado adicionado com sucesso!");
@@ -26,19 +26,20 @@ export default function AdicionarRecados() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full h-full flex flex-col justify-between">
+    <form
+      onSubmit={handleSubmit}
+      className="w-full h-full flex flex-col justify-between"
+    >
       <div className="w-full h-full flex flex-col justify-between">
         <div className="flex flex-col">
           <p className="font-semibold text-[1.2rem] text-theme-blue mb-2">
             📝 Adicionar recados
           </p>
-          
 
-          
-            <TextareaAutosize
-              aria-label="maximum height"
-              placeholder="Escreva o recado..."
-              className="font-normal"
+          <TextareaAutosize
+            aria-label="maximum height"
+            placeholder="Escreva o recado..."
+            className="font-normal"
             value={texto}
             onChange={(e) => {
               if (e.target.value.length > 1000) {
@@ -48,13 +49,13 @@ export default function AdicionarRecados() {
               setTexto(e.target.value);
             }}
             style={{
-              width: '100%',
-              height: '200px',
-              borderRadius: '15px',
-              padding: '1rem', 
-              backgroundColor: '#ECECEC', 
-              border: 'none',
-              outline: 'none'
+              width: "100%",
+              height: "200px",
+              borderRadius: "15px",
+              padding: "1rem",
+              backgroundColor: "#ECECEC",
+              border: "none",
+              outline: "none",
             }}
           />
         </div>

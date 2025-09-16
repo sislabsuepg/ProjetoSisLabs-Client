@@ -77,16 +77,16 @@ export default function AdicionarEventos() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const laboratoriosResponse = await apiOnline.get<ILaboratorio[] | { data: ILaboratorio[] }>(
-          "/laboratorio"
-        );
+        const laboratoriosResponse = await apiOnline.get<
+          ILaboratorio[] | { data: ILaboratorio[] }
+        >("/laboratorio");
         console.log(laboratoriosResponse);
         const responseData = laboratoriosResponse as {
           data: ILaboratorio[] | { data?: ILaboratorio[] };
         };
         const labData = Array.isArray(responseData.data)
           ? (responseData.data as ILaboratorio[])
-          : ((responseData.data as { data?: ILaboratorio[] }).data || []);
+          : (responseData.data as { data?: ILaboratorio[] }).data || [];
         setLaboratorios(labData);
       } catch (err: unknown) {
         if (err instanceof AxiosError) {

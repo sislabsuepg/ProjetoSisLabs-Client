@@ -37,12 +37,16 @@ export default function FormEntregaPesquisa() {
     setLoading(true);
     try {
       const fetchLaboratorios = async () => {
-        const response = await apiOnline.get<ILaboratorio[] | { data: ILaboratorio[] }>(
-          "/laboratorio?ativo=true&restrito=false"
-        );
-        const resp = response as { data: ILaboratorio[] | { data?: ILaboratorio[] } };
+        const response = await apiOnline.get<
+          ILaboratorio[] | { data: ILaboratorio[] }
+        >("/laboratorio?ativo=true&restrito=false");
+        const resp = response as {
+          data: ILaboratorio[] | { data?: ILaboratorio[] };
+        };
         const inner = resp.data;
-        const labs = Array.isArray(inner) ? inner : (inner as { data?: ILaboratorio[] }).data || [];
+        const labs = Array.isArray(inner)
+          ? inner
+          : (inner as { data?: ILaboratorio[] }).data || [];
         setLaboratorios(labs);
         setLoading(false);
       };
@@ -140,8 +144,10 @@ export default function FormEntregaPesquisa() {
                     .catch((err) => {
                       setValidado(false);
                       setForm((f) => ({ ...f, idAluno: 0 }));
-                      (err as { response?: { data?: { erros?: string[] } } })?.response?.data?.erros?.forEach(
-                        (er: string) => toast.error(er)
+                      (
+                        err as { response?: { data?: { erros?: string[] } } }
+                      )?.response?.data?.erros?.forEach((er: string) =>
+                        toast.error(er)
                       );
                     });
                 }
@@ -180,8 +186,10 @@ export default function FormEntregaPesquisa() {
                       return (res as { data?: unknown }).data != null;
                     })
                     .catch((err) => {
-                      (err as { response?: { data?: { erros?: string[] } } })?.response?.data?.erros?.forEach(
-                        (er: string) => toast.error(er)
+                      (
+                        err as { response?: { data?: { erros?: string[] } } }
+                      )?.response?.data?.erros?.forEach((er: string) =>
+                        toast.error(er)
                       );
                       return false;
                     });

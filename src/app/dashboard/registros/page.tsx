@@ -56,7 +56,7 @@ export default function RegistrosPage() {
       query += `&idUsuario=${usuarioSelecionado}`;
     }
     if (datas.inicio && datas.fim) {
-  const dataFim = new Date(datas.fim as unknown as string);
+      const dataFim = new Date(datas.fim as unknown as string);
       dataFim.setHours(23, 59, 59, 999);
       query += `&dataInicio=${datas.inicio.toISOString()}&dataFim=${dataFim.toISOString()}`;
     }
@@ -66,16 +66,20 @@ export default function RegistrosPage() {
         const repCount = await apiOnline.get<{ total: number }>(
           "/registro/count"
         );
-  const total = (repCount as { count?: number }).count ?? 0;
+        const total = (repCount as { count?: number }).count ?? 0;
         setTotalRegistros(total);
         setTotalPaginas(Math.ceil(total / itensPorPagina));
         const response = await apiOnline.get<{ data: IRegistro[] }>(
           `/registro${query}`
         );
         if ((response.data as unknown as { total?: number })?.total !== total) {
-          setTotalRegistros((response.data as unknown as { total?: number })?.total || total);
+          setTotalRegistros(
+            (response.data as unknown as { total?: number })?.total || total
+          );
         }
-        setRegistros((response.data as unknown as { registros: IRegistro[] }).registros);
+        setRegistros(
+          (response.data as unknown as { registros: IRegistro[] }).registros
+        );
         setTotalPaginas(
           Math.ceil(
             ((response.data as unknown as { total?: number })?.total || total) /

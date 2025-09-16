@@ -39,13 +39,34 @@ import { ApiResponse, IPermissao } from "@/interfaces/interfaces";
 import { AxiosError } from "axios";
 
 // Tipagens auxiliares para evitar uso de 'any' mantendo a lógica original
-interface LaboratoriosApi { laboratorios?: FormLaboratorio[]; total?: number }
-interface OrientacoesApi { orientacoes?: FormOrientacao[]; total?: number }
-interface CursosApi { cursos?: FormCurso[]; total?: number }
-interface PermissaoApi { permissaoUsuario?: FormPermissao[]; total?: number }
-interface UsuariosApi { usuarios?: FormUsuario[]; total?: number }
-interface AcademicosApi { alunos?: FormAcademico[]; total?: number }
-interface ProfessoresApi { professores?: FormProfessor[]; total?: number }
+interface LaboratoriosApi {
+  laboratorios?: FormLaboratorio[];
+  total?: number;
+}
+interface OrientacoesApi {
+  orientacoes?: FormOrientacao[];
+  total?: number;
+}
+interface CursosApi {
+  cursos?: FormCurso[];
+  total?: number;
+}
+interface PermissaoApi {
+  permissaoUsuario?: FormPermissao[];
+  total?: number;
+}
+interface UsuariosApi {
+  usuarios?: FormUsuario[];
+  total?: number;
+}
+interface AcademicosApi {
+  alunos?: FormAcademico[];
+  total?: number;
+}
+interface ProfessoresApi {
+  professores?: FormProfessor[];
+  total?: number;
+}
 
 export default function Alterar() {
   const [activeId, setActiveId] = useState(1);
@@ -276,17 +297,22 @@ export default function Alterar() {
             }${filtroTemp ? `&${filtroTemp}` : ""}`
           );
           console.log(response);
-          const dataResp = response.data as unknown as AcademicosApi | FormAcademico[];
+          const dataResp = response.data as unknown as
+            | AcademicosApi
+            | FormAcademico[];
           if (
             (dataResp as AcademicosApi)?.total !== undefined &&
-            pages !== Math.ceil(((dataResp as AcademicosApi).total || 0) / itemsPerPage)
+            pages !==
+              Math.ceil(((dataResp as AcademicosApi).total || 0) / itemsPerPage)
           ) {
             setTotalPages(
               Math.ceil(((dataResp as AcademicosApi).total || 0) / itemsPerPage)
             );
             return (dataResp as AcademicosApi).alunos || [];
           }
-          return Array.isArray(dataResp) ? dataResp : (dataResp as AcademicosApi).alunos || [];
+          return Array.isArray(dataResp)
+            ? dataResp
+            : (dataResp as AcademicosApi).alunos || [];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -331,14 +357,21 @@ export default function Alterar() {
               Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
-          const dataResp = response.data as unknown as LaboratoriosApi | FormLaboratorio[];
+          const dataResp = response.data as unknown as
+            | LaboratoriosApi
+            | FormLaboratorio[];
           if (
             (dataResp as LaboratoriosApi)?.total !== undefined &&
-            pages !== Math.ceil(((dataResp as LaboratoriosApi).total || 0) / itemsPerPage)
+            pages !==
+              Math.ceil(
+                ((dataResp as LaboratoriosApi).total || 0) / itemsPerPage
+              )
           ) {
             console.log(response);
             setTotalPages(
-              Math.ceil(((dataResp as LaboratoriosApi).total || 0) / itemsPerPage)
+              Math.ceil(
+                ((dataResp as LaboratoriosApi).total || 0) / itemsPerPage
+              )
             );
             return (dataResp as LaboratoriosApi).laboratorios || [];
           }
@@ -362,13 +395,20 @@ export default function Alterar() {
               Inativo == true ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
-          const dataResp = response.data as unknown as OrientacoesApi | FormOrientacao[];
+          const dataResp = response.data as unknown as
+            | OrientacoesApi
+            | FormOrientacao[];
           if (
             (dataResp as OrientacoesApi)?.total !== undefined &&
-            pages !== Math.ceil(((dataResp as OrientacoesApi).total || 0) / itemsPerPage)
+            pages !==
+              Math.ceil(
+                ((dataResp as OrientacoesApi).total || 0) / itemsPerPage
+              )
           ) {
             setTotalPages(
-              Math.ceil(((dataResp as OrientacoesApi).total || 0) / itemsPerPage)
+              Math.ceil(
+                ((dataResp as OrientacoesApi).total || 0) / itemsPerPage
+              )
             );
             return (dataResp as OrientacoesApi).orientacoes || [];
           }
@@ -395,7 +435,8 @@ export default function Alterar() {
           const dataResp = response.data as unknown as CursosApi | FormCurso[];
           if (
             (dataResp as CursosApi)?.total !== undefined &&
-            pages !== Math.ceil(((dataResp as CursosApi).total || 0) / itemsPerPage)
+            pages !==
+              Math.ceil(((dataResp as CursosApi).total || 0) / itemsPerPage)
           ) {
             setTotalPages(
               Math.ceil(((dataResp as CursosApi).total || 0) / itemsPerPage)
@@ -422,10 +463,13 @@ export default function Alterar() {
               Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
-          const dataResp = response.data as unknown as PermissaoApi | FormPermissao[];
+          const dataResp = response.data as unknown as
+            | PermissaoApi
+            | FormPermissao[];
           if (
             (dataResp as PermissaoApi)?.total !== undefined &&
-            pages !== Math.ceil(((dataResp as PermissaoApi).total || 0) / itemsPerPage)
+            pages !==
+              Math.ceil(((dataResp as PermissaoApi).total || 0) / itemsPerPage)
           ) {
             console.log(response);
             setTotalPages(
@@ -453,19 +497,22 @@ export default function Alterar() {
               Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
-          const dataResp = response.data as unknown as UsuariosApi | FormUsuario[];
+          const dataResp = response.data as unknown as
+            | UsuariosApi
+            | FormUsuario[];
           if (
             (dataResp as UsuariosApi)?.total !== undefined &&
-            pages !== Math.ceil(((dataResp as UsuariosApi).total || 0) / itemsPerPage)
+            pages !==
+              Math.ceil(((dataResp as UsuariosApi).total || 0) / itemsPerPage)
           ) {
             setTotalPages(
               Math.ceil(((dataResp as UsuariosApi).total || 0) / itemsPerPage)
             );
             return (dataResp as UsuariosApi).usuarios || [];
           }
-            return Array.isArray(dataResp)
-              ? dataResp
-              : (dataResp as UsuariosApi).usuarios || [];
+          return Array.isArray(dataResp)
+            ? dataResp
+            : (dataResp as UsuariosApi).usuarios || [];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -660,12 +707,9 @@ export default function Alterar() {
           async function ativar() {
             if (openAtivar.id === 0) return;
             try {
-              await apiOnline.put(
-                `/${mapRoutes[activeId]}/${openAtivar.id}`,
-                {
-                  ativo: true,
-                }
-              );
+              await apiOnline.put(`/${mapRoutes[activeId]}/${openAtivar.id}`, {
+                ativo: true,
+              });
             } catch (err) {
               const error = (err as AxiosError).response?.data as ApiResponse;
               console.error("Erro ao ativar no backend:", error);
@@ -737,7 +781,8 @@ export default function Alterar() {
             if (
               ((field as string) === "geral" &&
                 (value as unknown as boolean) === true) ||
-              ("geral" in formData && (formData as { geral?: boolean }).geral === true)
+              ("geral" in formData &&
+                (formData as { geral?: boolean }).geral === true)
             ) {
               return {
                 ...prev,

@@ -409,11 +409,14 @@ export default function Cronograma() {
     }
     // Separador noite: existe noite e (existe tarde ou (não existe tarde mas existe manhã))
     const precisaSeparadorNoite = !!(
-      primeiraNoite && (hasAfternoon || (!hasAfternoon && hasMorning))
+      primeiraNoite &&
+      (hasAfternoon || (!hasAfternoon && hasMorning))
     );
     // Separador tarde: existe tarde e existe manhã e primeiraTarde definida
     const precisaSeparadorTarde = !!(
-      hasMorning && hasAfternoon && primeiraTarde
+      hasMorning &&
+      hasAfternoon &&
+      primeiraTarde
     );
     return {
       hasAfternoon,

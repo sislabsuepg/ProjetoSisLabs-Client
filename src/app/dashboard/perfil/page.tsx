@@ -26,10 +26,13 @@ export default function Perfil() {
 
   async function handleSubmit(e: FormEvent): Promise<void> {
     e.preventDefault();
-    const validado = await apiOnline.post<IUsuario | { data?: IUsuario }>("usuario/login", {
-      login: cookies.usuario.login,
-      senha: form.senha_atual,
-    });
+    const validado = await apiOnline.post<IUsuario | { data?: IUsuario }>(
+      "usuario/login",
+      {
+        login: cookies.usuario.login,
+        senha: form.senha_atual,
+      }
+    );
 
     const validadoData = (validado as { data?: IUsuario }).data
       ? (validado as { data?: IUsuario }).data
