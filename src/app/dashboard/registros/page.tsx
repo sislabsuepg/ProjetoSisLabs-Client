@@ -7,18 +7,21 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import Pagination from "@/components/Pagination";
 import ListaRegistros from "@/components/Registros";
-import { count } from "console";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 
 interface FiltroDatas {
-  inicio: string; // yyyy-mm-dd
-  fim: string; // yyyy-mm-dd
+  inicio: dayjs.Dayjs | null;
+  fim: dayjs.Dayjs | null;
 }
 
 export default function RegistrosPage() {
   const [usuarios, setUsuarios] = useState<IUsuario[]>([]);
   const [registros, setRegistros] = useState<IRegistro[]>([]);
   const [usuarioSelecionado, setUsuarioSelecionado] = useState<number>(0);
-  const [datas, setDatas] = useState<FiltroDatas>({ inicio: "", fim: "" });
+  const [datas, setDatas] = useState<FiltroDatas>({ inicio: null, fim: null });
   const [buscaRegistros, setBuscaRegistros] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [paginaAtual, setPaginaAtual] = useState<number>(1);
@@ -51,7 +54,9 @@ export default function RegistrosPage() {
       query += `&idUsuario=${usuarioSelecionado}`;
     }
     if (datas.inicio && datas.fim) {
-      query += `&dataInicio=${datas.inicio}&dataFim=${datas.fim}`;
+      let dataFim = new Date(datas.fim);
+      dataFim.setHours(23, 59, 59, 999);
+      query += `&dataInicio=${datas.inicio.toISOString()}&dataFim=${dataFim.toISOString()}`;
     }
     const buscaRegistros = async () => {
       setLoading(true);
@@ -90,62 +95,98 @@ export default function RegistrosPage() {
     <div className="w-full p-4 flex flex-col h-full">
       <h1 className="font-semibold text-[1.2rem] text-theme-blue">Registros</h1>
       <div className="mt-4 flex flex-wrap gap-4 items-end bg-theme-white rounded-lg p-4 border">
-        <div className="flex flex-col min-w-[220px]">
-          <label className="text-xs font-medium text-theme-blue mb-1">
-            Usuário
-          </label>
-          <select
-            className="border rounded px-2 py-2 text-sm bg-white"
-            value={usuarioSelecionado ?? ""}
-            onChange={(e) => {
-              const val = e.target.value;
-              setUsuarioSelecionado(val ? Number(val) : 0);
-            }}
+        <div className="flex min-w-[220px] items-center align-middle">
+          <FormControl
+            className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+            variant="filled"
           >
-            <option value="">-- Selecione --</option>
-            {usuarios.map((u) => (
-              <option key={u.id} value={u.id || ""}>
-                {u.login} - {u.nome}
-                {u.ativo === false ? " (desativado)" : ""}
-              </option>
-            ))}
-          </select>
+            <InputLabel id="demo-simple-select-filled-label">
+              Usuário
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-filled-label"
+              value={usuarioSelecionado ?? ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                setUsuarioSelecionado(val ? Number(val) : 0);
+              }}
+            >
+              <MenuItem value="">-- Selecione --</MenuItem>
+              {usuarios.map((u) => (
+                <MenuItem key={u.id} value={u.id || ""}>
+                  {u.login} - {u.nome}
+                  {u.ativo === false ? " (desativado)" : ""}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </div>
-        <div className="flex flex-col">
-          <label className="text-xs font-medium text-theme-blue mb-1">
-            Data início
-          </label>
-          <input
-            type="date"
-            className="border rounded px-2 py-2 text-sm"
-            value={datas.inicio}
-            onChange={(e) => {
-              if (
-                new Date(e.target.value) > new Date(datas.fim) &&
-                datas.fim !== ""
-              ) {
-                toast.error("Data início não pode ser maior que data fim");
-                return;
-              }
-              setDatas((d) => ({ ...d, inicio: e.target.value }));
-            }}
-          />
+        <div className="flex gap-4 flex-wrap">
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <span>
+              <DatePicker
+                label="Data de início"
+                format="DD/MM/YYYY"
+                value={datas.inicio ? dayjs(datas.inicio) : null}
+                onChange={(newValue) =>
+                  setDatas((d) => ({
+                    ...d,
+                    inicio: newValue,
+                    fim:
+                      d.fim && newValue && newValue.isAfter(d.fim)
+                        ? newValue.add(1, "day")
+                        : d.fim,
+                  }))
+                }
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    variant: "filled",
+                    className: "p-3 rounded-md",
+                  },
+                }}
+              />
+            </span>
+            <span>
+              <DatePicker
+                label="Data final"
+                format="DD/MM/YYYY"
+                value={datas.fim ? dayjs(datas.fim) : null}
+                minDate={
+                  datas.inicio
+                    ? dayjs(datas.inicio).add(1, "day")
+                    : dayjs().add(1, "day")
+                }
+                onChange={(newValue) => {
+                  if (
+                    newValue &&
+                    datas.inicio &&
+                    newValue.isBefore(datas.inicio)
+                  ) {
+                    toast.error("Data fim não pode ser menor que data início");
+                    return;
+                  }
+                  setDatas((d) => ({
+                    ...d,
+                    fim: newValue,
+                  }));
+                }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    variant: "filled",
+                    className: "p-3 rounded-md",
+                  },
+                }}
+              />
+            </span>
+          </LocalizationProvider>
         </div>
-        <div className="flex flex-col">
-          <label className="text-xs font-medium text-theme-blue mb-1">
-            Data fim
-          </label>
-          <input
-            type="date"
-            className="border rounded px-2 py-2 text-sm"
-            value={datas.fim}
-            onChange={(e) => setDatas((d) => ({ ...d, fim: e.target.value }))}
-          />
-        </div>
+
         <span className="flex gap-2 mr-auto">
           <button
             type="button"
-            className="ml-auto text-sm px-4 py-2 rounded border bg-white hover:bg-gray-100"
+            className="bg-theme-blue h-10 px-4 rounded-[10px] text-theme-white font-semibold"
             onClick={() => {
               setBuscaRegistros(!buscaRegistros);
             }}
@@ -154,7 +195,7 @@ export default function RegistrosPage() {
           </button>
           <button
             type="button"
-            className="ml-auto text-sm px-4 py-2 rounded border bg-white hover:bg-gray-100"
+            className="bg-theme-blue h-10 px-4 rounded-[10px] text-theme-white font-semibold"
             onClick={() => {
               setUsuarioSelecionado(0);
               setDatas({ inicio: "", fim: "" });

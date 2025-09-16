@@ -128,7 +128,7 @@ export default function ProfessorAutocomplete({
         placeholder={placeholder}
         disabled={disabled}
         className={clsx(
-          "h-[50px] rounded-none text-center bg-transparent focus:bg-theme-lightBlue/20 focus:outline-none text-sm border-none w-full",
+          "h-[50px] rounded-none text-center font-semibold bg-transparent focus:bg-theme-lightBlue/20 focus:outline-none text-sm border-none w-full",
           className
         )}
         role="combobox"

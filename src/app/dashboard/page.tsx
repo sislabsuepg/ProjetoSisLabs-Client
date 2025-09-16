@@ -2,7 +2,8 @@
 
 import Pagination from "@/components/Pagination";
 import { ApiResponse, IEmprestimo } from "@/interfaces/interfaces";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
 //import { useCookies } from "react-cookie";
 import { apiOnline } from "@/services/services";
 import { CircularProgress } from "@mui/material";
@@ -19,17 +20,53 @@ export default function Inicio() {
     status: boolean;
     id: number;
   }>({ status: false, id: 0 });
-  const [solicitacoes, setSolicitacoes] = useState<
-    {
-      id: string;
-      idAluno: number;
-      idLaboratorio: number;
-      aluno: { id: number; nome: string; ra: string };
-      laboratorio: { id: number; nome: string; numero: string };
-    }[]
-  >([]);
+  interface ISolicitacao {
+    id: string;
+    idAluno: number;
+    idLaboratorio: number;
+    aluno: { id: number; nome: string; ra: string };
+    laboratorio: { id: number; nome: string; numero: string };
+  }
+  const [solicitacoes, setSolicitacoes] = useState<ISolicitacao[]>([]);
   //const [cookies] = useCookies(["usuario"]);
   const [data, setData] = useState<IEmprestimo[]>([]);
+  // Handlers para aprovar / recusar solicitações
+  const handleAprovar = async (id: string) => {
+    try {
+      const solicitacaoInfo = solicitacoes.find((s) => s.id === id);
+      await apiOnline.put(`/solicitacoes`, {
+        id,
+        aceita: true,
+      });
+      await apiOnline.post(`/emprestimo`, {
+        idAluno: solicitacaoInfo?.idAluno,
+        idLaboratorio: solicitacaoInfo?.idLaboratorio,
+      });
+      setSolicitacoes((prev) => prev.filter((s) => s.id !== id));
+      toast.success("Solicitação aprovada");
+      setUpdate((u) => !u);
+    } catch (e) {
+      if (e.response?.data?.erros) {
+        e.response.data.erros.map((err: string) => toast.error(err));
+      } else {
+        toast.error("Erro ao aprovar solicitação");
+      }
+    }
+  };
+  const handleRecusar = async (id: string) => {
+    try {
+      await apiOnline.put(`/solicitacoes`, {
+        id,
+        aceita: false,
+      });
+
+      setSolicitacoes((prev) => prev.filter((s) => s.id !== id));
+      toast.info("Solicitação recusada");
+    } catch (e) {
+      console.error(e);
+      toast.error("Erro ao recusar solicitação");
+    }
+  };
   useEffect(() => {
     async function fetchData() {
       try {
@@ -63,6 +100,45 @@ export default function Inicio() {
     fetchData();
   }, [currentPage, update]);
 
+  // Polling de solicitações a cada 5s (com cleanup adequado)
+  const solicitacoesPrevRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const fetchSolicitacoes = async () => {
+      try {
+        const solicitacoesResposta = await apiOnline.get<ISolicitacao[]>(
+          "/solicitacoes"
+        );
+        const responseData: ISolicitacao[] = Array.isArray(
+          solicitacoesResposta.data
+        )
+          ? solicitacoesResposta.data
+          : [];
+        setSolicitacoes(() => {
+          const prevIds = solicitacoesPrevRef.current;
+          const novas = responseData.filter((s) => !prevIds.has(s.id));
+          if (novas.length > 0) {
+            toast.info(
+              novas.length === 1
+                ? `Nova solicitação: ${novas[0].aluno.nome} - Lab ${novas[0].laboratorio.numero}`
+                : `${novas.length} novas solicitações de laboratório`
+            );
+          }
+          // atualizar ref
+          solicitacoesPrevRef.current = new Set(responseData.map((s) => s.id));
+          return responseData;
+        });
+      } catch (e) {
+        console.error("Erro ao buscar solicitações", e);
+      }
+    };
+    fetchSolicitacoes();
+    interval = setInterval(fetchSolicitacoes, 5000);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, []);
+
   if (loading) {
     return (
       <div className="w-full h-full flex items-center justify-center">
@@ -71,20 +147,51 @@ export default function Inicio() {
     );
   }
 
-  setInterval(async () => {
-    const response = await apiOnline.get("/solicitacoes");
-    const responseData = response.data;
-    if (responseData.length !== solicitacoes.length) {
-      setSolicitacoes(responseData);
-    }
-    console.log(responseData);
-  }, 5000);
-
   return (
     <div className="w-full flex flex-col h-full items-start">
       <p className="text-theme-blue font-semibold text-[1.2rem] w-full text-start">
         ✅ Laboratórios em uso
       </p>
+
+      {/* Solicitações Pendentes */}
+      {solicitacoes.length > 0 && (
+        <div className="w-full bg-theme-container border border-theme-blue/10 rounded-xl p-4 mt-4 shadow-sm">
+          <h2 className="text-theme-blue font-semibold text-sm mb-3 flex items-center gap-2">
+            🔔 Solicitações de uso pendentes
+          </h2>
+          <div className="flex flex-col gap-3 max-h-64 overflow-auto pr-2">
+            {solicitacoes.map((s) => (
+              <div
+                key={s.id}
+                className="flex items-start justify-between gap-4 bg-white/60 rounded-lg px-3 py-2 border border-theme-blue/10"
+              >
+                <div className="flex flex-col text-xs">
+                  <span className="text-theme-text font-medium">
+                    {s.aluno.nome} ({s.aluno.ra})
+                  </span>
+                  <span className="text-theme-blue font-semibold">
+                    Lab {s.laboratorio.numero} - {s.laboratorio.nome}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleAprovar(s.id)}
+                    className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md font-medium transition-colors"
+                  >
+                    Aprovar
+                  </button>
+                  <button
+                    onClick={() => handleRecusar(s.id)}
+                    className="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md font-medium transition-colors"
+                  >
+                    Recusar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="w-full flex flex-col h-full mt-5">
         {data.length > 0 ? (
@@ -93,7 +200,7 @@ export default function Inicio() {
               key={item?.id}
               className={`w-full ${
                 Number(index) % 2 == 0 ? "bg-[#F3F3F3]" : "bg-transparent"
-              } px-4 py-2 rounded-[10px]`}
+              } px-4 py-2 rounded-[10px] mt-3`}
             >
               {/* Layout em linha: ponto, texto (cresce), ícone logo após o texto */}
               <div className="flex w-full items-start gap-2">

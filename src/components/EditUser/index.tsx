@@ -365,6 +365,7 @@ function EditUserModal<T extends object>({
                   // Para campos de telefone, remover a máscara antes de salvar
                   if (getInputType(key) === "phone") {
                     newValue = removeMaskPhone(e.target.value);
+                    newValue = newValue.slice(0, 15); // limita a 15 dígitos
                   } else if (getInputType(key) === "date") {
                     console.log(
                       `Campo de data ${key} - valor original:`,

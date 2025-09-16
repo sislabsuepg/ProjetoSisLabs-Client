@@ -715,8 +715,9 @@ export default function Alterar() {
         onChange={(field, value) =>
           setFormData((prev) => {
             if (
-              (field as string) === "geral" &&
-              (value as unknown as boolean) === true
+              ((field as string) === "geral" &&
+                (value as unknown as boolean) === true) ||
+              formData.geral === true
             ) {
               return {
                 ...prev,
@@ -727,6 +728,7 @@ export default function Alterar() {
                 relatorio: true,
               };
             }
+
             if ((field as string) === "dataInicio") {
               const date = new Date(value as unknown as string);
               const dateFim = new Date(

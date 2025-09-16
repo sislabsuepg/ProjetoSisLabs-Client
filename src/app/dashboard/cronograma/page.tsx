@@ -703,7 +703,7 @@ export default function Cronograma() {
                                 {professor ? (
                                   <div className="flex flex-col gap-1">
                                     <span
-                                      className="font-medium text-theme-blue truncate"
+                                      className="font-bold text-theme-blue truncate"
                                       title={professor}
                                     >
                                       {professor}
