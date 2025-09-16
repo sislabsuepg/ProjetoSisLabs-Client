@@ -52,19 +52,19 @@ export default function EventosRecados() {
         apiOnline.get<ApiResponse<IRecado[]>>("/recado"),
       ]).then(([eventosResponse, recadosResponse]) => {
         if (eventosResponse.status === "fulfilled") {
-            const orderedEventos = [...eventosResponse.value.data].sort(
-              (a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()
-            );
-            setEventos(orderedEventos);
+          const orderedEventos = [...eventosResponse.value.data].sort(
+            (a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()
+          );
+          setEventos(orderedEventos);
         } else {
           console.error("Erro ao buscar eventos:", eventosResponse.reason);
         }
 
         if (recadosResponse.status === "fulfilled") {
-            const orderedRecados = [...recadosResponse.value.data].sort(
-              (a, b) => a.id - b.id
-            );
-            setRecados(orderedRecados);
+          const orderedRecados = [...recadosResponse.value.data].sort(
+            (a, b) => a.id - b.id
+          );
+          setRecados(orderedRecados);
         } else {
           console.error("Erro ao buscar recados:", recadosResponse.reason);
         }
@@ -109,16 +109,16 @@ export default function EventosRecados() {
         responsavel: draftEvento.responsavel,
         idLaboratorio: draftEvento.idLaboratorio,
       });
-        setEventos((prev) => {
-          const updated = prev.map((ev) =>
-            ev.id === draftEvento.id
-              ? ({ ...(ev as IEvento), ...draftEvento, data: dateObj } as IEvento)
-              : ev
-          );
-          return updated.sort(
-            (a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()
-          );
-        });
+      setEventos((prev) => {
+        const updated = prev.map((ev) =>
+          ev.id === draftEvento.id
+            ? ({ ...(ev as IEvento), ...draftEvento, data: dateObj } as IEvento)
+            : ev
+        );
+        return updated.sort(
+          (a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()
+        );
+      });
       toast.success("Evento atualizado com sucesso!");
       setOpenEditEvento(false);
     } catch {
@@ -133,14 +133,14 @@ export default function EventosRecados() {
       await apiOnline.put(`/recado/${draftRecado.id}`, {
         texto: draftRecado.texto,
       });
-        setRecados((prev) => {
-          const updated = prev.map((r) =>
-            r.id === draftRecado.id
-              ? ({ ...(r as IRecado), ...draftRecado } as IRecado)
-              : r
-          );
-          return updated.sort((a, b) => a.id - b.id);
-        });
+      setRecados((prev) => {
+        const updated = prev.map((r) =>
+          r.id === draftRecado.id
+            ? ({ ...(r as IRecado), ...draftRecado } as IRecado)
+            : r
+        );
+        return updated.sort((a, b) => a.id - b.id);
+      });
       toast.success("Recado atualizado com sucesso!");
       setOpenEditRecado(false);
     } catch {
@@ -153,20 +153,18 @@ export default function EventosRecados() {
     try {
       if (openDelete.type === "evento") {
         await apiOnline.delete(`/evento/${openDelete.id}`);
-          setEventos((prev) =>
-            prev
-              .filter((e) => e.id !== openDelete.id)
-              .sort(
-                (a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()
-              )
-          );
+        setEventos((prev) =>
+          prev
+            .filter((e) => e.id !== openDelete.id)
+            .sort(
+              (a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()
+            )
+        );
       } else {
         await apiOnline.delete(`/recado/${openDelete.id}`);
-          setRecados((prev) =>
-            prev
-              .filter((r) => r.id !== openDelete.id)
-              .sort((a, b) => a.id - b.id)
-          );
+        setRecados((prev) =>
+          prev.filter((r) => r.id !== openDelete.id).sort((a, b) => a.id - b.id)
+        );
       }
       toast.success("Excluído com sucesso!");
     } catch {
