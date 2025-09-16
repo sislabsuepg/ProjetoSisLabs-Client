@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
-import Popover from '@/components/Popover';
-import { maskDate } from '@/utils/maskDate';
-import BorderColorIcon from '@mui/icons-material/BorderColor';
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
-import { FormOrientacao } from './types';
+import Popover from "@/components/Popover";
+import { maskDate } from "@/utils/maskDate";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import { FormOrientacao } from "./types";
 
 interface Props {
   list: FormOrientacao[];
   dados: FormOrientacao[];
+  inactive: boolean;
   setFormData: (data: FormOrientacao) => void;
   setOpenEditUser: (state: { status: boolean; id: number }) => void;
   setOpenExcluir: (state: { status: boolean; id: number }) => void;
@@ -17,6 +18,7 @@ interface Props {
 export default function ListOrientacao({
   list,
   dados,
+  inactive,
   setFormData,
   setOpenEditUser,
   setOpenExcluir,
@@ -42,9 +44,11 @@ export default function ListOrientacao({
               <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
                 Data fim
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
-                Editar
-              </th>
+              {!inactive && (
+                <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
+                  Ações
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -52,16 +56,22 @@ export default function ListOrientacao({
               list.map((item, index) => (
                 <tr
                   key={item.id}
-                  className={index % 2 === 0 ? 'bg-[#F5F5F5]' : 'bg-white'}
+                  className={index % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"}
                 >
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[100px] text-theme-text">
-                    <Popover title={item?.aluno?.nome}>{item?.aluno?.nome}</Popover>
+                    <Popover title={item?.aluno?.nome}>
+                      {item?.aluno?.nome}
+                    </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
-                    <Popover title={item?.professor?.nome}>{item?.professor?.nome}</Popover>
+                    <Popover title={item?.professor?.nome}>
+                      {item?.professor?.nome}
+                    </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
-                    <Popover title={item?.laboratorio?.numero}>{item?.laboratorio?.numero}</Popover>
+                    <Popover title={item?.laboratorio?.numero}>
+                      {item?.laboratorio?.numero}
+                    </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
                     <Popover title={maskDate(item.dataInicio?.split("T")[0])}>
@@ -73,38 +83,40 @@ export default function ListOrientacao({
                       {maskDate(item.dataFim?.split("T")[0])}
                     </Popover>
                   </td>
-                  <td className="px-4 py-3 text-[0.8rem] font-medium flex gap-2">
-                    <div className="flex items-center justify-center gap-3">
-                      <Popover title="Editar">
-                        <button
-                          onClick={() => {
-                            const user = dados.find((d) => d.id === item.id);
-                            if (user) {
-                              setFormData({ ...user });
-                              setOpenEditUser({ status: true, id: item.id });
+                  {!inactive && (
+                    <td className="px-4 py-3 text-[0.8rem] font-medium flex gap-2">
+                      <div className="flex items-center justify-center gap-3">
+                        <Popover title="Editar">
+                          <button
+                            onClick={() => {
+                              const user = dados.find((d) => d.id === item.id);
+                              if (user) {
+                                setFormData({ ...user });
+                                setOpenEditUser({ status: true, id: item.id });
+                              }
+                            }}
+                          >
+                            <BorderColorIcon
+                              className="text-theme-blue"
+                              sx={{ width: 20, height: 20 }}
+                            />
+                          </button>
+                        </Popover>
+                        <Popover title="Desativar">
+                          <button
+                            onClick={() =>
+                              setOpenExcluir({ status: true, id: item.id })
                             }
-                          }}
-                        >
-                          <BorderColorIcon
-                            className="text-theme-blue"
-                            sx={{ width: 20, height: 20 }}
-                          />
-                        </button>
-                      </Popover>
-                      <Popover title="Desativar">
-                        <button
-                          onClick={() =>
-                            setOpenExcluir({ status: true, id: item.id })
-                          }
-                        >
-                          <PersonRemoveIcon
-                            className="text-theme-blue"
-                            sx={{ width: 22, height: 22 }}
-                          />
-                        </button>
-                      </Popover>
-                    </div>
-                  </td>
+                          >
+                            <PersonRemoveIcon
+                              className="text-theme-blue"
+                              sx={{ width: 22, height: 22 }}
+                            />
+                          </button>
+                        </Popover>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))
             ) : (

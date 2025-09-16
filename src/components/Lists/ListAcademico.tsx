@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import Popover from '@/components/Popover';
-import BorderColorIcon from '@mui/icons-material/BorderColor';
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
-import { FormAcademico } from './types';
-import {maskPhone} from '@/utils/maskPhone';
-import { PersonAdd } from '@mui/icons-material';
+import Popover from "@/components/Popover";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import { FormAcademico } from "./types";
+import { maskPhone } from "@/utils/maskPhone";
+import { PersonAdd } from "@mui/icons-material";
 
 interface Props {
   list: FormAcademico[];
@@ -24,7 +24,6 @@ export default function ListAcademico({
   setOpenExcluir,
   setOpenAtivar,
 }: Props) {
-
   return (
     <div className="w-full h-full flex flex-col justify-between">
       <div className="h-full overflow-y-auto rounded-lg bg-theme-white mt-5">
@@ -50,7 +49,7 @@ export default function ListAcademico({
                 Ano
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
-                Editar
+                Ações
               </th>
             </tr>
           </thead>
@@ -59,7 +58,7 @@ export default function ListAcademico({
               list.map((item, index) => (
                 <tr
                   key={item.id}
-                  className={index % 2 === 0 ? 'bg-[#F5F5F5]' : 'bg-white'}
+                  className={index % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"}
                 >
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[100px] text-theme-text">
                     <Popover title={item.ra}>{item.ra}</Popover>
@@ -68,16 +67,24 @@ export default function ListAcademico({
                     <Popover title={item.nome}>{item.nome}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
-                    <Popover title={item.telefone|| "-"}>{maskPhone(item.telefone)|| "-"}</Popover>
+                    <Popover title={item.telefone || "-"}>
+                      {maskPhone(item.telefone) || "-"}
+                    </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
-                    <Popover title={item.email|| "-"}>{item.email|| "-"}</Popover>
+                    <Popover title={item.email || "-"}>
+                      {item.email || "-"}
+                    </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[150px] text-theme-text">
-                    <Popover title={item.curso?.nome || "-"}>{item.curso?.nome || "-"}</Popover>
+                    <Popover title={item.curso?.nome || "-"}>
+                      {item.curso?.nome || "-"}
+                    </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[80px] text-theme-text">
-                    <Popover title={String(item.anoCurso || "-")}>{item.anoCurso || "-"}</Popover>
+                    <Popover title={String(item.anoCurso || "-")}>
+                      {item.anoCurso || "-"}
+                    </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium flex gap-2">
                     <Popover title="Editar">
@@ -103,25 +110,25 @@ export default function ListAcademico({
                             setOpenExcluir({ status: true, id: item.id })
                           }
                         >
-                        <PersonRemoveIcon
-                          className="text-theme-blue"
-                          sx={{ width: 22, height: 22 }}
-                        />
-                      </button>
-                    </Popover>
-                    ):(
+                          <PersonRemoveIcon
+                            className="text-theme-blue"
+                            sx={{ width: 22, height: 22 }}
+                          />
+                        </button>
+                      </Popover>
+                    ) : (
                       <Popover title="Ativar">
                         <button
                           onClick={() =>
                             setOpenAtivar({ status: true, id: item.id })
                           }
                         >
-                        <PersonAdd
-                          className="text-theme-blue"
-                          sx={{ width: 22, height: 22 }}
-                        />
-                      </button>
-                    </Popover>
+                          <PersonAdd
+                            className="text-theme-blue"
+                            sx={{ width: 22, height: 22 }}
+                          />
+                        </button>
+                      </Popover>
                     )}
                   </td>
                 </tr>

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import Popover from '@/components/Popover';
-import BorderColorIcon from '@mui/icons-material/BorderColor';
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
-import { FormPermissao } from './types';
-import { PersonAdd } from '@mui/icons-material';
+import Popover from "@/components/Popover";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import { FormPermissao } from "./types";
+import { PersonAdd } from "@mui/icons-material";
 
 interface Props {
   list: FormPermissao[];
@@ -21,7 +21,7 @@ export default function ListLaboratorio({
   setFormData,
   setOpenEditUser,
   setOpenExcluir,
-  setOpenAtivar
+  setOpenAtivar,
 }: Props) {
   return (
     <div className="w-full h-full flex flex-col justify-between">
@@ -47,6 +47,9 @@ export default function ListLaboratorio({
               <th className="px-4 py-2 text-left text-xs font-medium text-theme-blue uppercase">
                 Relatório
               </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
+                Ações
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -55,33 +58,37 @@ export default function ListLaboratorio({
                 <tr
                   key={item.id}
                   className={`${
-                    index % 2 === 0 ? 'bg-[#F5F5F5]' : 'bg-white'
+                    index % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
                   } border-b last:border-0`}
                 >
                   <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.nomePermissao}>{item.nomePermissao}</Popover>
-                  </td>
-                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.geral ? 'Sim' : 'Não'}>{item.geral ? 'Sim' : 'Não'}</Popover>
-                  </td>
-                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.cadastro ? 'Sim' : 'Não'}>
-                      {item.cadastro ? 'Sim' : 'Não'}
-                    </Popover>
-                  </td>
-                    <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.alteracao ? 'Sim' : 'Não'}>
-                        {item.alteracao ? 'Sim' : 'Não'}
+                    <Popover title={item.nomePermissao}>
+                      {item.nomePermissao}
                     </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.advertencia ? 'Sim' : 'Não'}>
-                        {item.advertencia ? 'Sim' : 'Não'}
+                    <Popover title={item.geral ? "Sim" : "Não"}>
+                      {item.geral ? "Sim" : "Não"}
                     </Popover>
-                    </td>
-                    <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.relatorio ? 'Sim' : 'Não'}>
-                        {item.relatorio ? 'Sim' : 'Não'}
+                  </td>
+                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
+                    <Popover title={item.cadastro ? "Sim" : "Não"}>
+                      {item.cadastro ? "Sim" : "Não"}
+                    </Popover>
+                  </td>
+                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
+                    <Popover title={item.alteracao ? "Sim" : "Não"}>
+                      {item.alteracao ? "Sim" : "Não"}
+                    </Popover>
+                  </td>
+                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
+                    <Popover title={item.advertencia ? "Sim" : "Não"}>
+                      {item.advertencia ? "Sim" : "Não"}
+                    </Popover>
+                  </td>
+                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
+                    <Popover title={item.relatorio ? "Sim" : "Não"}>
+                      {item.relatorio ? "Sim" : "Não"}
                     </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium w-[100px]">
@@ -102,31 +109,33 @@ export default function ListLaboratorio({
                           />
                         </button>
                       </Popover>
-                      {item.ativo?(<Popover title="Desativar">
-                        <button
-                          onClick={() =>
-                            setOpenExcluir({ status: true, id: item.id })
-                          }
-                        >
-                          <PersonRemoveIcon
-                            className="text-theme-blue"
-                            sx={{ width: 22, height: 22 }}
-                          />
-                        </button>
-                      </Popover>):
-                      (<Popover title="Ativar">
-                        <button
-                          onClick={() =>
-                            setOpenAtivar({ status: true, id: item.id })
-                          }
-                        >
-                          <PersonAdd
-                            className="text-theme-blue"
-                            sx={{ width: 22, height: 22 }}
-                          />
-                        </button>
-                      </Popover>)
-                    }
+                      {item.ativo ? (
+                        <Popover title="Desativar">
+                          <button
+                            onClick={() =>
+                              setOpenExcluir({ status: true, id: item.id })
+                            }
+                          >
+                            <PersonRemoveIcon
+                              className="text-theme-blue"
+                              sx={{ width: 22, height: 22 }}
+                            />
+                          </button>
+                        </Popover>
+                      ) : (
+                        <Popover title="Ativar">
+                          <button
+                            onClick={() =>
+                              setOpenAtivar({ status: true, id: item.id })
+                            }
+                          >
+                            <PersonAdd
+                              className="text-theme-blue"
+                              sx={{ width: 22, height: 22 }}
+                            />
+                          </button>
+                        </Popover>
+                      )}
                     </div>
                   </td>
                 </tr>

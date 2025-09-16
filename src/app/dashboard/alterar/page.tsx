@@ -585,6 +585,7 @@ export default function Alterar() {
           <ListOrientacao
             list={getCurrentList() as FormOrientacao[]}
             dados={currentItems as FormOrientacao[]}
+            inactive={Inativo}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}

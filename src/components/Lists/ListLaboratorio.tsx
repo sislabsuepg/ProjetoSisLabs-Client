@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import Popover from '@/components/Popover';
-import BorderColorIcon from '@mui/icons-material/BorderColor';
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
-import { FormLaboratorio } from './types';
-import { PersonAdd } from '@mui/icons-material';
+import Popover from "@/components/Popover";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import { FormLaboratorio } from "./types";
+import { PersonAdd } from "@mui/icons-material";
 
 interface Props {
   list: FormLaboratorio[];
@@ -21,7 +21,7 @@ export default function ListLaboratorio({
   setFormData,
   setOpenEditUser,
   setOpenExcluir,
-  setOpenAtivar
+  setOpenAtivar,
 }: Props) {
   return (
     <div className="w-full h-full flex flex-col justify-between">
@@ -38,8 +38,8 @@ export default function ListLaboratorio({
               <th className="px-4 py-2 text-left text-xs font-medium text-theme-blue uppercase">
                 Restrito
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-theme-blue uppercase">
-                Editar
+              <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
+                Ações
               </th>
             </tr>
           </thead>
@@ -49,7 +49,7 @@ export default function ListLaboratorio({
                 <tr
                   key={item.id}
                   className={`${
-                    index % 2 === 0 ? 'bg-[#F5F5F5]' : 'bg-white'
+                    index % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
                   } border-b last:border-0`}
                 >
                   <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
@@ -59,8 +59,8 @@ export default function ListLaboratorio({
                     <Popover title={item.numero}>{item.numero}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.restrito ? 'Sim' : 'Não'}>
-                      {item.restrito ? 'Sim' : 'Não'}
+                    <Popover title={item.restrito ? "Sim" : "Não"}>
+                      {item.restrito ? "Sim" : "Não"}
                     </Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium w-[100px]">
@@ -88,12 +88,13 @@ export default function ListLaboratorio({
                               setOpenExcluir({ status: true, id: item.id })
                             }
                           >
-                          <PersonRemoveIcon
-                            className="text-theme-blue"
-                            sx={{ width: 22, height: 22 }}
-                          />
-                        </button>
-                      </Popover>):(
+                            <PersonRemoveIcon
+                              className="text-theme-blue"
+                              sx={{ width: 22, height: 22 }}
+                            />
+                          </button>
+                        </Popover>
+                      ) : (
                         <Popover title="Ativar">
                           <button
                             onClick={() =>

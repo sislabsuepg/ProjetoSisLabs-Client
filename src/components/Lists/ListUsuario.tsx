@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import Popover from '@/components/Popover';
-import BorderColorIcon from '@mui/icons-material/BorderColor';
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
-import { FormUsuario } from './types';
-import { PersonAdd } from '@mui/icons-material';
+import Popover from "@/components/Popover";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import { FormUsuario } from "./types";
+import { PersonAdd } from "@mui/icons-material";
 
 interface Props {
   list: FormUsuario[];
@@ -21,7 +21,7 @@ export default function ListUsuario({
   setFormData,
   setOpenEditUser,
   setOpenExcluir,
-  setOpenAtivar
+  setOpenAtivar,
 }: Props) {
   return (
     <div className="w-full h-full flex flex-col justify-between">
@@ -38,6 +38,9 @@ export default function ListUsuario({
               <th className="px-4 py-2 text-left text-xs font-medium text-theme-blue uppercase">
                 Permissão
               </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-theme-blue uppercase">
+                Ações
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -46,7 +49,7 @@ export default function ListUsuario({
                 <tr
                   key={item.id}
                   className={`${
-                    index % 2 === 0 ? 'bg-[#F5F5F5]' : 'bg-white'
+                    index % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
                   } border-b last:border-0`}
                 >
                   <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
@@ -56,11 +59,13 @@ export default function ListUsuario({
                     <Popover title={item.login}>{item.login}</Popover>
                   </td>
                   <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.permissaoUsuario?.nomePermissao || "-"}>
+                    <Popover
+                      title={item.permissaoUsuario?.nomePermissao || "-"}
+                    >
                       {item.permissaoUsuario?.nomePermissao || "-"}
                     </Popover>
                   </td>
-                    
+
                   <td className="px-4 py-3 text-[0.8rem] font-medium w-[100px]">
                     <div className="flex items-center justify-center gap-3">
                       <Popover title="Editar">
@@ -79,19 +84,20 @@ export default function ListUsuario({
                           />
                         </button>
                       </Popover>
-                      {item.ativo?(<Popover title="Desativar">
-                        <button
-                          onClick={() =>
-                            setOpenExcluir({ status: true, id: item.id })
-                          }
-                        >
-                          <PersonRemoveIcon
-                            className="text-theme-blue"
-                            sx={{ width: 22, height: 22 }}
-                          />
-                        </button>
-                      </Popover>):
-                      (
+                      {item.ativo ? (
+                        <Popover title="Desativar">
+                          <button
+                            onClick={() =>
+                              setOpenExcluir({ status: true, id: item.id })
+                            }
+                          >
+                            <PersonRemoveIcon
+                              className="text-theme-blue"
+                              sx={{ width: 22, height: 22 }}
+                            />
+                          </button>
+                        </Popover>
+                      ) : (
                         <Popover title="Ativar">
                           <button
                             onClick={() =>
