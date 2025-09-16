@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
-import { capitalize, CircularProgress, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import {
+  capitalize,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+} from "@mui/material";
 import { ILaboratorio } from "@/interfaces/interfaces";
 import { apiOnline } from "@/services/services";
 import { AxiosError } from "axios";
@@ -17,7 +26,9 @@ export default function AdicionarEventos() {
     idLaboratorio: 0, // Mantido como string para o Select
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
@@ -32,25 +43,33 @@ export default function AdicionarEventos() {
     form.duracao > 0 &&
     form.responsavel.trim().length > 0 &&
     form.idLaboratorio > 0 &&
-    form.hora.trim().length > 0;
+    form.hora.trim().length > 0 &&
+    new Date(`${form.data}T${form.hora}:00`) > new Date();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isFormValid) return;
     async function salvarEvento() {
-      try{
+      try {
         await apiOnline.post("/evento", {
           nome: form.nome,
           dataEvento: new Date(`${form.data}T${form.hora}:00`),
           duracao: form.duracao,
           responsavel: form.responsavel,
-          idLaboratorio: form.idLaboratorio
+          idLaboratorio: form.idLaboratorio,
+        });
+        setForm({
+          nome: "",
+          data: "",
+          hora: "",
+          duracao: 0,
+          responsavel: "",
+          idLaboratorio: 0,
         });
         toast.success("Evento adicionado com sucesso!");
       } catch (error) {
         toast.error("Erro ao adicionar evento.");
       }
-      
     }
     salvarEvento();
   };
@@ -58,7 +77,9 @@ export default function AdicionarEventos() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const laboratoriosResponse = await apiOnline.get<ILaboratorio[]>("/laboratorio");
+        const laboratoriosResponse = await apiOnline.get<ILaboratorio[]>(
+          "/laboratorio"
+        );
         console.log(laboratoriosResponse);
         setLaboratorios(laboratoriosResponse.data ?? []);
       } catch (err: unknown) {
@@ -131,7 +152,6 @@ export default function AdicionarEventos() {
                 onChange={handleChange}
                 className="w-full font-normal p-3 text-[0.9rem] rounded-md"
               />
-
             </div>
 
             <div className="w-full flex items-center gap-4">
