@@ -45,12 +45,13 @@ export default function Inicio() {
       setSolicitacoes((prev) => prev.filter((s) => s.id !== id));
       toast.success("Solicitação aprovada");
       setUpdate((u) => !u);
-    } catch (e) {
-      if (e.response?.data?.erros) {
-        e.response.data.erros.map((err: string) => toast.error(err));
-      } else {
-        toast.error("Erro ao aprovar solicitação");
+    } catch (e: unknown) {
+      const errObj = e as { response?: { data?: { erros?: string[] } } };
+      if (errObj?.response?.data?.erros) {
+        errObj.response.data.erros.map((err: string) => toast.error(err));
+        return;
       }
+      toast.error("Erro ao aprovar solicitação");
     }
   };
   const handleRecusar = async (id: string) => {
@@ -62,7 +63,7 @@ export default function Inicio() {
 
       setSolicitacoes((prev) => prev.filter((s) => s.id !== id));
       toast.info("Solicitação recusada");
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e);
       toast.error("Erro ao recusar solicitação");
     }
@@ -106,14 +107,15 @@ export default function Inicio() {
     let interval: ReturnType<typeof setInterval> | null = null;
     const fetchSolicitacoes = async () => {
       try {
-        const solicitacoesResposta = await apiOnline.get<ISolicitacao[]>(
-          "/solicitacoes"
-        );
-        const responseData: ISolicitacao[] = Array.isArray(
-          solicitacoesResposta.data
-        )
-          ? solicitacoesResposta.data
-          : [];
+        const solicitacoesResposta = await apiOnline.get<
+          ISolicitacao[] | { data: ISolicitacao[] }
+        >("/solicitacoes");
+        const raw = solicitacoesResposta as {
+          data: ISolicitacao[] | { data: ISolicitacao[] };
+        };
+        const responseData: ISolicitacao[] = Array.isArray(raw.data)
+          ? (raw.data as ISolicitacao[])
+          : ((raw.data as { data?: ISolicitacao[] }).data || []);
         setSolicitacoes(() => {
           const prevIds = solicitacoesPrevRef.current;
           const novas = responseData.filter((s) => !prevIds.has(s.id));
@@ -128,7 +130,7 @@ export default function Inicio() {
           solicitacoesPrevRef.current = new Set(responseData.map((s) => s.id));
           return responseData;
         });
-      } catch (e) {
+      } catch (e: unknown) {
         console.error("Erro ao buscar solicitações", e);
       }
     };

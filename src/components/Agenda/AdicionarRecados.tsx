@@ -16,8 +16,9 @@ export default function AdicionarRecados() {
       toast.success("Recado adicionado com sucesso!");
       setTexto("");
     } catch (error: unknown) {
-      if (error.response?.data?.erros) {
-        error.response.data.erros.forEach((e: string) => toast.error(e));
+      const errObj = error as { response?: { data?: { erros?: string[] } } };
+      if (errObj?.response?.data?.erros) {
+        errObj.response.data.erros.forEach((e: string) => toast.error(e));
       } else {
         toast.error("Erro ao adicionar recado. Tente novamente.");
       }

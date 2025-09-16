@@ -118,13 +118,13 @@ export default function Cronograma() {
         telefone: form.telefone,
       });
       toast.success("Perfil atualizado com sucesso!");
-    } catch (error) {
-      if (error.response?.data?.erros) {
-        error.response.data.erros.forEach((e: string) => toast.error(e));
+    } catch (error: unknown) {
+      const errObj = error as { response?: { data?: { erros?: string[] } } };
+      if (errObj?.response?.data?.erros) {
+        errObj.response.data.erros.forEach((e: string) => toast.error(e));
         return;
-      } else {
-        toast.error("Erro ao atualizar perfil. Tente novamente.");
       }
+      toast.error("Erro ao atualizar perfil. Tente novamente.");
     }
   };
   const handleSenhaUpdate = async (e: React.FormEvent) => {
@@ -134,7 +134,6 @@ export default function Cronograma() {
         login: cookies.aluno.ra,
         senha: form.senha_atual,
       });
-      console.log(validado);
       await apiOnline.put(`/aluno/senha/${cookies.aluno.id}`, {
         novaSenha: form.nova_senha,
       });
@@ -145,9 +144,10 @@ export default function Cronograma() {
         nova_senha: "",
         confirmar_nova_senha: "",
       });
-    } catch (error) {
-      if (error.response.data.erros) {
-        error.response.data.erros.forEach((e: string) => toast.error(e));
+    } catch (error: unknown) {
+      const errObj = error as { response?: { data?: { erros?: string[] } } };
+      if (errObj?.response?.data?.erros) {
+        errObj.response.data.erros.forEach((e: string) => toast.error(e));
         return;
       }
     }

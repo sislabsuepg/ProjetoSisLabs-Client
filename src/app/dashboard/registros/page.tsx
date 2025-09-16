@@ -3,7 +3,7 @@
 import Loading from "@/app/loading";
 import { IRegistro, IUsuario } from "@/interfaces/interfaces";
 import { apiOnline } from "@/services/services";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Pagination from "@/components/Pagination";
 import ListaRegistros from "@/components/Registros";
@@ -26,7 +26,8 @@ export default function RegistrosPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [paginaAtual, setPaginaAtual] = useState<number>(1);
   const [totalPaginas, setTotalPaginas] = useState<number>(1);
-  const [totalRegistros, setTotalRegistros] = useState<number>(0);
+  // Removido totalRegistros não utilizado para atender lint
+  const [, setTotalRegistros] = useState<number>(0);
   const itensPorPagina = 10;
 
   useEffect(() => {
@@ -35,9 +36,10 @@ export default function RegistrosPage() {
       try {
         const response = await apiOnline.get<{ data: IUsuario[] }>("/usuario");
         setUsuarios(response.data);
-      } catch (error) {
-        if (error?.response?.data?.erros) {
-          error.response.data.erros.map((err: string) => toast.error(err));
+      } catch (error: unknown) {
+        const errObj = error as { response?: { data?: { erros?: string[] } } };
+        if (errObj?.response?.data?.erros) {
+          errObj.response.data.erros.map((err: string) => toast.error(err));
         } else {
           toast.error("Erro ao buscar usuários");
         }
@@ -54,7 +56,7 @@ export default function RegistrosPage() {
       query += `&idUsuario=${usuarioSelecionado}`;
     }
     if (datas.inicio && datas.fim) {
-      let dataFim = new Date(datas.fim);
+  const dataFim = new Date(datas.fim as unknown as string);
       dataFim.setHours(23, 59, 59, 999);
       query += `&dataInicio=${datas.inicio.toISOString()}&dataFim=${dataFim.toISOString()}`;
     }
@@ -64,20 +66,26 @@ export default function RegistrosPage() {
         const repCount = await apiOnline.get<{ total: number }>(
           "/registro/count"
         );
-        let total = repCount.count ?? 0;
+  const total = (repCount as { count?: number }).count ?? 0;
         setTotalRegistros(total);
         setTotalPaginas(Math.ceil(total / itensPorPagina));
         const response = await apiOnline.get<{ data: IRegistro[] }>(
           `/registro${query}`
         );
-        if (response.data.total !== total) {
-          setTotalRegistros(response.data.total);
+        if ((response.data as unknown as { total?: number })?.total !== total) {
+          setTotalRegistros((response.data as unknown as { total?: number })?.total || total);
         }
-        setRegistros(response.data.registros);
-        setTotalPaginas(Math.ceil(response.data.total / itensPorPagina));
-      } catch (error) {
-        if (error?.response?.data?.erros) {
-          error.response.data.erros.map((err: string) => toast.error(err));
+        setRegistros((response.data as unknown as { registros: IRegistro[] }).registros);
+        setTotalPaginas(
+          Math.ceil(
+            ((response.data as unknown as { total?: number })?.total || total) /
+              itensPorPagina
+          )
+        );
+      } catch (error: unknown) {
+        const errObj = error as { response?: { data?: { erros?: string[] } } };
+        if (errObj?.response?.data?.erros) {
+          errObj.response.data.erros.map((err: string) => toast.error(err));
           setRegistros([]);
         } else {
           toast.error("Erro ao buscar registros");
@@ -198,7 +206,7 @@ export default function RegistrosPage() {
             className="bg-theme-blue h-10 px-4 rounded-[10px] text-theme-white font-semibold"
             onClick={() => {
               setUsuarioSelecionado(0);
-              setDatas({ inicio: "", fim: "" });
+              setDatas({ inicio: null, fim: null });
               setBuscaRegistros(!buscaRegistros);
             }}
           >

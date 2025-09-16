@@ -4,7 +4,7 @@ import { cadastro_academico } from "@/schemas";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { apiOnline } from "@/services/services";
-import { ICurso, ApiResponse } from "@/interfaces/interfaces";
+import { ICurso } from "@/interfaces/interfaces";
 import { maskPhone } from "@/utils/maskPhone";
 import { removeLetters } from "@/utils/removeLetters";
 import { CircularProgress, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
@@ -100,10 +100,12 @@ export default function FormAcademico() {
   useEffect(() => {
     const fetchCursos = async () => {
       try {
-        const response = await apiOnline.get("/curso");
-        const data: ICurso[] = Array.isArray(response)
-          ? response
-          : (response as ApiResponse).data || [];
+        const response = await apiOnline.get<ICurso[] | { data: ICurso[] }>("/curso");
+        const respWrapped = response as { data: ICurso[] | { data?: ICurso[] } };
+        const inner = respWrapped.data;
+        const data: ICurso[] = Array.isArray(inner)
+          ? inner
+          : ((inner as { data?: ICurso[] }).data || []);
         setCursos(data);
         setLoading(false);
 

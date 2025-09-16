@@ -38,6 +38,15 @@ import { CircularProgress } from "@mui/material";
 import { ApiResponse, IPermissao } from "@/interfaces/interfaces";
 import { AxiosError } from "axios";
 
+// Tipagens auxiliares para evitar uso de 'any' mantendo a lógica original
+interface LaboratoriosApi { laboratorios?: FormLaboratorio[]; total?: number }
+interface OrientacoesApi { orientacoes?: FormOrientacao[]; total?: number }
+interface CursosApi { cursos?: FormCurso[]; total?: number }
+interface PermissaoApi { permissaoUsuario?: FormPermissao[]; total?: number }
+interface UsuariosApi { usuarios?: FormUsuario[]; total?: number }
+interface AcademicosApi { alunos?: FormAcademico[]; total?: number }
+interface ProfessoresApi { professores?: FormProfessor[]; total?: number }
+
 export default function Alterar() {
   const [activeId, setActiveId] = useState(1);
   const [filtro, setFiltro] = useState("");
@@ -267,14 +276,17 @@ export default function Alterar() {
             }${filtroTemp ? `&${filtroTemp}` : ""}`
           );
           console.log(response);
+          const dataResp = response.data as unknown as AcademicosApi | FormAcademico[];
           if (
-            response?.data?.total !== undefined &&
-            pages !== Math.ceil(response.data.total / itemsPerPage)
+            (dataResp as AcademicosApi)?.total !== undefined &&
+            pages !== Math.ceil(((dataResp as AcademicosApi).total || 0) / itemsPerPage)
           ) {
-            setTotalPages(Math.ceil(response.data.total / itemsPerPage));
-            return response.data.alunos as unknown as FormAcademico[];
+            setTotalPages(
+              Math.ceil(((dataResp as AcademicosApi).total || 0) / itemsPerPage)
+            );
+            return (dataResp as AcademicosApi).alunos || [];
           }
-          return response.data as unknown as FormAcademico[];
+          return Array.isArray(dataResp) ? dataResp : (dataResp as AcademicosApi).alunos || [];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -293,14 +305,15 @@ export default function Alterar() {
               Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
+          const dataResp = response.data as unknown as ProfessoresApi;
           if (
-            response?.data?.total !== undefined &&
-            pages !== Math.ceil(response.data.total / itemsPerPage)
+            dataResp?.total !== undefined &&
+            pages !== Math.ceil((dataResp.total || 0) / itemsPerPage)
           ) {
-            setTotalPages(Math.ceil(response.data.total / itemsPerPage));
-            return response.data.professores as unknown as FormProfessor[];
+            setTotalPages(Math.ceil((dataResp.total || 0) / itemsPerPage));
+            return dataResp.professores || [];
           }
-          return response.data.professores as unknown as FormProfessor[];
+          return dataResp.professores || [];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -318,19 +331,20 @@ export default function Alterar() {
               Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
+          const dataResp = response.data as unknown as LaboratoriosApi | FormLaboratorio[];
           if (
-            response?.data?.total !== undefined &&
-            pages !== Math.ceil(response.data.total / itemsPerPage)
+            (dataResp as LaboratoriosApi)?.total !== undefined &&
+            pages !== Math.ceil(((dataResp as LaboratoriosApi).total || 0) / itemsPerPage)
           ) {
-            console.log(response),
-              setTotalPages(Math.ceil(response.data.total / itemsPerPage));
-            return (response.data as any).laboratorios
-              ? ((response.data as any).laboratorios as FormLaboratorio[])
-              : (response.data as FormLaboratorio[]);
+            console.log(response);
+            setTotalPages(
+              Math.ceil(((dataResp as LaboratoriosApi).total || 0) / itemsPerPage)
+            );
+            return (dataResp as LaboratoriosApi).laboratorios || [];
           }
-          return (response.data as any).laboratorios
-            ? ((response.data as any).laboratorios as FormLaboratorio[])
-            : (response.data as FormLaboratorio[]);
+          return Array.isArray(dataResp)
+            ? dataResp
+            : (dataResp as LaboratoriosApi).laboratorios || [];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -348,18 +362,19 @@ export default function Alterar() {
               Inativo == true ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
+          const dataResp = response.data as unknown as OrientacoesApi | FormOrientacao[];
           if (
-            response?.data?.total !== undefined &&
-            pages !== Math.ceil(response.data.total / itemsPerPage)
+            (dataResp as OrientacoesApi)?.total !== undefined &&
+            pages !== Math.ceil(((dataResp as OrientacoesApi).total || 0) / itemsPerPage)
           ) {
-            setTotalPages(Math.ceil(response.data.total / itemsPerPage));
-            return (response.data as any).orientacoes
-              ? ((response.data as any).orientacoes as FormOrientacao[])
-              : (response.data as FormOrientacao[]);
+            setTotalPages(
+              Math.ceil(((dataResp as OrientacoesApi).total || 0) / itemsPerPage)
+            );
+            return (dataResp as OrientacoesApi).orientacoes || [];
           }
-          return (response.data as any).orientacoes
-            ? ((response.data as any).orientacoes as FormOrientacao[])
-            : (response.data as FormOrientacao[]);
+          return Array.isArray(dataResp)
+            ? dataResp
+            : (dataResp as OrientacoesApi).orientacoes || [];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -377,18 +392,19 @@ export default function Alterar() {
               Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
+          const dataResp = response.data as unknown as CursosApi | FormCurso[];
           if (
-            response?.data?.total !== undefined &&
-            pages !== Math.ceil(response.data.total / itemsPerPage)
+            (dataResp as CursosApi)?.total !== undefined &&
+            pages !== Math.ceil(((dataResp as CursosApi).total || 0) / itemsPerPage)
           ) {
-            setTotalPages(Math.ceil(response.data.total / itemsPerPage));
-            return (response.data as any).cursos
-              ? ((response.data as any).cursos as FormCurso[])
-              : (response.data as FormCurso[]);
+            setTotalPages(
+              Math.ceil(((dataResp as CursosApi).total || 0) / itemsPerPage)
+            );
+            return (dataResp as CursosApi).cursos || [];
           }
-          return (response.data as any).cursos
-            ? ((response.data as any).cursos as FormCurso[])
-            : (response.data as FormCurso[]);
+          return Array.isArray(dataResp)
+            ? dataResp
+            : (dataResp as CursosApi).cursos || [];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -406,19 +422,20 @@ export default function Alterar() {
               Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
+          const dataResp = response.data as unknown as PermissaoApi | FormPermissao[];
           if (
-            response?.data?.total !== undefined &&
-            pages !== Math.ceil(response.data.total / itemsPerPage)
+            (dataResp as PermissaoApi)?.total !== undefined &&
+            pages !== Math.ceil(((dataResp as PermissaoApi).total || 0) / itemsPerPage)
           ) {
-            console.log(response),
-              setTotalPages(Math.ceil(response.data.total / itemsPerPage));
-            return (response.data as any).permissaoUsuario
-              ? ((response.data as any).permissaoUsuario as FormPermissao[])
-              : (response.data as FormPermissao[]);
+            console.log(response);
+            setTotalPages(
+              Math.ceil(((dataResp as PermissaoApi).total || 0) / itemsPerPage)
+            );
+            return (dataResp as PermissaoApi).permissaoUsuario || [];
           }
-          return (response.data as any).permissaoUsuario
-            ? ((response.data as any).permissaoUsuario as FormPermissao[])
-            : (response.data as FormPermissao[]);
+          return Array.isArray(dataResp)
+            ? dataResp
+            : (dataResp as PermissaoApi).permissaoUsuario || [];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -436,18 +453,19 @@ export default function Alterar() {
               Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
+          const dataResp = response.data as unknown as UsuariosApi | FormUsuario[];
           if (
-            response?.data?.total !== undefined &&
-            pages !== Math.ceil(response.data.total / itemsPerPage)
+            (dataResp as UsuariosApi)?.total !== undefined &&
+            pages !== Math.ceil(((dataResp as UsuariosApi).total || 0) / itemsPerPage)
           ) {
-            setTotalPages(Math.ceil(response.data.total / itemsPerPage));
-            return (response.data as any).usuarios
-              ? ((response.data as any).usuarios as FormUsuario[])
-              : (response.data as FormUsuario[]);
+            setTotalPages(
+              Math.ceil(((dataResp as UsuariosApi).total || 0) / itemsPerPage)
+            );
+            return (dataResp as UsuariosApi).usuarios || [];
           }
-          return (response.data as any).usuarios
-            ? ((response.data as any).usuarios as FormUsuario[])
-            : (response.data as FormUsuario[]);
+            return Array.isArray(dataResp)
+              ? dataResp
+              : (dataResp as UsuariosApi).usuarios || [];
         } catch (error) {
           console.error("Erro ao buscar dados:", error);
           return [];
@@ -642,10 +660,12 @@ export default function Alterar() {
           async function ativar() {
             if (openAtivar.id === 0) return;
             try {
-              await apiOnline.put(`/${mapRoutes[activeId]}/${openAtivar.id}`, {
-                ativo: true,
-              });
-              currentItems.filter((el) => el.id !== openAtivar.id);
+              await apiOnline.put(
+                `/${mapRoutes[activeId]}/${openAtivar.id}`,
+                {
+                  ativo: true,
+                }
+              );
             } catch (err) {
               const error = (err as AxiosError).response?.data as ApiResponse;
               console.error("Erro ao ativar no backend:", error);
@@ -684,7 +704,6 @@ export default function Alterar() {
               await apiOnline.delete(
                 `/${mapRoutes[activeId]}/${openExcluir.id}`
               );
-              currentItems.filter((el) => el.id !== openExcluir.id);
             } catch (err) {
               const error = (err as AxiosError).response?.data as ApiResponse;
               console.error("Erro ao desativar:", error);
@@ -718,7 +737,7 @@ export default function Alterar() {
             if (
               ((field as string) === "geral" &&
                 (value as unknown as boolean) === true) ||
-              formData.geral === true
+              ("geral" in formData && (formData as { geral?: boolean }).geral === true)
             ) {
               return {
                 ...prev,

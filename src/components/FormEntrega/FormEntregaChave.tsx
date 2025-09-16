@@ -47,8 +47,9 @@ export default function FormEntregaChave() {
       toast.success("Entrega de chave realizada com sucesso!");
       setForm({ ra: "", senha: "", idLaboratorio: 0, idAluno: 0 });
     } catch (err: unknown) {
-      if (err?.response?.data?.erros) {
-        err.response.data.erros.forEach((err: string) => {
+      const errObj = err as { response?: { data?: { erros?: string[] } } };
+      if (errObj?.response?.data?.erros) {
+        errObj.response.data.erros.forEach((err: string) => {
           toast.error(err);
         });
       } else toast.error("Erro ao enviar formulário");
@@ -86,22 +87,29 @@ export default function FormEntregaChave() {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   try {
-                    const buscaAluno = await apiOnline.get(`/aluno/${form.ra}`);
+                    const buscaAluno = await apiOnline.get<IAcademico | { data: IAcademico }>(`/aluno/${form.ra}`);
+                    const alunoResp = (buscaAluno as { data: IAcademico }).data
+                      ? (buscaAluno as { data: IAcademico }).data
+                      : (buscaAluno as IAcademico);
                     setForm((prev) => ({
                       ...prev,
-                      idAluno: buscaAluno.data.id,
+                      idAluno: alunoResp.id,
                     }));
-                    setAluno(buscaAluno.data);
-                    const buscaOrientacao = await apiOnline.get<IOrientacao>(
-                      `/orientacao/aluno/${buscaAluno.data.id}`
+                    setAluno(alunoResp);
+                    const buscaOrientacao = await apiOnline.get<IOrientacao | { data: IOrientacao }>(
+                      `/orientacao/aluno/${alunoResp.id}`
                     );
-                    setOrientacao(buscaOrientacao.data);
+                    const orientResp = (buscaOrientacao as { data: IOrientacao }).data
+                      ? (buscaOrientacao as { data: IOrientacao }).data
+                      : (buscaOrientacao as IOrientacao);
+                    setOrientacao(orientResp);
                     setForm((prev) => ({
                       ...prev,
-                      idLaboratorio: buscaOrientacao.data.laboratorio?.id || 0,
+                      idLaboratorio: orientResp.laboratorio?.id || 0,
                     }));
-                  } catch (error) {
-                    error?.response?.data?.erros?.forEach((err: string) =>
+                  } catch (error: unknown) {
+                    const errObj = error as { response?: { data?: { erros?: string[] } } };
+                    errObj?.response?.data?.erros?.forEach((err: string) =>
                       toast.error(err)
                     );
                   }
@@ -136,19 +144,21 @@ export default function FormEntregaChave() {
                     return;
                   }
                   try {
-                    const valido = await apiOnline.post(
+                    const valido = await apiOnline.post<unknown | { data?: unknown }>(
                       "/aluno/verificasenha",
                       {
                         login: form.ra,
                         senha: form.senha,
                       }
                     );
-                    setValidado(valido.data != null);
-                    if (valido.data) {
+                    const validoData = (valido as { data?: unknown }).data ?? valido;
+                    setValidado(validoData != null);
+                    if (validoData) {
                       toast.success("Aluno validado com sucesso");
                     }
-                  } catch (error) {
-                    error?.response?.data?.erros?.forEach((err: string) =>
+                  } catch (error: unknown) {
+                    const errObj = error as { response?: { data?: { erros?: string[] } } };
+                    errObj?.response?.data?.erros?.forEach((err: string) =>
                       toast.error(err)
                     );
                     setValidado(false);
@@ -167,7 +177,7 @@ export default function FormEntregaChave() {
                 disabled={validado === false}
                 labelId="lab-label"
                 id="lab-select"
-                value={orientacao?.laboratorio?.id || 0}
+                value={(orientacao?.laboratorio?.id || 0).toString()}
                 onChange={(e: SelectChangeEvent) => {
                   setForm((prev) => ({
                     ...prev,
@@ -175,7 +185,7 @@ export default function FormEntregaChave() {
                   }));
                 }}
               >
-                <MenuItem value={form.idLaboratorio || 0}>
+                <MenuItem value={(form.idLaboratorio || 0).toString()}>
                   {" "}
                   {form.idLaboratorio !== 0
                     ? orientacao?.laboratorio?.numero

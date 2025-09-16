@@ -26,24 +26,31 @@ export default function Perfil() {
 
   async function handleSubmit(e: FormEvent): Promise<void> {
     e.preventDefault();
-    const validado = await apiOnline.post("usuario/login", {
+    const validado = await apiOnline.post<IUsuario | { data?: IUsuario }>("usuario/login", {
       login: cookies.usuario.login,
       senha: form.senha_atual,
     });
 
-    if (!validado.data) {
+    const validadoData = (validado as { data?: IUsuario }).data
+      ? (validado as { data?: IUsuario }).data
+      : (validado as IUsuario);
+
+    if (!validadoData || !validadoData.id) {
       toast.error("Senha atual incorreta.");
       return;
     }
 
-    const atualizado = await apiOnline.put<{ data: IUsuario }>(
+    const atualizado = await apiOnline.put<IUsuario | { data?: IUsuario }>(
       `usuario/senha/${cookies.usuario.id}`,
       {
         novaSenha: form.nova_senha,
       }
     );
+    const atualizadoData = (atualizado as { data?: IUsuario }).data
+      ? (atualizado as { data?: IUsuario }).data
+      : (atualizado as IUsuario);
 
-    if (atualizado.data) {
+    if (atualizadoData && (atualizadoData as IUsuario).id) {
       toast.success("Senha atualizada com sucesso!");
       setForm({
         senha_atual: "",

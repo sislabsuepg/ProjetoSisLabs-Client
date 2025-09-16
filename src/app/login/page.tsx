@@ -56,8 +56,8 @@ export default function Login() {
   const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
   const router = useRouter();
   const [cookies, setCookie, removeCookie] = useCookies(["usuario", "aluno"]);
-  const user = cookies.usuario;
-  const isAcademico = user && !isNaN(user.login);
+  // Removido 'user' não utilizado
+  // 'isAcademico' removido (variável não utilizada)
 
   // Previne hydration mismatch e verifica se usuário já está autenticado
   useEffect(() => {
@@ -136,12 +136,22 @@ export default function Login() {
         senha: form.senha,
       });
       // Type guard for IUsuario
-      function isUsuario(obj: any): obj is IUsuario {
-        return obj && typeof obj.login === "string";
+      function isUsuario(obj: unknown): obj is IUsuario {
+        return (
+          typeof obj === "object" &&
+          obj !== null &&
+          "login" in obj &&
+          typeof (obj as { login?: unknown }).login === "string"
+        );
       }
       // Type guard for IAcademico
-      function isAcademico(obj: any): obj is IAcademico {
-        return obj && typeof obj.ra === "string";
+      function isAcademico(obj: unknown): obj is IAcademico {
+        return (
+          typeof obj === "object" &&
+          obj !== null &&
+          "ra" in obj &&
+          typeof (obj as { ra?: unknown }).ra === "string"
+        );
       }
 
       if (isUsuario(data.data) && !isAcademico(data.data)) {
@@ -198,7 +208,7 @@ export default function Login() {
     } catch (err: unknown) {
       if (isCustomAxiosError(err)) {
         const apiErrors = err.response?.data?.erros || [];
-        apiErrors.forEach((erro) => toast.error(erro));
+  apiErrors.forEach((erro) => toast.error(erro.mensagem));
 
         if (apiErrors.length > 0) {
           const apiErrObj: { [key: string]: string } = {};

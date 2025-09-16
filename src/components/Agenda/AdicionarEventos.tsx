@@ -67,7 +67,7 @@ export default function AdicionarEventos() {
           idLaboratorio: 0,
         });
         toast.success("Evento adicionado com sucesso!");
-      } catch (error) {
+      } catch {
         toast.error("Erro ao adicionar evento.");
       }
     }
@@ -77,11 +77,17 @@ export default function AdicionarEventos() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const laboratoriosResponse = await apiOnline.get<ILaboratorio[]>(
+        const laboratoriosResponse = await apiOnline.get<ILaboratorio[] | { data: ILaboratorio[] }>(
           "/laboratorio"
         );
         console.log(laboratoriosResponse);
-        setLaboratorios(laboratoriosResponse.data ?? []);
+        const responseData = laboratoriosResponse as {
+          data: ILaboratorio[] | { data?: ILaboratorio[] };
+        };
+        const labData = Array.isArray(responseData.data)
+          ? (responseData.data as ILaboratorio[])
+          : ((responseData.data as { data?: ILaboratorio[] }).data || []);
+        setLaboratorios(labData);
       } catch (err: unknown) {
         if (err instanceof AxiosError) {
           const data = err.response?.data as { erros?: string[] } | undefined;

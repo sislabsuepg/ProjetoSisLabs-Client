@@ -37,17 +37,23 @@ export default function FormEntregaPesquisa() {
     setLoading(true);
     try {
       const fetchLaboratorios = async () => {
-        const response = await apiOnline.get<ILaboratorio[]>(
+        const response = await apiOnline.get<ILaboratorio[] | { data: ILaboratorio[] }>(
           "/laboratorio?ativo=true&restrito=false"
         );
-        setLaboratorios(response.data);
+        const resp = response as { data: ILaboratorio[] | { data?: ILaboratorio[] } };
+        const inner = resp.data;
+        const labs = Array.isArray(inner) ? inner : (inner as { data?: ILaboratorio[] }).data || [];
+        setLaboratorios(labs);
         setLoading(false);
       };
       fetchLaboratorios();
-    } catch (error) {
-      if (error?.response?.data?.erros)
-        error.response.data.erros.forEach((err: string) => toast.error(err));
-      else toast.error("Erro ao buscar laboratórios");
+    } catch (err: unknown) {
+      const errObj2 = err as { response?: { data?: { erros?: string[] } } };
+      if (errObj2?.response?.data?.erros) {
+        errObj2.response.data.erros.forEach((er: string) => toast.error(er));
+      } else {
+        toast.error("Erro ao buscar laboratórios");
+      }
       setLoading(false);
     }
   }, []);
@@ -72,8 +78,9 @@ export default function FormEntregaPesquisa() {
       setForm({ ra: "", senha: "", idLaboratorio: 0 });
       setValidado(false);
     } catch (err: unknown) {
-      if (err?.response?.data?.erros)
-        err.response.data.erros.forEach((err: string) => toast.error(err));
+      const errObj = err as { response?: { data?: { erros?: string[] } } };
+      if (errObj?.response?.data?.erros)
+        errObj.response.data.erros.forEach((er: string) => toast.error(er));
     }
   };
 
@@ -115,16 +122,26 @@ export default function FormEntregaPesquisa() {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   await apiOnline
-                    .get(`/aluno/${form.ra}`)
+                    .get<{ data?: { id?: number } } | { id?: number }>(
+                      `/aluno/${form.ra}`
+                    )
                     .then((res) => {
-                      setForm((f) => ({ ...f, idAluno: res.data.id }));
-                      console.log("🔍 Usuário encontrado:", res.data);
+                      const r = (res as { data?: { id?: number } }).data
+                        ? (res as { data?: { id?: number } }).data
+                        : (res as { id?: number });
+                      if (r && r.id) {
+                        setForm((f) => ({ ...f, idAluno: r.id! }));
+                        console.log("🔍 Usuário encontrado:", r);
+                      } else {
+                        setValidado(false);
+                        setForm((f) => ({ ...f, idAluno: 0 }));
+                      }
                     })
                     .catch((err) => {
                       setValidado(false);
                       setForm((f) => ({ ...f, idAluno: 0 }));
-                      err.response.data.erros.forEach((err: string) =>
-                        toast.error(err)
+                      (err as { response?: { data?: { erros?: string[] } } })?.response?.data?.erros?.forEach(
+                        (er: string) => toast.error(er)
                       );
                     });
                 }
@@ -152,16 +169,19 @@ export default function FormEntregaPesquisa() {
                     return;
                   }
                   const valido = await apiOnline
-                    .post("/aluno/verificasenha", {
-                      login: form.ra,
-                      senha: form.senha,
-                    })
+                    .post<unknown | { data?: unknown }>(
+                      "/aluno/verificasenha",
+                      {
+                        login: form.ra,
+                        senha: form.senha,
+                      }
+                    )
                     .then((res) => {
-                      return res.data != null;
+                      return (res as { data?: unknown }).data != null;
                     })
                     .catch((err) => {
-                      err.response.data.erros.forEach((err: string) =>
-                        toast.error(err)
+                      (err as { response?: { data?: { erros?: string[] } } })?.response?.data?.erros?.forEach(
+                        (er: string) => toast.error(er)
                       );
                       return false;
                     });

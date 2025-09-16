@@ -389,6 +389,42 @@ export default function Cronograma() {
     [tabelaAulasHoje.laboratorios]
   );
 
+  // Calcula, especificamente para a tabela "Aulas de Hoje", qual a primeira hora da noite presente
+  // e se há pelo menos um horário da tarde. Isso permite inserir o separador noite mesmo quando
+  // o horário pivot (ex: 18:45) não está listado entre as aulas do dia.
+  const separadoresHoje = useMemo(() => {
+    const horas = tabelaAulasHoje.horarios;
+    let primeiraTarde: string | undefined;
+    let primeiraNoite: string | undefined;
+    let hasAfternoon = false;
+    let hasMorning = false;
+    for (const h of horas) {
+      const hh = Number(h.split(":")[0]);
+      if (hh < 12) hasMorning = true; // manhã (até 11:59)
+      if (hh >= 13 && hh < 18) {
+        hasAfternoon = true; // tarde
+        if (primeiraTarde === undefined) primeiraTarde = h;
+      }
+      if (hh >= 18 && primeiraNoite === undefined) primeiraNoite = h; // noite
+    }
+    // Separador noite: existe noite e (existe tarde ou (não existe tarde mas existe manhã))
+    const precisaSeparadorNoite = !!(
+      primeiraNoite && (hasAfternoon || (!hasAfternoon && hasMorning))
+    );
+    // Separador tarde: existe tarde e existe manhã e primeiraTarde definida
+    const precisaSeparadorTarde = !!(
+      hasMorning && hasAfternoon && primeiraTarde
+    );
+    return {
+      hasAfternoon,
+      hasMorning,
+      primeiraNoite,
+      primeiraTarde,
+      precisaSeparadorNoite,
+      precisaSeparadorTarde,
+    };
+  }, [tabelaAulasHoje.horarios]);
+
   const dadosIncompletos = useMemo(
     () =>
       laboratoriosUnificados.some(
@@ -645,13 +681,15 @@ export default function Cronograma() {
                 </thead>
                 <tbody>
                   {tabelaAulasHoje.horarios.map((hora, idxHora) => {
+                    // Separador noite agora baseado na primeira hora de noite realmente presente no dia
                     const isNightSeparator =
-                      firstNightIndex !== undefined &&
-                      horarios[firstNightIndex] === hora &&
-                      idxHora !== 0; // evita separador topo
+                      separadoresHoje.precisaSeparadorNoite &&
+                      separadoresHoje.primeiraNoite === hora &&
+                      idxHora !== 0; // evita separador no topo
+                    // Separador tarde agora dinâmico: antes da primeira hora efetiva da tarde presente
                     const isAfternoonSeparator =
-                      firstAfternoonIndex !== undefined &&
-                      horarios[firstAfternoonIndex] === hora &&
+                      separadoresHoje.precisaSeparadorTarde &&
+                      separadoresHoje.primeiraTarde === hora &&
                       idxHora !== 0;
                     return (
                       <>
