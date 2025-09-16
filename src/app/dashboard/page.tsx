@@ -28,6 +28,12 @@ export default function Inicio() {
     laboratorio: { id: number; nome: string; numero: string };
   }
   const [solicitacoes, setSolicitacoes] = useState<ISolicitacao[]>([]);
+  // Mapa de advertências por aluno (true se possui advertência recente)
+  const [advertenciasAlunos, setAdvertenciasAlunos] = useState<
+    Record<number, boolean>
+  >({});
+  // Ref para evitar repetir toast de advertência para o mesmo aluno
+  const alunosAdvertenciaAvisadosRef = useRef<Set<number>>(new Set());
   //const [cookies] = useCookies(["usuario"]);
   const [data, setData] = useState<IEmprestimo[]>([]);
   // Handlers para aprovar / recusar solicitações
@@ -130,6 +136,57 @@ export default function Inicio() {
           solicitacoesPrevRef.current = new Set(responseData.map((s) => s.id));
           return responseData;
         });
+
+        // Buscar advertências apenas para alunos ainda não consultados
+        const idsAlunoUnicos = Array.from(
+          new Set(responseData.map((s) => s.idAluno).filter((id) => id != null))
+        );
+        const novosIds = idsAlunoUnicos.filter(
+          (id) => !(id in advertenciasAlunos)
+        );
+        if (novosIds.length) {
+          try {
+            const resultados = await Promise.all(
+              novosIds.map(async (id) => {
+                try {
+                  // Pode vir boolean direto ou objeto { data: boolean }
+                  const respAd = await apiOnline.get<
+                    boolean | { data: boolean }
+                  >(`/aluno/advertencias/${id}`);
+                  const flag =
+                    typeof respAd === "boolean"
+                      ? respAd
+                      : respAd?.data === true;
+                  return { id, flag: !!flag };
+                } catch {
+                  return { id, flag: false };
+                }
+              })
+            );
+            const atual: Record<number, boolean> = {};
+            resultados.forEach((r) => (atual[r.id] = r.flag));
+            if (Object.keys(atual).length) {
+              setAdvertenciasAlunos((prev) => ({ ...prev, ...atual }));
+              resultados.forEach((r) => {
+                if (r.flag && !alunosAdvertenciaAvisadosRef.current.has(r.id)) {
+                  const solicitacao = responseData.find(
+                    (s) => s.idAluno === r.id
+                  );
+                  const nome = solicitacao?.aluno?.nome || `Aluno ${r.id}`;
+                  const ra = solicitacao?.aluno?.ra
+                    ? ` (${solicitacao.aluno.ra})`
+                    : "";
+                  toast.warning(
+                    `Atenção: ${nome}${ra} possui advertências registradas no último mês.`
+                  );
+                  alunosAdvertenciaAvisadosRef.current.add(r.id);
+                }
+              });
+            }
+          } catch (e) {
+            console.error("Erro ao buscar advertências de alunos", e);
+          }
+        }
       } catch (e: unknown) {
         console.error("Erro ao buscar solicitações", e);
       }
@@ -174,6 +231,14 @@ export default function Inicio() {
                   <span className="text-theme-blue font-semibold">
                     Lab {s.laboratorio.numero} - {s.laboratorio.nome}
                   </span>
+                  {advertenciasAlunos[s.idAluno] && (
+                    <span
+                      className="mt-1 inline-block text-[0.6rem] px-2 py-[2px] rounded-full bg-amber-500/90 text-white font-semibold tracking-wide shadow-sm"
+                      title="Aluno possui advertências recentes"
+                    >
+                      Advertência
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <button

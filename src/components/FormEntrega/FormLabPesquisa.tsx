@@ -129,11 +129,20 @@ export default function FormEntregaPesquisa() {
                     .get<{ data?: { id?: number } } | { id?: number }>(
                       `/aluno/${form.ra}`
                     )
-                    .then((res) => {
+                    .then(async (res) => {
                       const r = (res as { data?: { id?: number } }).data
                         ? (res as { data?: { id?: number } }).data
                         : (res as { id?: number });
                       if (r && r.id) {
+                        const advertenciaResponse: { data: boolean } =
+                          await apiOnline.get<{ data: boolean }>(
+                            `/aluno/advertencias/${r.id}`
+                          );
+                        if (advertenciaResponse.data == true) {
+                          toast.warning(
+                            "Atenção: O aluno possui advertências registradas no ultimo mês."
+                          );
+                        }
                         setForm((f) => ({ ...f, idAluno: r.id! }));
                         console.log("🔍 Usuário encontrado:", r);
                       } else {

@@ -107,6 +107,15 @@ export default function FormEntregaChave() {
                       ? (buscaOrientacao as { data: IOrientacao }).data
                       : (buscaOrientacao as IOrientacao);
                     setOrientacao(orientResp);
+                    const advertenciaResponse: { data: boolean } =
+                      await apiOnline.get<{ data: boolean }>(
+                        `/aluno/advertencias/${alunoResp.id}`
+                      );
+                    if (advertenciaResponse.data == true) {
+                      toast.warning(
+                        "Atenção: O aluno possui advertências registradas no ultimo mês."
+                      );
+                    }
                     setForm((prev) => ({
                       ...prev,
                       idLaboratorio: orientResp.laboratorio?.id || 0,
