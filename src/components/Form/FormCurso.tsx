@@ -14,7 +14,9 @@ export default function FormCurso() {
     anosMaximo: 0,
   });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
 
     if (name === "anosMaximo") {
@@ -33,6 +35,7 @@ export default function FormCurso() {
         anosMaximo: form.anosMaximo,
       });
       toast.success("Cadastro do curso realizado com sucesso!");
+      setForm({ nome: "", anosMaximo: 0 });
       console.log("✅ Dados válidos:", form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
@@ -59,7 +62,7 @@ export default function FormCurso() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-       📝 Cadastro do curso
+        📝 Cadastro do curso
       </p>
 
       <form
@@ -69,17 +72,29 @@ export default function FormCurso() {
       >
         <div className="space-y-4">
           <div className="w-full flex items-center gap-4">
-            <TextField id="filled-basic" label="Nome do curso" variant="filled" type="text"
+            <TextField
+              id="filled-basic"
+              label="Nome do curso"
+              variant="filled"
+              type="text"
               name="nome"
               value={form.nome ? form.nome : ""}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+            />
 
-            <TextField id="filled-basic" label="Quantos anos tem o curso?" variant="filled" type="number"
+            <TextField
+              id="filled-basic"
+              label="Quantos anos tem o curso?"
+              variant="filled"
+              type="number"
               name="anosMaximo"
               value={form.anosMaximo > 0 ? form.anosMaximo : 1}
-              inputProps={{ min: 1, max:8 }}
+              inputProps={{ min: 1, max: 8 }}
               onClick={(e) => (e.target as HTMLInputElement).select()}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+            />
           </div>
         </div>
 

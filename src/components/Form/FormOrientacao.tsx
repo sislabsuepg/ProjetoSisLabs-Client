@@ -73,6 +73,14 @@ export default function FormOrientacao() {
 
       await cadastro_orientacao.validate(formComAluno);
       await apiOnline.post("/orientacao", formComAluno);
+      setForm({
+        dataInicio: null,
+        dataFim: null,
+        idAluno: 0,
+        idProfessor: 0,
+        idLaboratorio: 0,
+      });
+      setRa("");
       toast.success("Cadastro da orientação realizado com sucesso!");
     } catch (err: unknown) {
       if (err instanceof Yup.ValidationError) {
