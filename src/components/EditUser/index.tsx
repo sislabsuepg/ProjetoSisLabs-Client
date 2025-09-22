@@ -420,6 +420,7 @@ function EditUserModal<T extends object>({
                     message: "Senha resetada com sucesso!",
                     status: "success",
                   });
+                  onClose();
                 } catch (error) {
                   console.error("Erro ao resetar senha", error);
                   showToast({
