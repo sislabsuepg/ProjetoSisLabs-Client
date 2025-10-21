@@ -6,6 +6,8 @@ import PersonIcon from "@mui/icons-material/Person";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import ModalNotification from "../ModalNotifications";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -34,15 +36,13 @@ function SidebarItem({
   return (
     <li
       className={`relative flex items-center p-3 my-2 rounded-[10px] transition-colors duration-200
-        ${
-          disabled
-            ? "cursor-not-allowed opacity-40 bg-[#4F6B98]"
-            : "cursor-pointer hover:bg-[#5679b1]"
+        ${disabled
+          ? "cursor-not-allowed opacity-40 bg-[#4F6B98]"
+          : "cursor-pointer hover:bg-[#5679b1]"
         }
-        ${
-          active && !disabled
-            ? "bg-theme-blue text-theme-white"
-            : !active
+        ${active && !disabled
+          ? "bg-theme-blue text-theme-white"
+          : !active
             ? "bg-[#4F6B98]"
             : ""
         }
@@ -71,6 +71,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const [activeItem, setActiveItem] = useState("Início");
   const router = useRouter();
   const [cookies, , removeCookie] = useCookies(["usuario"]);
+  const [openModalNotification, setOpenModalNotification] = useState(false);
   const user = cookies.usuario;
   const isAcademico = user && !isNaN(user.login);
   const permissions = user?.permissao || {};
@@ -110,9 +111,8 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       <aside
         className={`h-screen bg-theme-blue flex flex-col p-4 shadow-lg transition-transform duration-500 z-50
             fixed left-0 top-0
-            ${
-              isOpen ? "translate-x-0 w-[380px]" : "-translate-x-full w-[380px]"
-            }
+            ${isOpen ? "translate-x-0 w-[380px]" : "-translate-x-full w-[380px]"
+          }
           `}
       >
         <div className="flex items-center justify-between gap-2 px-2 border-b border-theme-blue/70">
@@ -235,7 +235,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             />
             <SidebarItem
               icon={data_images?.icon_agenda}
-              text="Eventos e Avisos"
+              text="Adicionar eventos e avisos"
               active={activeItem === "Eventos e Avisos"}
               onClick={() => {
                 setActiveItem("Eventos e Avisos");
@@ -276,6 +276,22 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           />
         </div>
       </aside>
+
+      <div className="absolute bottom-5 right-5 group w-fit">
+        <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-theme-blue text-theme-white font-normal text-sm px-2 py-1 rounded shadow-md whitespace-nowrap">
+          Avisos e eventos
+        </span>
+
+        <NotificationsIcon
+          sx={{ fontSize: 40 }}
+          className="cursor-pointer text-theme-lightBlue"
+          onClick={() => {
+            setOpenModalNotification(true);
+          }}
+        />
+      </div>
+
+      {openModalNotification && <ModalNotification open={openModalNotification} setOpen={setOpenModalNotification}/>}
     </>
   );
 }

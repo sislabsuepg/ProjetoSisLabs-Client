@@ -2,16 +2,14 @@
 
 import AdicionarRecados from "@/components/Agenda/AdicionarRecados";
 import AdicionarEventos from "@/components/Agenda/AdicionarEventos";
-import EventosRecados from "@/components/Agenda/EventosRecados";
 import { useState } from "react";
 
 export default function Cronograma() {
   const [activeId, setActiveId] = useState(1);
 
   const listButtons = [
-    { id: 1, title: "Eventos e Recados", component: <EventosRecados /> },
-    { id: 2, title: "Adicionar eventos", component: <AdicionarEventos /> },
-    { id: 3, title: "Adicionar recados", component: <AdicionarRecados /> },
+    { id: 1, title: "Adicionar eventos", component: <AdicionarEventos /> },
+    { id: 2, title: "Adicionar recados", component: <AdicionarRecados /> },
   ];
 
   return (
