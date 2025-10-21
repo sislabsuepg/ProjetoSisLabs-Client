@@ -15,6 +15,7 @@ import { IEvento, IRecado } from "../Lists/types";
 import style from "./ModalNotification.module.scss";
 import { maskDate } from "@/utils/maskDate";
 import { useNotificationStore } from "@/store";
+import { fetchAndCountNotifications } from "@/utils/fetchNotifications";
 
 interface ModalNotificationProps {
   open: boolean;
@@ -148,6 +149,8 @@ const loading = useNotificationStore(s => s.loading);
           prev.filter((r) => r.id !== openDelete.id).sort((a, b) => a.id - b.id)
         );
       }
+
+      await fetchAndCountNotifications();
       toast.success("Excluído com sucesso!");
     } catch {
       toast.error("Erro ao excluir.");

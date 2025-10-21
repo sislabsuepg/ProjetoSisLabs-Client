@@ -13,6 +13,7 @@ import { ILaboratorio } from "@/interfaces/interfaces";
 import { apiOnline } from "@/services/services";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
+import { fetchAndCountNotifications } from "@/utils/fetchNotifications";
 
 export default function AdicionarEventos() {
   const [laboratorios, setLaboratorios] = useState<ILaboratorio[]>([]);
@@ -58,6 +59,9 @@ export default function AdicionarEventos() {
           responsavel: form.responsavel,
           idLaboratorio: form.idLaboratorio,
         });
+        
+        await fetchAndCountNotifications();
+
         setForm({
           nome: "",
           data: "",
