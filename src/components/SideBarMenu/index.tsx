@@ -4,10 +4,13 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import PersonIcon from "@mui/icons-material/Person";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ModalNotification from "../ModalNotifications";
+import Badge from "@mui/material/Badge";
+import { useNotificationStore } from "@/store";
+import { fetchAndCountNotifications } from "@/utils/fetchNotifications";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -75,6 +78,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const user = cookies.usuario;
   const isAcademico = user && !isNaN(user.login);
   const permissions = user?.permissao || {};
+  const notificationCount = useNotificationStore((state) => state.count);
   // Matriz de regras:
   // geral: pode listar e cadastrar usuários, permissões, cursos, professores, laboratórios e acessar registros
   // advertencia: somente emitir advertência
@@ -96,6 +100,10 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     menuAdvertencia: permissions.advertencia === true, // apenas advertencia
     menuEmprestimo: permissions.geral === true || permissions.cadastro === true, // emprestimo requer geral ou cadastro
   };
+
+useEffect(() => {
+  fetchAndCountNotifications();
+}, []);
 
   return (
     <>
@@ -282,16 +290,27 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           Avisos e eventos
         </span>
 
-        <NotificationsIcon
-          sx={{ fontSize: 40 }}
-          className="cursor-pointer text-theme-lightBlue"
-          onClick={() => {
-            setOpenModalNotification(true);
-          }}
-        />
+        <Badge
+          badgeContent={notificationCount}
+          color="error"
+          invisible={notificationCount === 0}
+        >
+          <NotificationsIcon
+            sx={{ fontSize: 40 }}
+            className="cursor-pointer text-theme-lightBlue"
+            onClick={() => {
+              setOpenModalNotification(true);
+            }}
+          />
+        </Badge>
       </div>
 
-      {openModalNotification && <ModalNotification open={openModalNotification} setOpen={setOpenModalNotification}/>}
+      {openModalNotification && (
+        <ModalNotification
+          open={openModalNotification}
+          setOpen={setOpenModalNotification}
+        />
+      )}
     </>
   );
 }

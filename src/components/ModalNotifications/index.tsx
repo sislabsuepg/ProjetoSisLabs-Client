@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   CircularProgress,
   Modal,
@@ -11,9 +11,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
 import { apiOnline } from "@/services/services";
-import { ApiResponse, IEvento, IRecado } from "../Lists/types";
+import { IEvento, IRecado } from "../Lists/types";
 import style from "./ModalNotification.module.scss";
 import { maskDate } from "@/utils/maskDate";
+import { useNotificationStore } from "@/store";
 
 interface ModalNotificationProps {
   open: boolean;
@@ -24,9 +25,12 @@ export default function ModalNotification({
   open,
   setOpen,
 }: ModalNotificationProps) {
-  const [eventos, setEventos] = useState<IEvento[]>([]);
-  const [recados, setRecados] = useState<IRecado[]>([]);
-  const [loading, setLoading] = useState(true);
+const eventos = useNotificationStore(s => s.eventos);
+const recados = useNotificationStore(s => s.recados);
+const setEventos = useNotificationStore(s => s.setEventos);
+const setRecados = useNotificationStore(s => s.setRecados);
+const loading = useNotificationStore(s => s.loading);
+
   const [openEditEvento, setOpenEditEvento] = useState(false);
   const [openEditRecado, setOpenEditRecado] = useState(false);
   const [openDelete, setOpenDelete] = useState<null | {
@@ -52,44 +56,6 @@ export default function ModalNotification({
       return `${duracao} minuto(s)`;
     }
   }
-
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      try {
-        const [eventosResponse, recadosResponse] = await Promise.allSettled([
-          apiOnline.get<ApiResponse<IEvento[]>>("/evento"),
-          apiOnline.get<ApiResponse<IRecado[]>>("/recado"),
-        ]);
-
-        if (eventosResponse.status === "fulfilled") {
-          const orderedEventos = [...eventosResponse.value.data].sort(
-            (a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()
-          );
-          setEventos(orderedEventos);
-        } else {
-          console.error("Erro ao buscar eventos:", eventosResponse.reason);
-        }
-
-        if (recadosResponse.status === "fulfilled") {
-          const orderedRecados = [...recadosResponse.value.data].sort(
-            (a, b) => a.id - b.id
-          );
-          setRecados(orderedRecados);
-        } else {
-          console.error("Erro ao buscar recados:", recadosResponse.reason);
-        }
-      } catch (err) {
-        console.error("Erro inesperado:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (open) {
-      fetchData();
-    }
-  }, [open]);
 
   function openEventoForEdit(e: IEvento) {
     const data = new Date(e.data);
