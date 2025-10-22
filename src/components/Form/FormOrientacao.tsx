@@ -20,7 +20,11 @@ import {
   TextField,
 } from "@mui/material";
 
-export default function FormOrientacao() {
+type FormAcademicoProps = {
+  handleCloseModal: () => void;
+};
+
+export default function FormOrientacao({ handleCloseModal }: FormAcademicoProps) {
   const [form, setForm] = useState<{
     dataInicio: Dayjs | null;
     dataFim: Dayjs | null;
@@ -149,7 +153,7 @@ export default function FormOrientacao() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        📝 Cadastro da orientação
+        Cadastro da orientação
       </p>
 
       <form
@@ -254,7 +258,14 @@ export default function FormOrientacao() {
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-between">
+          <button
+            type="button"
+           onClick={handleCloseModal}
+            className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={!isFormValid}

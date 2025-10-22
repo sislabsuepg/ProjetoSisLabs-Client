@@ -273,7 +273,7 @@ export default function EventosRecados() {
         </div>
 
         <div className={`${style.container} w-1/2 flex flex-col `}>
-          <p className="text-theme-blue font-medium">Avisos</p>
+          <p className="text-theme-blue font-medium">Recados</p>
           <div
             className={`${style.scrollbarContainer} flex flex-col gap-2 overflow-y-auto p-1 h-[70vh]`}
           >
@@ -323,7 +323,7 @@ export default function EventosRecados() {
               })
             ) : (
               <p className="text-theme-text font-normal">
-                Nenhum aviso disponível.
+                Nenhum recado disponível.
               </p>
             )}
           </div>

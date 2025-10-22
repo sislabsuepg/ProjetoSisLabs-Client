@@ -19,7 +19,11 @@ import {
 import { capitalize } from "@/utils/capitalize";
 import { ApiError } from "@/utils/tipos";
 
-export default function FormAcademico() {
+type FormAcademicoProps = {
+  handleCloseModal: () => void;
+};
+
+export default function FormAcademico({ handleCloseModal }: FormAcademicoProps) {
   const [form, setForm] = useState({
     nome: "",
     ra: "",
@@ -145,7 +149,7 @@ export default function FormAcademico() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        📝 Cadastro do acadêmico
+        Cadastro do acadêmico
       </p>
 
       <form
@@ -275,7 +279,15 @@ export default function FormAcademico() {
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-between">
+          <button
+            type="button"
+           onClick={handleCloseModal}
+            className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
+          >
+            Cancelar
+          </button>
+
           <button
             type="submit"
             disabled={!isFormValid}

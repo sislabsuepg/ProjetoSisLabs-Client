@@ -181,7 +181,7 @@ const loading = useNotificationStore(s => s.loading);
           <CloseIcon onClick={() => setOpen(false)} className="cursor-pointer absolute top-3 right-3"/>
 
           <div className="lmd:w-1/2 w-full flex flex-col">
-            <p className="text-theme-blue font-semibold text-[1.4rem] pl-4">Avisos</p>
+            <p className="text-theme-blue font-semibold text-[1.4rem] pl-4">Recados</p>
             <div
               className={`${style.scrollbarContainer} flex flex-col gap-2 overflow-y-auto p-4`}
             >
@@ -231,7 +231,7 @@ const loading = useNotificationStore(s => s.loading);
                 })
               ) : (
                 <p className="text-theme-text font-normal">
-                  Nenhum aviso disponível.
+                  Nenhum recado disponível.
                 </p>
               )}
             </div>

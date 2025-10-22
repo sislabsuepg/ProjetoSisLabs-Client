@@ -11,15 +11,16 @@ import ListProfessor from "@/components/Lists/ListProfessor";
 import ListCurso from "@/components/Lists/ListCurso";
 import ListPermissao from "@/components/Lists/ListPermissao";
 import ListUsuario from "@/components/Lists/ListUsuario";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import * as Yup from "yup";
 import {
-  FormAcademico,
-  FormCurso,
-  FormLaboratorio,
-  FormOrientacao,
-  FormPermissao,
-  FormProfessor,
-  FormUsuario,
+  FormCursoType,
+  FormLaboratorioType,
+  FormOrientacaoType,
+  FormPermissaoType,
+  FormProfessorType,
+  FormAcademicoType,
+  FormUsuarioType,
   IData,
 } from "@/components/Lists/types";
 import {
@@ -36,37 +37,44 @@ import { useEffect, useState, useMemo } from "react";
 import { useCookies } from "react-cookie";
 import { getUserPermissions } from "@/utils/permissions";
 import { toast } from "react-toastify";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Modal, styled, Switch } from "@mui/material";
 import { ApiResponse, IPermissao } from "@/interfaces/interfaces";
 import { AxiosError } from "axios";
+import FormAcademico from "@/components/Form/FormAcademico";
+import FormProfessor from "@/components/Form/FormProfessor";
+import FormLaboratorio from "@/components/Form/FormLaboratorio";
+import FormOrientacao from "@/components/Form/FormOrientacao";
+import FormCurso from "@/components/Form/FormCurso";
+import FormPermissao from "@/components/Form/FormPermissao";
+import FormUsuario from "@/components/Form/FormUsuario";
 
 // Tipagens auxiliares para evitar uso de 'any' mantendo a lógica original
 interface LaboratoriosApi {
-  laboratorios?: FormLaboratorio[];
+  laboratorios?: FormLaboratorioType[];
   total?: number;
 }
 interface OrientacoesApi {
-  orientacoes?: FormOrientacao[];
+  orientacoes?: FormOrientacaoType[];
   total?: number;
 }
 interface CursosApi {
-  cursos?: FormCurso[];
+  cursos?: FormCursoType[];
   total?: number;
 }
 interface PermissaoApi {
-  permissaoUsuario?: FormPermissao[];
+  permissaoUsuario?: FormPermissaoType[];
   total?: number;
 }
 interface UsuariosApi {
-  usuarios?: FormUsuario[];
+  usuarios?: FormUsuarioType[];
   total?: number;
 }
 interface AcademicosApi {
-  alunos?: FormAcademico[];
+  alunos?: FormAcademicoType[];
   total?: number;
 }
 interface ProfessoresApi {
-  professores?: FormProfessor[];
+  professores?: FormProfessorType[];
   total?: number;
 }
 
@@ -79,12 +87,12 @@ export default function Alterar() {
   const [openAtivar, setOpenAtivar] = useState({ status: false, id: 0 });
   const [currentItems, setCurrentItems] = useState<IData[]>([]);
   const [formData, setFormData] = useState<IData>(formMap[activeId]);
-  const itemsPerPage = 10;
+  const itemsPerPage = 6;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState(false);
-
+  const [openModal, setOpenModal] = useState<number | null>(null);
   const [cookies] = useCookies(["usuario"]);
   const perms = getUserPermissions(cookies);
   const podeGeral = perms.geral === true;
@@ -101,6 +109,14 @@ export default function Alterar() {
     { id: 6, title: "Permissão", need: "geral" },
     { id: 7, title: "Usuário", need: "geral" },
   ] as const;
+
+  const handleOpenModal = () => {
+    setOpenModal(activeId);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(null);
+  };
 
   const listButtons = useMemo(
     () =>
@@ -171,8 +187,7 @@ export default function Alterar() {
     const updatedItem = currentItems.find((item) => item.id === id);
     if (!updatedItem) {
       toast.error(
-        `${
-          listButtons.find((btn) => btn.id === activeId)?.title
+        `${listButtons.find((btn) => btn.id === activeId)?.title
         } não encontrado.`
       );
       return;
@@ -223,31 +238,31 @@ export default function Alterar() {
         if (item.id === openEditUser.id) {
           switch (activeId) {
             case 1: {
-              const data = formData as FormAcademico;
+              const data = formData as FormAcademicoType;
               return { ...item, ...data };
             }
             case 2: {
-              const data = formData as FormProfessor;
+              const data = formData as FormProfessorType;
               return { ...item, ...data };
             }
             case 3: {
-              const data = formData as FormLaboratorio;
+              const data = formData as FormLaboratorioType;
               return { ...item, ...data };
             }
             case 4: {
-              const data = formData as FormOrientacao;
+              const data = formData as FormOrientacaoType;
               return { ...item, ...data };
             }
             case 5: {
-              const data = formData as FormCurso;
+              const data = formData as FormCursoType;
               return { ...item, ...data };
             }
             case 6: {
-              const data = formData as FormPermissao;
+              const data = formData as FormPermissaoType;
               return { ...item, ...data };
             }
             case 7: {
-              const data = formData as FormUsuario;
+              const data = formData as FormUsuarioType;
               return { ...item, ...data };
             }
             default:
@@ -265,19 +280,19 @@ export default function Alterar() {
   const getCurrentList = () => {
     switch (activeId) {
       case 1:
-        return currentItems as FormAcademico[];
+        return currentItems as FormAcademicoType[];
       case 2:
-        return currentItems as FormProfessor[];
+        return currentItems as FormProfessorType[];
       case 3:
-        return currentItems as FormLaboratorio[];
+        return currentItems as FormLaboratorioType[];
       case 4:
-        return currentItems as FormOrientacao[];
+        return currentItems as FormOrientacaoType[];
       case 5:
-        return currentItems as FormCurso[];
+        return currentItems as FormCursoType[];
       case 6:
-        return currentItems as FormPermissao[];
+        return currentItems as FormPermissaoType[];
       case 7:
-        return currentItems as FormUsuario[];
+        return currentItems as FormUsuarioType[];
       default:
         return [];
     }
@@ -307,18 +322,17 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/aluno?page=${currentPage}&items=${itemsPerPage}&ativo=${
-              Inativo ? "false" : "true"
+            `/aluno?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"
             }${filtroTemp ? `&${filtroTemp}` : ""}`
           );
           console.log(response);
           const dataResp = response.data as unknown as
             | AcademicosApi
-            | FormAcademico[];
+            | FormAcademicoType[];
           if (
             (dataResp as AcademicosApi)?.total !== undefined &&
             pages !==
-              Math.ceil(((dataResp as AcademicosApi).total || 0) / itemsPerPage)
+            Math.ceil(((dataResp as AcademicosApi).total || 0) / itemsPerPage)
           ) {
             setTotalPages(
               Math.ceil(((dataResp as AcademicosApi).total || 0) / itemsPerPage)
@@ -342,8 +356,7 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/professor?page=${currentPage}&items=${itemsPerPage}&ativo=${
-              Inativo ? "false" : "true"
+            `/professor?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
           const dataResp = response.data as unknown as ProfessoresApi;
@@ -368,19 +381,18 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/laboratorio?page=${currentPage}&items=${itemsPerPage}&ativo=${
-              Inativo ? "false" : "true"
+            `/laboratorio?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
           const dataResp = response.data as unknown as
             | LaboratoriosApi
-            | FormLaboratorio[];
+            | FormLaboratorioType[];
           if (
             (dataResp as LaboratoriosApi)?.total !== undefined &&
             pages !==
-              Math.ceil(
-                ((dataResp as LaboratoriosApi).total || 0) / itemsPerPage
-              )
+            Math.ceil(
+              ((dataResp as LaboratoriosApi).total || 0) / itemsPerPage
+            )
           ) {
             console.log(response);
             setTotalPages(
@@ -406,19 +418,18 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/orientacao?page=${currentPage}&items=${itemsPerPage}&ativo=${
-              Inativo == true ? "false" : "true"
+            `/orientacao?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo == true ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
           const dataResp = response.data as unknown as
             | OrientacoesApi
-            | FormOrientacao[];
+            | FormOrientacaoType[];
           if (
             (dataResp as OrientacoesApi)?.total !== undefined &&
             pages !==
-              Math.ceil(
-                ((dataResp as OrientacoesApi).total || 0) / itemsPerPage
-              )
+            Math.ceil(
+              ((dataResp as OrientacoesApi).total || 0) / itemsPerPage
+            )
           ) {
             setTotalPages(
               Math.ceil(
@@ -443,15 +454,14 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(Math.ceil(count / itemsPerPage));
           const response: ApiResponse = await apiOnline.get(
-            `/curso?page=${currentPage}&items=${itemsPerPage}&ativo=${
-              Inativo ? "false" : "true"
+            `/curso?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
-          const dataResp = response.data as unknown as CursosApi | FormCurso[];
+          const dataResp = response.data as unknown as CursosApi | FormCursoType[];
           if (
             (dataResp as CursosApi)?.total !== undefined &&
             pages !==
-              Math.ceil(((dataResp as CursosApi).total || 0) / itemsPerPage)
+            Math.ceil(((dataResp as CursosApi).total || 0) / itemsPerPage)
           ) {
             setTotalPages(
               Math.ceil(((dataResp as CursosApi).total || 0) / itemsPerPage)
@@ -474,17 +484,16 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/permissao?page=${currentPage}&items=${itemsPerPage}&ativo=${
-              Inativo ? "false" : "true"
+            `/permissao?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
           const dataResp = response.data as unknown as
             | PermissaoApi
-            | FormPermissao[];
+            | FormPermissaoType[];
           if (
             (dataResp as PermissaoApi)?.total !== undefined &&
             pages !==
-              Math.ceil(((dataResp as PermissaoApi).total || 0) / itemsPerPage)
+            Math.ceil(((dataResp as PermissaoApi).total || 0) / itemsPerPage)
           ) {
             console.log(response);
             setTotalPages(
@@ -508,17 +517,16 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/usuario?page=${currentPage}&items=${itemsPerPage}&ativo=${
-              Inativo ? "false" : "true"
+            `/usuario?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
           const dataResp = response.data as unknown as
             | UsuariosApi
-            | FormUsuario[];
+            | FormUsuarioType[];
           if (
             (dataResp as UsuariosApi)?.total !== undefined &&
             pages !==
-              Math.ceil(((dataResp as UsuariosApi).total || 0) / itemsPerPage)
+            Math.ceil(((dataResp as UsuariosApi).total || 0) / itemsPerPage)
           ) {
             setTotalPages(
               Math.ceil(((dataResp as UsuariosApi).total || 0) / itemsPerPage)
@@ -563,78 +571,132 @@ export default function Alterar() {
     );
   }
 
-  console.log(currentItems);
+  const CustomSwitch = styled(Switch)(({ theme }) => ({
+    width: 42,
+    height: 26,
+    padding: 0,
+    "& .MuiSwitch-switchBase": {
+      padding: 0,
+      margin: 2,
+      transitionDuration: "300ms",
+      "&.Mui-checked": {
+        transform: "translateX(16px)",
+        color: "#fff",
+        "& + .MuiSwitch-track": {
+          backgroundColor: "#65C466",
+          opacity: 1,
+          border: 0,
+          ...theme.applyStyles("dark", {
+            backgroundColor: "#2ECA45",
+          }),
+        },
+      },
+    },
+    "& .MuiSwitch-thumb": {
+      boxSizing: "border-box",
+      width: 22,
+      height: 22,
+    },
+    "& .MuiSwitch-track": {
+      borderRadius: 26 / 2,
+      backgroundColor: "#E9E9EA",
+      opacity: 1,
+      transition: theme.transitions.create(["background-color"], {
+        duration: 500,
+      }),
+      ...theme.applyStyles("dark", {
+        backgroundColor: "#39393D",
+      }),
+    },
+  }));
 
   return (
     <div className="w-full flex flex-col items-start">
-      <div className="w-full flex items-center justify-center gap-2">
+      <div className="w-full flex items-center justify-center gap-2 flex-wrap">
         {listButtons?.map((item) => (
           <button
             key={item?.id}
             onClick={() => setActiveId(item.id)}
-            className={`${
-              item?.id === activeId ? "bg-theme-lightBlue" : "bg-theme-blue"
-            } h-12 px-4 rounded-[10px] text-theme-white font-semibold`}
+            className={`${item?.id === activeId ? "bg-theme-lightBlue" : "bg-theme-blue"
+              } h-12 px-4 rounded-[10px] text-theme-white font-semibold`}
           >
             {item?.title}
           </button>
         ))}
       </div>
 
-      <div className="flex items-center justify-between w-full mt-10 mb-3">
-        <p className="font-semibold text-[1.2rem] text-theme-blue">
-          {activeId === 1 && "Lista dos Acadêmicos"}
-          {activeId === 2 && "Lista dos Professores"}
-          {activeId === 3 && "Lista dos Laboratórios"}
-          {activeId === 4 && "Lista de Orientação/Mestrado"}
-          {activeId === 5 && "Lista dos Cursos"}
-          {activeId === 6 && "Lista das Permissões"}
-          {activeId === 7 && "Lista dos Usuários"}
-        </p>
+      <div className="flex flex-col items-start justify-between w-full mt-12 mb-4 gap-2">
+        <div className="flex md:flex-row flex-col items-center justify-between gap-2 w-full">
+          <p className="font-semibold text-[1.2rem] text-theme-blue">
+            {activeId === 1 && "Lista dos Acadêmicos"}
+            {activeId === 2 && "Lista dos Professores"}
+            {activeId === 3 && "Lista dos Laboratórios"}
+            {activeId === 4 && "Lista de Orientação/Mestrado"}
+            {activeId === 5 && "Lista dos Cursos"}
+            {activeId === 6 && "Lista das Permissões"}
+            {activeId === 7 && "Lista dos Usuários"}
+          </p>
 
-        <div className="flex items-center justify-end gap-2 w-full max-w-[500px]">
-          <span className="font-normal text-[0.9rem] text-theme-text whitespace-nowrap mr-2">
-            Mostrar Inativo:
-          </span>
-          <input
-            type="checkbox"
-            className="w-4 h-4 accent-theme-blue"
-            checked={Inativo}
-            onChange={() => setInativo(!Inativo)}
-          />
-
-          <input
-            placeholder={placeholderMap[activeId]}
-            type="text"
-            value={filtro}
-            onChange={(e) => {
-              setFiltro(e.target.value);
-              if (e.target.value === "") {
-                setBusca(!busca);
-              }
-            }}
-            className="w-full max-w-[250px] font-normal h-[40px] px-3 py-2 text-[0.9rem] rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
-          />
           <button
-            type="submit"
-            disabled={!filtro.trim()}
-            onClick={() => setBusca(!busca)}
-            className={`${
-              !filtro.trim()
+            onClick={handleOpenModal}
+            className={`bg-theme-lightBlue h-12 px-4 leading-5 text-[0.9rem] rounded-[10px] text-theme-white font-medium flex items-center gap-4`}>
+            <p className="flex gap-1 items-center">
+              <span>Cadastrar</span>
+              {activeId === 1 && "acadêmico"}
+              {activeId === 2 && "professor"}
+              {activeId === 3 && "laboratório"}
+              {activeId === 4 && "orientação/mestrado"}
+              {activeId === 5 && "curso"}
+              {activeId === 6 && "permissão"}
+              {activeId === 7 && "usuário"}
+            </p>
+            <PersonAddIcon />
+          </button>
+        </div>
+
+        <div className="flex md:flex-row flex-col items-center justify-between gap-2 w-full">
+          <div className="flex items-center justify-center md:justify-start gap-2 w-full">
+            <input
+              placeholder={placeholderMap[activeId]}
+              type="text"
+              value={filtro}
+              onChange={(e) => {
+                setFiltro(e.target.value);
+                if (e.target.value === "") {
+                  setBusca(!busca);
+                }
+              }}
+              className="w-full max-w-[250px] font-normal h-[40px] px-3 py-2 text-[0.9rem] rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
+            />
+            <button
+              type="submit"
+              disabled={!filtro.trim()}
+              onClick={() => setBusca(!busca)}
+              className={`${!filtro.trim()
                 ? "bg-gray-200 cursor-not-allowed text-[#c0c0c0]"
                 : "border border-theme-blue hover:bg-theme-blue text-theme-blue hover:text-theme-white"
-            } font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] rounded-[10px]`}
-          >
-            Buscar
-          </button>
+                } font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] rounded-[10px]`}
+            >
+              Buscar
+            </button>
+          </div>
+
+          <label className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-700 whitespace-nowrap">Mostrar Inativo</span>
+            <CustomSwitch
+              checked={Inativo}
+              onChange={() => setInativo(!Inativo)}
+              name="geral"
+            />
+          </label>
         </div>
       </div>
 
       <div className="w-full">
         {activeId === 1 && (
           <ListAcademico
-            list={getCurrentList() as FormAcademico[]}
-            dados={currentItems as FormAcademico[]}
+            list={getCurrentList() as FormAcademicoType[]}
+            dados={currentItems as FormAcademicoType[]}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
@@ -643,8 +705,8 @@ export default function Alterar() {
         )}
         {activeId === 2 && (
           <ListProfessor
-            list={getCurrentList() as FormProfessor[]}
-            dados={currentItems as FormProfessor[]}
+            list={getCurrentList() as FormProfessorType[]}
+            dados={currentItems as FormProfessorType[]}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
@@ -653,8 +715,8 @@ export default function Alterar() {
         )}
         {activeId === 3 && (
           <ListLaboratorio
-            list={getCurrentList() as FormLaboratorio[]}
-            dados={currentItems as FormLaboratorio[]}
+            list={getCurrentList() as FormLaboratorioType[]}
+            dados={currentItems as FormLaboratorioType[]}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
@@ -663,8 +725,8 @@ export default function Alterar() {
         )}
         {activeId === 4 && (
           <ListOrientacao
-            list={getCurrentList() as FormOrientacao[]}
-            dados={currentItems as FormOrientacao[]}
+            list={getCurrentList() as FormOrientacaoType[]}
+            dados={currentItems as FormOrientacaoType[]}
             inactive={Inativo}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
@@ -673,8 +735,8 @@ export default function Alterar() {
         )}
         {activeId === 5 && (
           <ListCurso
-            list={getCurrentList() as FormCurso[]}
-            dados={currentItems as FormCurso[]}
+            list={getCurrentList() as FormCursoType[]}
+            dados={currentItems as FormCursoType[]}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
@@ -683,8 +745,8 @@ export default function Alterar() {
         )}
         {activeId === 6 && (
           <ListPermissao
-            list={getCurrentList() as FormPermissao[]}
-            dados={currentItems as FormPermissao[]}
+            list={getCurrentList() as FormPermissaoType[]}
+            dados={currentItems as FormPermissaoType[]}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
@@ -693,8 +755,8 @@ export default function Alterar() {
         )}
         {activeId === 7 && (
           <ListUsuario
-            list={getCurrentList() as FormUsuario[]}
-            dados={currentItems as FormUsuario[]}
+            list={getCurrentList() as FormUsuarioType[]}
+            dados={currentItems as FormUsuarioType[]}
             setFormData={setFormData}
             setOpenEditUser={setOpenEditUser}
             setOpenExcluir={setOpenExcluir}
@@ -714,9 +776,8 @@ export default function Alterar() {
         open={openAtivar.status}
         onClose={() => setOpenAtivar({ status: false, id: 0 })}
         title="Atenção"
-        message={`Deseja, realmente, ativar esta(e) ${
-          listButtons.find((btn) => btn.id === activeId)?.title || ""
-        }?`}
+        message={`Deseja, realmente, ativar esta(e) ${listButtons.find((btn) => btn.id === activeId)?.title || ""
+          }?`}
         onCancel={() => setOpenAtivar({ status: false, id: 0 })}
         onConfirm={() => {
           async function ativar() {
@@ -735,26 +796,23 @@ export default function Alterar() {
             );
             setOpenAtivar({ status: false, id: 0 });
             toast.success(
-              `${
-                listButtons.find((btn) => btn.id === activeId)?.title || ""
+              `${listButtons.find((btn) => btn.id === activeId)?.title || ""
               } ativado com sucesso!`
             );
           }
           ativar();
         }}
         cancelText="Cancelar"
-        confirmText={`Ativar ${
-          listButtons.find((btn) => btn.id === activeId)?.title || ""
-        }`}
+        confirmText={`Ativar ${listButtons.find((btn) => btn.id === activeId)?.title || ""
+          }`}
       />
 
       <CustomModal
         open={openExcluir.status}
         onClose={() => setOpenExcluir({ status: false, id: 0 })}
         title="Atenção"
-        message={`Deseja, realmente, desativar esta(e) ${
-          listButtons.find((btn) => btn.id === activeId)?.title || ""
-        }?`}
+        message={`Deseja, realmente, desativar esta(e) ${listButtons.find((btn) => btn.id === activeId)?.title || ""
+          }?`}
         onCancel={() => setOpenExcluir({ status: false, id: 0 })}
         onConfirm={() => {
           async function desativar() {
@@ -773,17 +831,15 @@ export default function Alterar() {
             );
             setOpenExcluir({ status: false, id: 0 });
             toast.success(
-              `${
-                listButtons.find((btn) => btn.id === activeId)?.title || ""
+              `${listButtons.find((btn) => btn.id === activeId)?.title || ""
               } desativado com sucesso!`
             );
           }
           desativar();
         }}
         cancelText="Cancelar"
-        confirmText={`Desativar ${
-          listButtons.find((btn) => btn.id === activeId)?.title || ""
-        }`}
+        confirmText={`Desativar ${listButtons.find((btn) => btn.id === activeId)?.title || ""
+          }`}
       />
 
       <EditUserModal<typeof formData>
@@ -842,6 +898,119 @@ export default function Alterar() {
         }
         title={listButtons.find((btn) => btn.id === activeId)?.title || ""}
       />
+
+      {/* MODAIS */}
+      {openModal === 1 && (
+        <Modal open={openModal === 1} onClose={handleCloseModal}>
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+            className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          >
+            <FormAcademico handleCloseModal={() => setOpenModal(null)} />
+          </div>
+        </Modal>
+      )}
+
+      {openModal === 2 && (
+        <Modal open={openModal === 2} onClose={handleCloseModal}>
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+            className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          >
+            <FormProfessor handleCloseModal={() => setOpenModal(null)}/>
+          </div>
+        </Modal>
+      )}
+
+      {openModal === 3 && (
+        <Modal open={openModal === 3} onClose={handleCloseModal} title="Cadastrar Laboratório">
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+            className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          >
+            <FormLaboratorio handleCloseModal={() => setOpenModal(null)}/>
+          </div>
+        </Modal>
+      )}
+
+      {openModal === 4 && (
+        <Modal open={openModal === 4} onClose={handleCloseModal} title="Cadastrar Laboratório">
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+            className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          >
+            <FormOrientacao handleCloseModal={() => setOpenModal(null)}/>
+          </div>
+        </Modal>
+      )}
+
+      {openModal === 5 && (
+        <Modal open={openModal === 5} onClose={handleCloseModal} title="Cadastrar Laboratório">
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+            className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          >
+            <FormCurso handleCloseModal={() => setOpenModal(null)}/>
+          </div>
+        </Modal>
+      )}
+
+      {openModal === 6 && (
+        <Modal open={openModal === 6} onClose={handleCloseModal} title="Cadastrar Laboratório">
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+            className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          >
+            <FormPermissao handleCloseModal={() => setOpenModal(null)}/>
+          </div>
+        </Modal>
+      )}
+
+      {openModal === 7 && (
+        <Modal open={openModal === 7} onClose={handleCloseModal} title="Cadastrar Laboratório">
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+            className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          >
+            <FormUsuario handleCloseModal={() => setOpenModal(null)}/>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

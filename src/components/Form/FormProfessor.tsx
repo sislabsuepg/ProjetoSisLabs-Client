@@ -9,7 +9,11 @@ import { capitalize, TextField } from '@mui/material';
 import { apiOnline } from '@/services/services';
 import { ApiError } from '@/utils/tipos';
 
-export default function FormAcademico() {
+type FormAcademicoProps = {
+  handleCloseModal: () => void;
+};
+
+export default function FormAcademico({ handleCloseModal }: FormAcademicoProps) {
   const [form, setForm] = useState({
     nome: '',
     email: '',
@@ -50,7 +54,7 @@ const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-       📝 Cadastro do professor
+       Cadastro do professor
       </p>
 
       <form
@@ -72,7 +76,14 @@ const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-between">
+          <button
+            type="button"
+           onClick={handleCloseModal}
+            className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={!isFormValid}

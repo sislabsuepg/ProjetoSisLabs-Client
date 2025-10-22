@@ -6,10 +6,6 @@ import PersonIcon from "@mui/icons-material/Person";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import ModalNotification from "../ModalNotifications";
-import Badge from "@mui/material/Badge";
-import { useNotificationStore } from "@/store";
 import { fetchAndCountNotifications } from "@/utils/fetchNotifications";
 
 interface SidebarProps {
@@ -74,11 +70,9 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const [activeItem, setActiveItem] = useState("Início");
   const router = useRouter();
   const [cookies, , removeCookie] = useCookies(["usuario"]);
-  const [openModalNotification, setOpenModalNotification] = useState(false);
   const user = cookies.usuario;
   const isAcademico = user && !isNaN(user.login);
   const permissions = user?.permissao || {};
-  const notificationCount = useNotificationStore((state) => state.count);
   // Matriz de regras:
   // geral: pode listar e cadastrar usuários, permissões, cursos, professores, laboratórios e acessar registros
   // advertencia: somente emitir advertência
@@ -177,17 +171,6 @@ useEffect(() => {
               isOpen={isOpen}
             />
             <SidebarItem
-              icon={data_images?.icon_cadastro}
-              text="Cadastro"
-              active={activeItem === "Cadastro"}
-              onClick={() => {
-                setActiveItem("Cadastro");
-                router.push("/dashboard/cadastro");
-              }}
-              isOpen={isOpen}
-              disabled={!can.menuCadastro}
-            />
-            <SidebarItem
               icon={data_images?.icon_alterar_excluir}
               text="Listas"
               active={activeItem === "Alterar ou excluir"}
@@ -243,10 +226,10 @@ useEffect(() => {
             />
             <SidebarItem
               icon={data_images?.icon_agenda}
-              text="Adicionar eventos e avisos"
-              active={activeItem === "Eventos e Avisos"}
+              text="Adicionar eventos e recados"
+              active={activeItem === "Eventos e Recados"}
               onClick={() => {
-                setActiveItem("Eventos e Avisos");
+                setActiveItem("Eventos e Recados");
                 router.push("/dashboard/agenda");
               }}
               isOpen={isOpen}
@@ -284,33 +267,6 @@ useEffect(() => {
           />
         </div>
       </aside>
-
-      <div className="absolute bottom-5 right-5 group w-fit">
-        <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-theme-blue text-theme-white font-normal text-sm px-2 py-1 rounded shadow-md whitespace-nowrap">
-          Avisos e eventos
-        </span>
-
-        <Badge
-          badgeContent={notificationCount}
-          color="error"
-          invisible={notificationCount === 0}
-        >
-          <NotificationsIcon
-            sx={{ fontSize: 40 }}
-            className="cursor-pointer text-theme-lightBlue"
-            onClick={() => {
-              setOpenModalNotification(true);
-            }}
-          />
-        </Badge>
-      </div>
-
-      {openModalNotification && (
-        <ModalNotification
-          open={openModalNotification}
-          setOpen={setOpenModalNotification}
-        />
-      )}
     </>
   );
 }

@@ -10,7 +10,11 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 
-export default function FormPermissao() {
+type FormAcademicoProps = {
+  handleCloseModal: () => void;
+};
+
+export default function FormPermissao({ handleCloseModal }: FormAcademicoProps) {
   const [form, setForm] = useState({
     nomePermissao: "",
     geral: false,
@@ -95,7 +99,7 @@ export default function FormPermissao() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        📝 Cadastro de permissão de usuário
+        Cadastro de permissão de usuário
       </p>
 
       <form
@@ -218,7 +222,14 @@ export default function FormPermissao() {
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-between">
+          <button
+            type="button"
+           onClick={handleCloseModal}
+            className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={!isFormValid}

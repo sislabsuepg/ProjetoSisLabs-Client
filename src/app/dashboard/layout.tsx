@@ -1,9 +1,13 @@
 "use client";
+import ModalNotification from "@/components/ModalNotifications";
 import Sidebar from "@/components/SideBarMenu";
+import { useNotificationStore } from "@/store";
 import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import Badge from "@mui/material/Badge";
 
 export default function DashboardLayout({
   children,
@@ -14,6 +18,8 @@ export default function DashboardLayout({
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const [cookies] = useCookies(["usuario", "aluno"]);
+  const notificationCount = useNotificationStore((state) => state.count);
+  const [openModalNotification, setOpenModalNotification] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -53,11 +59,37 @@ export default function DashboardLayout({
     <div className="w-full flex items-start">
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
       <section
-        className={`transition-all duration-500 flex-1 min-h-screen md:min-h-[calc(100vh-2.5rem)] m-5 border-4 p-5 border-[#F3F3F3] rounded-[20px] box-border overflow-x-auto overflow-y-auto ${
-          isOpen ? "ml-0 md:ml-[400px]" : "ml-5 md:ml-[60px]"
-        }`}
+        className={`transition-all duration-500 flex-1 min-h-screen md:min-h-[calc(100vh-2.5rem)] m-5 border-4 p-5 border-[#F3F3F3] rounded-[20px] box-border overflow-x-auto overflow-y-auto ${isOpen ? "ml-0 md:ml-[400px]" : "ml-5 md:ml-[60px]"
+          }`}
       >
         {children}
+
+        <div className="fixed top-5 right-5 group w-fit">
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-theme-blue text-theme-white font-normal text-sm px-2 py-1 rounded shadow-md whitespace-nowrap">
+            Recados e Eventos
+          </span>
+
+          <Badge
+            badgeContent={notificationCount}
+            color="error"
+            invisible={notificationCount === 0}
+          >
+            <NotificationsIcon
+              sx={{ fontSize: 40 }}
+              className="cursor-pointer text-theme-lightBlue"
+              onClick={() => {
+                setOpenModalNotification(true);
+              }}
+            />
+          </Badge>
+        </div>
+
+        {openModalNotification && (
+          <ModalNotification
+            open={openModalNotification}
+            setOpen={setOpenModalNotification}
+          />
+        )}
       </section>
     </div>
   );

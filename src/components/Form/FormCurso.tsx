@@ -8,7 +8,11 @@ import { apiOnline } from "@/services/services";
 import { ApiError } from "@/utils/tipos";
 import { TextField } from "@mui/material";
 
-export default function FormCurso() {
+type FormAcademicoProps = {
+  handleCloseModal: () => void;
+};
+
+export default function FormCurso({ handleCloseModal }: FormAcademicoProps) {
   const [form, setForm] = useState({
     nome: "",
     anosMaximo: 0,
@@ -62,7 +66,7 @@ export default function FormCurso() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        📝 Cadastro do curso
+        Cadastro do curso
       </p>
 
       <form
@@ -98,7 +102,14 @@ export default function FormCurso() {
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-between">
+          <button
+            type="button"
+           onClick={handleCloseModal}
+            className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={!isFormValid}
