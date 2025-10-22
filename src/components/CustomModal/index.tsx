@@ -47,7 +47,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
         <div className="flex items-center justify-between w-full gap-4">
           {onCancel && (
             <button
-              className="bg-theme-blue text-theme-white font-normal text-[0.9rem] h-[40px] w-full max-w-[200px] rounded-[8px]"
+              className="bg-theme-red text-theme-white font-normal text-[0.9rem] h-[40px] w-full max-w-[200px] rounded-[8px]"
               onClick={onCancel}
             >
               {cancelText}
@@ -56,7 +56,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
 
           {onConfirm && (
             <button
-              className="bg-theme-red text-theme-white font-normal text-[0.9rem] h-[40px] w-full max-w-[200px] rounded-[8px]"
+              className="bg-theme-blue text-theme-white font-normal text-[0.9rem] h-[40px] w-full max-w-[200px] rounded-[8px]"
               onClick={onConfirm}
             >
               {confirmText}

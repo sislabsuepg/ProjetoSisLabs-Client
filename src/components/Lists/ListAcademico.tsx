@@ -3,14 +3,14 @@
 import Popover from "@/components/Popover";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
-import { FormAcademico } from "./types";
+import { FormAcademicoType } from "./types";
 import { maskPhone } from "@/utils/maskPhone";
 import { PersonAdd } from "@mui/icons-material";
 
 interface Props {
-  list: FormAcademico[];
-  dados: FormAcademico[];
-  setFormData: (data: FormAcademico) => void;
+  list: FormAcademicoType[];
+  dados: FormAcademicoType[];
+  setFormData: (data: FormAcademicoType) => void;
   setOpenEditUser: (state: { status: boolean; id: number }) => void;
   setOpenExcluir: (state: { status: boolean; id: number }) => void;
   setOpenAtivar: (state: { status: boolean; id: number }) => void;

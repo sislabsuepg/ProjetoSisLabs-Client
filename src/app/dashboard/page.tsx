@@ -7,12 +7,13 @@ import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import { apiOnline } from "@/services/services";
 import { CircularProgress } from "@mui/material";
-import { Cancel } from "@mui/icons-material";
 import CustomModal from "@/components/CustomModal";
+import DeleteIcon from '@mui/icons-material/Delete';
+import Popover from "@/components/Popover";
 
 export default function Inicio() {
   const [loading, setLoading] = useState(true);
-  const itemsPerPage = 10;
+  const itemsPerPage = 9;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [update, setUpdate] = useState(false);
@@ -209,10 +210,12 @@ export default function Inicio() {
     );
   }
 
+  console.log('data - ', data)
+
   return (
     <div className="w-full flex flex-col h-full items-start">
       <p className="text-theme-blue font-semibold text-[1.2rem] w-full text-start">
-        ✅ Laboratórios em uso
+        Laboratórios em uso
       </p>
 
       {/* Solicitações Pendentes */}
@@ -265,83 +268,100 @@ export default function Inicio() {
         </div>
       )}
 
-      <div className="w-full flex flex-col h-full mt-5">
-        {data.length > 0 ? (
-          data?.map((item, index) => (
-            <div
-              key={item?.id}
-              className={`w-full ${
-                Number(index) % 2 == 0 ? "bg-[#F3F3F3]" : "bg-transparent"
-              } px-4 py-2 rounded-[10px] mt-3`}
-            >
-              {/* Layout em linha: ponto, texto (cresce), ícone logo após o texto */}
-              <div className="flex w-full items-start gap-2">
-                <div className="flex items-start gap-2 flex-1">
-                  <div className="h-2 w-2 bg-[#22FF00] rounded-full mt-[6px]"></div>
-                  <p className="text-theme-text text-[0.9rem] font-normal leading-relaxed">
-                    {item.posseChave ? (
-                      <>
-                        Laboratório{" "}
-                        <span className="font-semibold">
-                          {item?.laboratorio.nome}
-                        </span>{" "}
-                        - Chave do Laboratório {item?.laboratorio.nome} foi
-                        emprestado pelo(a) aluno(a){" "}
-                        <span className="font-semibold">
-                          {item?.aluno?.nome || "-"}
-                        </span>{" "}
-                        -{" "}
-                        {item?.dataHoraEntrada
-                          ? new Date(item.dataHoraEntrada).toLocaleString()
-                          : ""}
-                      </>
-                    ) : (
-                      <>
-                        Laboratório{" "}
-                        <span className="font-semibold">
-                          Laboratório {item?.laboratorio.nome}
-                        </span>{" "}
-                        foi aberto pelo(a) aluno(a){" "}
-                        <span className="font-semibold">
-                          {item?.aluno?.nome || "-"} para pesquisa
-                        </span>{" "}
-                        - :{" "}
-                        {item?.dataHoraEntrada
-                          ? new Date(item.dataHoraEntrada).toLocaleString()
-                          : ""}
-                      </>
-                    )}
-                  </p>
-                </div>
-                {item.id != null && canAcao && (
-                  <Cancel
-                    className="text-theme-red cursor-pointer hover:scale-110 transition-transform mt-[4px]"
-                    sx={{ width: 20, height: 20 }}
-                    onClick={() =>
-                      setOpenEncerrar({ status: true, id: item.id! })
-                    }
-                  />
-                )}
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="h-full flex items-center justify-center">
-            <p className="text-theme-text text-[0.9rem] font-normal">
-              Nenhum laboratório em uso no momento.
-            </p>
-          </div>
-        )}
+      <div className="w-full h-full flex flex-col justify-between">
+        <div className="h-full overflow-y-auto rounded-lg bg-theme-white mt-5">
+          <table className="h-full min-w-full">
+            <thead>
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-theme-blue uppercase">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-theme-blue uppercase">
+                  Laboratório
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-theme-blue uppercase">
+                  Aluno
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-theme-blue uppercase">
+                  Data/Hora de Entrada
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-theme-blue uppercase">
+                  Ações
+                </th>
+              </tr>
+            </thead>
 
+            <tbody>
+              {data.length > 0 ? (
+                data.map((item, index) => (
+                  <tr
+                    key={item.id}
+                    className={index % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"}
+                  >
+                    <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`h-2 w-2 rounded-full ${item.posseChave ? "bg-[#22FF00]" : "bg-theme-lightBlue"
+                            }`}
+                        ></div>
+                        {item.posseChave ? "Com chave" : "Aberto"}
+                      </div>
+                    </td>
+
+                    <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text">
+                      <Popover extendedClass="font-medium" title={item.laboratorio?.nome}>{item.laboratorio?.nome}</Popover>
+                    </td>
+
+                    <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text">
+                      <Popover extendedClass="font-medium" title={item.aluno?.nome || "-"}>{item.aluno?.nome || "-"}</Popover>
+                    </td>
+
+                    <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text">
+                      <Popover extendedClass="font-medium" title={item.dataHoraEntrada
+                        ? new Date(item.dataHoraEntrada).toLocaleString()
+                        : "-"}>{item.dataHoraEntrada
+                          ? new Date(item.dataHoraEntrada).toLocaleString()
+                          : "-"}</Popover>
+                    </td>
+
+                    <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text text-center">
+                      {item.id != null && canAcao && (
+                        <Popover extendedClass="font-medium" title="Encerrar uso do laboratório">
+                          <button
+                            onClick={() =>
+                              setOpenEncerrar({ status: true, id: item.id! })
+                            }
+                            className="hover:scale-110 transition-transform"
+                          >
+                            <DeleteIcon className="text-theme-red" />
+                          </button>
+                        </Popover>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-4 py-3 text-center text-sm text-theme-blue font-normal"
+                  >
+                    Nenhum laboratório em uso no momento.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* MODAL DE ENCERRAR */}
         <CustomModal
           open={openEncerrar.status}
           onClose={() => setOpenEncerrar({ status: false, id: 0 })}
-          title="Encerrar Uso do Laboratório"
-          message={`Tem certeza que deseja encerrar o emprestimo para ${
-            data.find((item) => item.id === openEncerrar.id)?.aluno.nome
-          } no laboratório ${
-            data.find((item) => item.id === openEncerrar.id)?.laboratorio.nome
-          }?`}
+          title="Encerrar uso do laboratório"
+          message={`Tem certeza que deseja encerrar o empréstimo para ${data.find((item) => item.id === openEncerrar.id)?.aluno.nome
+            } no laboratório ${data.find((item) => item.id === openEncerrar.id)?.laboratorio.nome
+            }?`}
           onConfirm={async () => {
             try {
               await apiOnline.put(`/emprestimo/close/${openEncerrar.id}`);
@@ -357,6 +377,7 @@ export default function Inicio() {
           onCancel={() => setOpenEncerrar({ status: false, id: 0 })}
         />
 
+        {/* PAGINAÇÃO */}
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
