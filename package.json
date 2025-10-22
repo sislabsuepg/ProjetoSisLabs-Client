@@ -14,6 +14,7 @@
     "@mui/icons-material": "^6.4.8",
     "@mui/material": "^6.4.8",
     "@mui/x-date-pickers": "^8.11.0",
+    "@reactour/tour": "^3.8.0",
     "axios": "^1.10.0",
     "dayjs": "^1.11.18",
     "next": "15.2.3",

@@ -70,7 +70,7 @@ export default function Perfil() {
   return (
     <div className="h-full w-full flex flex-col items-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        👤 Perfil
+        Perfil
       </p>
       <div className="flex md:flex-row flex-col h-full w-full md:px-10">
         <div className="bg-theme-container flex flex-col justify-between items-center md:w-[40%] w-full px-5 pt-8 pb-5 h-full rounded-[15px]">
@@ -85,13 +85,13 @@ export default function Perfil() {
 
           <div className="flex flex-col items-center gap-1 justify-center">
             <p className="font-medium">{cookies?.usuario?.nome}</p>
-            <p className="text-theme-text font-normal text-[0.9rem]">
+            <p className="nome-usuario text-theme-text font-normal text-[0.9rem]">
               @{cookies?.usuario?.login}
             </p>
           </div>
 
           <div className="flex flex-col items-center justify-center">
-            <p className="bg-[#d1d1d1] text-theme-blue font-medium px-4 py-2 rounded-[5px]">
+            <p className="permissao-usuario bg-[#d1d1d1] text-theme-blue font-medium px-4 py-2 rounded-[5px]">
               {cookies?.usuario?.permissao?.nomePermissao}
             </p>
             <p className="text-theme-text text-[0.9rem] font-medium mt-5">
@@ -107,7 +107,7 @@ export default function Perfil() {
             </p>
           </div>
 
-          <div className="w-full">
+          <div className="atualizar-senha w-full">
             <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
               Senha
             </p>

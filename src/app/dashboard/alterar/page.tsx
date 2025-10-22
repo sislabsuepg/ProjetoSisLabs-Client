@@ -612,7 +612,7 @@ export default function Alterar() {
 
   return (
     <div className="w-full flex flex-col items-start">
-      <div className="w-full flex items-center justify-center gap-2 flex-wrap">
+      <div className="navigation-tabs-listas w-full flex items-center justify-center gap-2 flex-wrap">
         {listButtons?.map((item) => (
           <button
             key={item?.id}
@@ -639,7 +639,7 @@ export default function Alterar() {
 
           <button
             onClick={handleOpenModal}
-            className={`bg-theme-lightBlue h-12 px-4 leading-5 text-[0.9rem] rounded-[10px] text-theme-white font-medium flex items-center gap-4`}>
+            className={`bg-theme-lightBlue add-button h-12 px-4 leading-5 text-[0.9rem] rounded-[10px] text-theme-white font-medium flex items-center gap-4`}>
             <p className="flex gap-1 items-center">
               <span>Cadastrar</span>
               {activeId === 1 && "acadêmico"}
@@ -655,7 +655,7 @@ export default function Alterar() {
         </div>
 
         <div className="flex md:flex-row flex-col items-center justify-between gap-2 w-full">
-          <div className="flex items-center justify-center md:justify-start gap-2 w-full">
+          <div className="search-bar-listas flex items-center justify-center md:justify-start gap-2">
             <input
               placeholder={placeholderMap[activeId]}
               type="text"
@@ -666,7 +666,7 @@ export default function Alterar() {
                   setBusca(!busca);
                 }
               }}
-              className="w-full max-w-[250px] font-normal h-[40px] px-3 py-2 text-[0.9rem] rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
+              className="w-[250px] font-normal h-[40px] px-3 py-2 text-[0.9rem] rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
             />
             <button
               type="submit"
@@ -675,13 +675,13 @@ export default function Alterar() {
               className={`${!filtro.trim()
                 ? "bg-gray-200 cursor-not-allowed text-[#c0c0c0]"
                 : "border border-theme-blue hover:bg-theme-blue text-theme-blue hover:text-theme-white"
-                } font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] rounded-[10px]`}
+                } font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-[150px] rounded-[10px]`}
             >
               Buscar
             </button>
           </div>
 
-          <label className="flex items-center gap-2">
+          <label className="toggle-inativo flex items-center gap-2">
             <span className="text-sm font-medium text-gray-700 whitespace-nowrap">Mostrar Inativo</span>
             <CustomSwitch
               checked={Inativo}
@@ -692,7 +692,7 @@ export default function Alterar() {
         </div>
       </div>
 
-      <div className="w-full">
+      <div className="tabela-listas w-full">
         {activeId === 1 && (
           <ListAcademico
             list={getCurrentList() as FormAcademicoType[]}

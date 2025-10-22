@@ -273,19 +273,19 @@ export default function Inicio() {
           <table className="h-full min-w-full">
             <thead>
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-theme-blue uppercase">
+                <th className="status-column px-4 py-3 text-left text-xs font-semibold text-theme-blue uppercase">
                   Status
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-theme-blue uppercase">
+                <th className="laboratorio-column px-4 py-3 text-left text-xs font-semibold text-theme-blue uppercase">
                   Laboratório
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-theme-blue uppercase">
+                <th className="aluno-column px-4 py-3 text-left text-xs font-semibold text-theme-blue uppercase">
                   Aluno
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-theme-blue uppercase">
+                <th className="data-hora-entrada-column px-4 py-3 text-left text-xs font-semibold text-theme-blue uppercase">
                   Data/Hora de Entrada
                 </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-theme-blue uppercase">
+                <th className="acoes-column px-4 py-3 text-center text-xs font-semibold text-theme-blue uppercase">
                   Ações
                 </th>
               </tr>
@@ -304,7 +304,7 @@ export default function Inicio() {
                           className={`h-2 w-2 rounded-full ${item.posseChave ? "bg-[#22FF00]" : "bg-theme-lightBlue"
                             }`}
                         ></div>
-                        {item.posseChave ? "Com chave" : "Aberto"}
+                        {item.posseChave ? "Com chave" : "Sem chave"}
                       </div>
                     </td>
 

@@ -137,17 +137,16 @@ export default function Advertencia() {
   return (
     <div className="w-full flex flex-col h-full items-start">
       <p className="text-theme-blue font-semibold text-[1.2rem] w-full text-start">
-        ⚠️ Emitir advertência
+        Emitir advertência
       </p>
-      {/* ... Funciona pls ... */}
+
       <form
         onSubmit={handleSubmit}
         className="mt-4 space-y-4 w-full h-full flex flex-col justify-between"
       >
         <div className="flex flex-col space-y-4 w-full">
-          {/* Select de Alunos/Empréstimos */}
           <FormControl
-            className="w-full"
+            className="dropdown-academico w-full"
             variant="filled"
             disabled={isFetchingData || isLoading}
           >
@@ -163,12 +162,11 @@ export default function Advertencia() {
             </Select>
           </FormControl>
 
-          {/* Motivos da advertência */}
           <div className="w-full bg-theme-container py-3 px-5 rounded-[10px] relative">
             <p className="font-semibold text-theme-blue mb-2">
               Motivo da advertência
             </p>
-            <FormControl className="w-full">
+            <FormControl className="radio-advertencia w-full">
               <RadioGroup value={form.motivo} onChange={handleRadioChange}>
                 <FormControlLabel
                   value="naoDevolucaoChave"
@@ -189,7 +187,6 @@ export default function Advertencia() {
             </FormControl>
           </div>
 
-          {/* Campos condicionais para outro motivo */}
           {outroMotivo && (
             <div className="w-full flex flex-col gap-4">
               <TextField
@@ -199,7 +196,7 @@ export default function Advertencia() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, assuntoOutro: e.target.value }))
                 }
-                className="w-full"
+                className="input-assunto-email w-full"
               />
               <TextField
                 label="Escreva o Corpo do E-mail"
@@ -211,7 +208,7 @@ export default function Advertencia() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, corpoOutro: e.target.value }))
                 }
-                className="w-full"
+                className="textarea-corpo-email w-full"
               />
             </div>
           )}

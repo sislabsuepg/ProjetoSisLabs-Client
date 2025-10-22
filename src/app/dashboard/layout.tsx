@@ -8,6 +8,11 @@ import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from "@mui/material/Badge";
+import HelpIcon from '@mui/icons-material/Help';
+import { useTour } from "@reactour/tour";
+import { usePathname } from "next/navigation";
+import { toursByPage } from "@/components/GuidedTour/stepsPages";
+
 
 export default function DashboardLayout({
   children,
@@ -20,6 +25,8 @@ export default function DashboardLayout({
   const [cookies] = useCookies(["usuario", "aluno"]);
   const notificationCount = useNotificationStore((state) => state.count);
   const [openModalNotification, setOpenModalNotification] = useState(false);
+  const { setIsOpen: setIsOpenTour, setSteps, setCurrentStep } = useTour();
+  const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
@@ -55,6 +62,23 @@ export default function DashboardLayout({
     );
   }
 
+  const handleOpenTour = () => {
+    localStorage.removeItem("tour-menu");
+    const steps = toursByPage[pathname] || [];
+    if (steps.length === 0) {
+      alert("Nenhum tour disponível para esta página!");
+      return;
+    }
+
+    // Espera a página renderizar antes de abrir o tour
+    setTimeout(() => {
+      setSteps!(steps);
+      setCurrentStep!(0);
+      setIsOpenTour!(true);
+    }, 300);
+  };
+
+
   return (
     <div className="w-full flex items-start">
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
@@ -82,6 +106,17 @@ export default function DashboardLayout({
               }}
             />
           </Badge>
+        </div>
+
+        <div className="fixed bottom-5 right-5 group w-fit">
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-theme-blue text-theme-white font-normal text-sm px-2 py-1 rounded shadow-md whitespace-nowrap">
+            Ajuda!
+          </span>
+
+          <HelpIcon
+            sx={{ fontSize: 40 }}
+            className="cursor-pointer text-theme-blue"
+            onClick={handleOpenTour} />
         </div>
 
         {openModalNotification && (

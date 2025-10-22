@@ -7,6 +7,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { fetchAndCountNotifications } from "@/utils/fetchNotifications";
+import { stepsMenu } from "../GuidedTour/stepsMenu";
+import HelpIcon from '@mui/icons-material/Help';
+import Popover from "../Popover";
+import { useTour } from "@reactour/tour";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,6 +25,7 @@ interface SidebarItemProps {
   isOpen?: boolean;
   disabled?: boolean;
   title?: string;
+  extendclass?: string
 }
 
 function SidebarItem({
@@ -31,10 +36,11 @@ function SidebarItem({
   isOpen,
   disabled = false,
   title,
+  extendclass
 }: SidebarItemProps) {
   return (
     <li
-      className={`relative flex items-center p-3 my-2 rounded-[10px] transition-colors duration-200
+      className={`${extendclass} relative flex items-center p-3 my-2 rounded-[10px] transition-colors duration-200
         ${disabled
           ? "cursor-not-allowed opacity-40 bg-[#4F6B98]"
           : "cursor-pointer hover:bg-[#5679b1]"
@@ -68,6 +74,7 @@ function SidebarItem({
 
 export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const [activeItem, setActiveItem] = useState("Início");
+  const { setIsOpen: setIsOpenTour, setSteps, setCurrentStep } = useTour();
   const router = useRouter();
   const [cookies, , removeCookie] = useCookies(["usuario"]);
   const user = cookies.usuario;
@@ -95,9 +102,16 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     menuEmprestimo: permissions.geral === true || permissions.cadastro === true, // emprestimo requer geral ou cadastro
   };
 
-useEffect(() => {
-  fetchAndCountNotifications();
-}, []);
+  const handleOpenTour = () => {
+    localStorage.removeItem("tour-menu");
+    setSteps!(stepsMenu);
+    setCurrentStep(0);
+    setIsOpenTour(true);
+  };
+
+  useEffect(() => {
+    fetchAndCountNotifications();
+  }, []);
 
   return (
     <>
@@ -123,7 +137,7 @@ useEffect(() => {
               setActiveItem("");
               router.push("/dashboard/perfil");
             }}
-            className="cursor-pointer flex items-center gap-2"
+            className="step-menu-perfil cursor-pointer flex items-center gap-2"
           >
             <div className="p-2 border-4 border-[#4F6B98] rounded-full bg-theme-white">
               <PersonIcon sx={{ fontSize: 40 }} className="text-theme-blue" />
@@ -137,8 +151,9 @@ useEffect(() => {
               </span>
             </div>
           </div>
+
           <button
-            className={`h-[40px] w-[40px] flex items-center justify-center cursor-pointer rounded-full p-2 hover:bg-[#6481B0] text-theme-white/80 hover:text-theme-white transition-transform duration-300`}
+            className={`step-menu-diminuir-menu h-[40px] w-[40px] flex items-center justify-center cursor-pointer rounded-full p-2 hover:bg-[#6481B0] text-theme-white/80 hover:text-theme-white transition-transform duration-300`}
             onClick={() => setIsOpen(!isOpen)}
           >
             <ArrowBackIosNewIcon sx={{ fontSize: 20 }} />
@@ -169,6 +184,7 @@ useEffect(() => {
                 router.push("/dashboard/");
               }}
               isOpen={isOpen}
+              extendclass="step-menu-inicio"
             />
             <SidebarItem
               icon={data_images?.icon_alterar_excluir}
@@ -180,6 +196,7 @@ useEffect(() => {
               }}
               isOpen={isOpen}
               disabled={!can.menuListas}
+              extendclass="step-menu-listas"
             />
             <SidebarItem
               icon={data_images?.icon_relatorio}
@@ -191,6 +208,7 @@ useEffect(() => {
               }}
               isOpen={isOpen}
               disabled={!can.menuRelatorios}
+              extendclass="step-menu-relatorios"
             />
             <SidebarItem
               icon={data_images?.icon_advertencia}
@@ -202,6 +220,7 @@ useEffect(() => {
               }}
               isOpen={isOpen}
               disabled={!can.menuAdvertencia}
+              extendclass="step-menu-advertencia"
             />
             <SidebarItem
               icon={data_images?.icon_chave}
@@ -213,6 +232,7 @@ useEffect(() => {
               }}
               isOpen={isOpen}
               disabled={!can.menuEmprestimo}
+              extendclass="step-menu-emprestimo"
             />
             <SidebarItem
               icon={data_images?.icon_aulas}
@@ -223,6 +243,7 @@ useEffect(() => {
                 router.push("/dashboard/cronograma");
               }}
               isOpen={isOpen}
+              extendclass="step-menu-cronograma"
             />
             <SidebarItem
               icon={data_images?.icon_agenda}
@@ -233,6 +254,7 @@ useEffect(() => {
                 router.push("/dashboard/agenda");
               }}
               isOpen={isOpen}
+              extendclass="step-menu-add-notificacao"
             />
             <SidebarItem
               icon={data_images?.icon_logs}
@@ -244,11 +266,18 @@ useEffect(() => {
               }}
               isOpen={isOpen}
               disabled={!can.registros}
+              extendclass="step-menu-registros"
             />
           </ul>
         )}
 
         <div className="mt-auto">
+          <div className="w-full flex items-center justify-end">
+            <Popover title={"Ajuda com o menu!"}>
+              <HelpIcon onClick={handleOpenTour} className="text-theme-white cursor-pointer" />
+            </Popover>
+          </div>
+
           <div className="flex justify-center">
             <img
               className="w-full max-w-[150px]"
@@ -264,6 +293,7 @@ useEffect(() => {
               router.push("/login");
             }}
             isOpen={isOpen}
+            extendclass="step-menu-sair"
           />
         </div>
       </aside>
