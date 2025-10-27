@@ -85,6 +85,7 @@ export default function FormCurso({ handleCloseModal }: FormAcademicoProps) {
               value={form.nome ? form.nome : ""}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
 
             <TextField
@@ -98,6 +99,7 @@ export default function FormCurso({ handleCloseModal }: FormAcademicoProps) {
               onClick={(e) => (e.target as HTMLInputElement).select()}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
           </div>
         </div>

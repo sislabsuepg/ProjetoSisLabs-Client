@@ -115,6 +115,7 @@ export default function FormPermissao({ handleCloseModal }: FormAcademicoProps) 
               variant="filled"
               type="text"
               name="nomePermissao"
+              required={true}
               value={form.nomePermissao ? capitalize(form.nomePermissao) : ""}
               onChange={(e) =>
                 setForm((prev) => ({

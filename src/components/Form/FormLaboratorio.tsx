@@ -118,12 +118,14 @@ export default function FormLaboratorio({ handleCloseModal }: FormAcademicoProps
             <TextField id="filled-basic" label="Nome do laboratório" variant="filled" type="text"
               name="nome"
               value={form.nome ? capitalize(form.nome) : ''}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true} />
 
             <TextField id="filled-basic" label="Número" variant="filled" type="text"
               name="numero"
               value={form.numero}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true} />
           </div>
 
           <div className="w-full flex items-center gap-4">
