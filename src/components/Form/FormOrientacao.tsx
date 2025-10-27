@@ -165,7 +165,7 @@ export default function FormOrientacao({ handleCloseModal }: FormAcademicoProps)
           <div className="w-full flex items-center gap-4">
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label="Data de início"
+                label="Data de início *"
                 format="DD/MM/YYYY"
                 value={form.dataInicio}
                 minDate={dayjs()}
@@ -189,9 +189,10 @@ export default function FormOrientacao({ handleCloseModal }: FormAcademicoProps)
               />
 
               <DatePicker
-                label="Data final"
+                label="Data final *"
                 format="DD/MM/YYYY"
                 value={form.dataFim}
+                
                 minDate={
                   form.dataInicio
                     ? form.dataInicio.add(1, "day")
@@ -207,6 +208,7 @@ export default function FormOrientacao({ handleCloseModal }: FormAcademicoProps)
                     className: "p-3 rounded-md",
                   },
                 }}
+                
               />
             </LocalizationProvider>
           </div>
@@ -220,6 +222,7 @@ export default function FormOrientacao({ handleCloseModal }: FormAcademicoProps)
               onChange={(e) => setRa(e.target.value)}
               inputProps={{ maxLength: 13 }}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
 
             <FormControl className="w-full" variant="filled">

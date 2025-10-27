@@ -168,6 +168,7 @@ export default function FormAcademico({ handleCloseModal }: FormAcademicoProps) 
               value={form.nome ? capitalize(form.nome) : ""}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
 
             <TextField
@@ -180,6 +181,7 @@ export default function FormAcademico({ handleCloseModal }: FormAcademicoProps) 
               inputProps={{ maxLength: 13 }}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
           </div>
 
@@ -224,6 +226,7 @@ export default function FormAcademico({ handleCloseModal }: FormAcademicoProps) 
                 onChange={(e: SelectChangeEvent<number>) =>
                   setForm((f) => ({ ...f, idCurso: Number(e.target.value) }))
                 }
+                required={true}
               >
                 <MenuItem value="">-- Selecione uma opção --</MenuItem>
                 {cursos?.map((el) => (
@@ -249,6 +252,7 @@ export default function FormAcademico({ handleCloseModal }: FormAcademicoProps) 
               }}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
           </div>
 
@@ -263,6 +267,7 @@ export default function FormAcademico({ handleCloseModal }: FormAcademicoProps) 
               value={removeLetters(form.senha)}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
 
             <TextField
@@ -275,6 +280,7 @@ export default function FormAcademico({ handleCloseModal }: FormAcademicoProps) 
               value={removeLetters(form.repetirSenha)}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
           </div>
         </div>

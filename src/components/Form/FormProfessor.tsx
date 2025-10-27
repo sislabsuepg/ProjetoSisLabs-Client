@@ -67,12 +67,14 @@ const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
             <TextField id="filled-basic" label="Nome completo" variant="filled" type="text"
               name="nome"
               value={form.nome ? capitalize(form.nome) : ''}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true} />
 
             <TextField id="filled-basic" label="E-Mail" variant="filled" type="text"
               name="email"
               value={form.email}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true} />
           </div>
         </div>
 

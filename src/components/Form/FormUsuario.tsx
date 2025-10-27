@@ -133,18 +133,19 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
           <div className="w-full flex items-center gap-4">
             <TextField
               id="filled-basic"
-              label="Nome completo"
+              label="Nome completo *"
               variant="filled"
               type="text"
               name="nome"
               value={form.nome ? capitalize(form.nome) : ""}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
 
             <TextField
               id="filled-basic"
-              label="Login"
+              label="Login *"
               variant="filled"
               type="text"
               name="login"
@@ -152,6 +153,8 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
               inputProps={{ minLength: 3, maxLength: 20 }}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
+
             />
           </div>
 
@@ -161,7 +164,7 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
               variant="filled"
             >
               <InputLabel id="demo-simple-select-filled-label">
-                Permissão
+                Permissão *
               </InputLabel>
               <Select
                 labelId="demo-simple-select-filled-label"
@@ -188,19 +191,20 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
           <div className="w-full flex items-center gap-4">
             <TextField
               id="filled-basic"
-              label="Senha"
+              label="Senha *"
               variant="filled"
               type="password"
               name="senha"
               inputProps={{ minLength: 6, maxLength: 12 }}
               value={form.senha}
               onChange={handleChange}
+              required={true}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
             />
 
             <TextField
               id="filled-basic"
-              label="Repetir Senha"
+              label="Repetir Senha *"
               variant="filled"
               type="password"
               name="repetirSenha"
@@ -208,6 +212,7 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
               value={form.repetirSenha}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
           </div>
         </div>
