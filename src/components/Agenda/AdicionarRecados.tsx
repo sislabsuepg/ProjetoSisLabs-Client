@@ -35,7 +35,7 @@ export default function AdicionarRecados() {
       <div className="w-full h-full flex flex-col justify-between">
         <div className="flex flex-col">
           <p className="font-semibold text-[1.2rem] text-theme-blue mb-2">
-            📝 Adicionar recados
+            Adicionar recados
           </p>
 
           <TextareaAutosize

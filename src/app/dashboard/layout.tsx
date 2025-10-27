@@ -12,15 +12,15 @@ import HelpIcon from '@mui/icons-material/Help';
 import { useTour } from "@reactour/tour";
 import { usePathname } from "next/navigation";
 import { toursByPage } from "@/components/GuidedTour/stepsPages";
+import { useGuidedTour } from "@/components/GuidedTour/TourContext";
 
-
-export default function DashboardLayout({
-  children,
-}: {
+interface DashboardLayoutProps {
   children: React.ReactNode;
-}) {
+}
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const { activeSection } = useGuidedTour();
   const router = useRouter();
   const [cookies] = useCookies(["usuario", "aluno"]);
   const notificationCount = useNotificationStore((state) => state.count);
@@ -63,21 +63,20 @@ export default function DashboardLayout({
   }
 
   const handleOpenTour = () => {
-    localStorage.removeItem("tour-menu");
-    const steps = toursByPage[pathname] || [];
-    if (steps.length === 0) {
+    const tourPage = toursByPage[pathname];
+    if (!tourPage) {
       alert("Nenhum tour disponível para esta página!");
       return;
     }
 
-    // Espera a página renderizar antes de abrir o tour
+    const steps = Array.isArray(tourPage) ? tourPage : tourPage[activeSection!];
+
     setTimeout(() => {
       setSteps!(steps);
       setCurrentStep!(0);
       setIsOpenTour!(true);
     }, 300);
   };
-
 
   return (
     <div className="w-full flex items-start">
@@ -116,7 +115,7 @@ export default function DashboardLayout({
           <HelpIcon
             sx={{ fontSize: 40 }}
             className="cursor-pointer text-theme-blue"
-            onClick={handleOpenTour} />
+            onClick={() => handleOpenTour()} />
         </div>
 
         {openModalNotification && (

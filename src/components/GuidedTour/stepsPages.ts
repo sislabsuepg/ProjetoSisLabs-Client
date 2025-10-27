@@ -1,7 +1,9 @@
 import { StepType } from "@reactour/tour";
 
-export const toursByPage: Record<string, StepType[]> = {
-"/dashboard": [
+type SubSections = Record<string, StepType[]>;
+
+export const toursByPage: Record<string, StepType[] | SubSections> = {
+  "/dashboard": [
   {
     selector: ".status-column",
     content: "O Status de acesso pode indicar o regime de uso da sala: 'com chave' significa que um aluno de mestrado/iniciação está responsável pela chave; 'sem chave' indica que a sala foi aberta para um usuário geral e a chave permanece com os laboratoristas.",
@@ -37,7 +39,7 @@ export const toursByPage: Record<string, StepType[]> = {
     content: "Neste formulário, você pode alterar a sua senha com segurança.",
   },
 ],
-"/dashboard/alterar": [
+  "/dashboard/alterar": [
   {
     selector: ".navigation-tabs-listas",
     content: "Estas abas permitem que você alterne entre os diferentes módulos do sistema, como listagem e cadastro de Professores, de Laboratórios ou Usuários gerais.",
@@ -59,7 +61,7 @@ export const toursByPage: Record<string, StepType[]> = {
   content: "Esta tabela exibe a lista de itens, que pode ser de usuários, cursos ou laboratórios, dependendo da seção selecionada nas abas acima.",
 }
 ],
-"/dashboard/advertencia": [
+  "/dashboard/advertencia": [
   {
     selector: ".dropdown-academico",
     content: "Neste campo, selecione o acadêmico que receberá a advertência. A lista mostra os estudantes que possuem empréstimos ativos no momento.",
@@ -77,4 +79,57 @@ export const toursByPage: Record<string, StepType[]> = {
     content: "Escreva o Corpo do E-mail detalhando a razão da advertência. Este texto será enviado diretamente ao aluno.",
   },
 ],
+ "/dashboard/agenda": [
+    {
+      selector: ".add-evento-button",
+      content:
+        "Clique neste botão para cadastrar um novo evento, como palestras, defesas, treinamentos ou reuniões do laboratório.",
+    },
+    {
+    selector: ".add-recado-button",
+    content:
+      "Clique aqui para adicionar um novo recado. Essa função permite que você publique comunicados, lembretes ou avisos que serão exibidos a todos os usuários do sistema.",
+  },
+  ],
+  "/dashboard/emprestimo": {
+    chave: [
+      {
+        selector: ".EntregaChave-button",
+        content: "Clique neste botão para registrar a entrega de chaves aos alunos.",
+      },
+      {
+        selector: "#ra",
+        content: "Digite aqui o RA do aluno.",
+      },
+      {
+        selector: "#senha",
+        content: "Digite a senha do aluno para validar seu acesso.",
+      },
+      {
+        selector: "#lab-select",
+        content:
+          "Selecione o laboratório que será utilizado pelo aluno. Essa seleção só é habilitada após a validação do RA e senha.",
+      },
+    ],
+    pesquisa: [
+      {
+        selector: ".LabPesquisa-button",
+        content:
+          "Clique aqui para registrar o empréstimo de laboratórios para pesquisas acadêmicas.",
+      },
+      {
+        selector: ".ra-guia",
+        content: "Digite o RA do aluno.",
+      },
+      {
+        selector: ".senha-guia",
+        content: "Digite a senha do aluno para validar seu acesso.",
+      },
+      {
+        selector: ".lab-select-guia",
+        content: "Selecione o laboratório disponível para pesquisa. Só é possível selecionar após validar o aluno.",
+      },
+
+    ],
+  },
 };

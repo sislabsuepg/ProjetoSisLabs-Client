@@ -122,7 +122,7 @@ export default function AdicionarEventos() {
     <div className="w-full h-full flex flex-col justify-start">
       <div className="flex flex-col h-full">
         <p className="font-semibold text-[1.2rem] text-theme-blue mb-2">
-          📝 Adicionar eventos
+          Adicionar eventos
         </p>
 
         <form

@@ -18,6 +18,8 @@ import { canAccessPage } from "@/utils/permissions";
 import { toast } from "react-toastify";
 import { apiOnline } from "@/services/services";
 import { Aluno, Laboratorio } from "@/utils/tipos";
+import { toursByPage } from "@/components/GuidedTour/stepsPages";
+import { useTour } from "@reactour/tour";
 
 interface EmprestimoAtivo {
   id: number;
@@ -49,6 +51,7 @@ export default function Advertencia() {
   const [outroMotivo, setOutroMotivo] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingData, setIsFetchingData] = useState(true);
+  const { setSteps, isOpen } = useTour();
 
   //Buscar empréstimos ativos
   useEffect(() => {
@@ -133,6 +136,18 @@ export default function Advertencia() {
     form.motivo !== "" &&
     (form.motivo !== "outro" ||
       (form.assuntoOutro.trim() !== "" && form.corpoOutro.trim() !== ""));
+
+  useEffect(() => {
+    const steps = toursByPage["/dashboard/advertencia"] || [];
+    setSteps!(steps);
+  }, [setSteps]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setForm((f) => ({ ...f, motivo: "outro" }));
+      setOutroMotivo(true);
+    }
+  }, [isOpen]);
 
   return (
     <div className="w-full flex flex-col h-full items-start">
@@ -229,9 +244,8 @@ export default function Advertencia() {
           <button
             type="submit"
             disabled={!isFormValid || isLoading}
-            className={`bg-theme-blue font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-full max-w-[170px] text-white rounded-[10px] ${
-              !isFormValid || isLoading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`bg-theme-blue font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-full max-w-[170px] text-white rounded-[10px] ${!isFormValid || isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
           >
             {isLoading ? (
               <CircularProgress size={24} color="inherit" />
