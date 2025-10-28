@@ -6,6 +6,7 @@ import Loading from "@/app/loading";
 import { apiOnline } from "@/services/services";
 import { IHorario, ILaboratorio, IProfessor } from "@/interfaces/interfaces";
 import { toast } from "react-toastify";
+import { useCookies } from "react-cookie";
 
 const dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const horarios = [
@@ -44,6 +45,7 @@ export default function Cronograma() {
   const [labsCarregados, setLabsCarregados] = useState<Set<number>>(new Set());
   // Mapa de células editáveis por laboratório (true = existe slot e pode atribuir professor)
   const [editaveis, setEditaveis] = useState<Record<number, boolean[][]>>({});
+  const [cookies] = useCookies(["usuario"]);
 
   const diaSemanaAtual = new Date().getDay();
 
@@ -904,7 +906,25 @@ export default function Cronograma() {
             </tbody>
           </table>
         </div>
-        <div className="w-full flex items-center justify-end mt-4">
+        <div
+          className={`w-full flex items-center ${
+            cookies.usuario?.permissao?.geral
+              ? "justify-between"
+              : "justify-end"
+          } mt-4`}
+        >
+          {cookies.usuario?.permissao?.geral ? (
+            <button
+              type="button"
+              className="bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]"
+              /* onClick={
+                limparHorariosLaboratorio(activeId) 
+              } */
+            >
+              Limpar Horários
+            </button>
+          ) : null}
+
           <button
             type="button"
             onClick={salvarTabela}
