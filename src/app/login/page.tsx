@@ -207,8 +207,9 @@ export default function Login() {
       // redirecionar para a pagina inicial
     } catch (err: unknown) {
       if (isCustomAxiosError(err)) {
+        console.error("Erro de API:", err.response?.data?.erros);
         const apiErrors = err.response?.data?.erros || [];
-        apiErrors.forEach((erro) => toast.error(erro.mensagem));
+        apiErrors.forEach((erro) => toast.error(erro as unknown as string));
 
         if (apiErrors.length > 0) {
           const apiErrObj: { [key: string]: string } = {};

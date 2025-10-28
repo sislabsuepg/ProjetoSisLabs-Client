@@ -23,14 +23,16 @@ type FormAcademicoProps = {
   handleCloseModal: () => void;
 };
 
-export default function FormAcademico({ handleCloseModal }: FormAcademicoProps) {
+export default function FormAcademico({
+  handleCloseModal,
+}: FormAcademicoProps) {
   const [form, setForm] = useState({
     nome: "",
     ra: "",
     email: "",
     telefone: "",
     idCurso: 0,
-    anoCurso: 0,
+    anoCurso: 1,
     senha: "",
     repetirSenha: "",
   });
@@ -216,7 +218,7 @@ export default function FormAcademico({ handleCloseModal }: FormAcademicoProps) 
               variant="filled"
             >
               <InputLabel id="demo-simple-select-filled-label">
-                Curso
+                Curso *
               </InputLabel>
               <Select
                 labelId="demo-simple-select-filled-label"
@@ -247,7 +249,7 @@ export default function FormAcademico({ handleCloseModal }: FormAcademicoProps) 
               inputProps={{
                 max:
                   cursos.find((c) => c.id === Number(form.idCurso))
-                    ?.anosMaximo || 0,
+                    ?.anosMaximo || 1,
                 min: 1,
               }}
               onChange={handleChange}
@@ -288,7 +290,7 @@ export default function FormAcademico({ handleCloseModal }: FormAcademicoProps) 
         <div className="w-full flex items-center justify-between">
           <button
             type="button"
-           onClick={handleCloseModal}
+            onClick={handleCloseModal}
             className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
           >
             Cancelar

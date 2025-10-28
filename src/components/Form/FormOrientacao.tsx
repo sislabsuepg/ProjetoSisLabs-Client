@@ -24,7 +24,9 @@ type FormAcademicoProps = {
   handleCloseModal: () => void;
 };
 
-export default function FormOrientacao({ handleCloseModal }: FormAcademicoProps) {
+export default function FormOrientacao({
+  handleCloseModal,
+}: FormAcademicoProps) {
   const [form, setForm] = useState<{
     dataInicio: Dayjs | null;
     dataFim: Dayjs | null;
@@ -192,7 +194,6 @@ export default function FormOrientacao({ handleCloseModal }: FormAcademicoProps)
                 label="Data final *"
                 format="DD/MM/YYYY"
                 value={form.dataFim}
-                
                 minDate={
                   form.dataInicio
                     ? form.dataInicio.add(1, "day")
@@ -208,7 +209,6 @@ export default function FormOrientacao({ handleCloseModal }: FormAcademicoProps)
                     className: "p-3 rounded-md",
                   },
                 }}
-                
               />
             </LocalizationProvider>
           </div>
@@ -226,7 +226,7 @@ export default function FormOrientacao({ handleCloseModal }: FormAcademicoProps)
             />
 
             <FormControl className="w-full" variant="filled">
-              <InputLabel>Professor</InputLabel>
+              <InputLabel>Professor *</InputLabel>
               <Select
                 name="idProfessor"
                 value={form.idProfessor}
@@ -244,7 +244,7 @@ export default function FormOrientacao({ handleCloseModal }: FormAcademicoProps)
 
           <div className="w-full flex items-center gap-4">
             <FormControl className="w-full" variant="filled">
-              <InputLabel>Laboratório</InputLabel>
+              <InputLabel>Laboratório *</InputLabel>
               <Select
                 name="idLaboratorio"
                 value={form.idLaboratorio}
@@ -264,7 +264,7 @@ export default function FormOrientacao({ handleCloseModal }: FormAcademicoProps)
         <div className="w-full flex items-center justify-between">
           <button
             type="button"
-           onClick={handleCloseModal}
+            onClick={handleCloseModal}
             className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
           >
             Cancelar

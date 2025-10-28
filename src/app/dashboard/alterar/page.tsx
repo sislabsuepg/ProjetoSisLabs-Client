@@ -11,7 +11,7 @@ import ListProfessor from "@/components/Lists/ListProfessor";
 import ListCurso from "@/components/Lists/ListCurso";
 import ListPermissao from "@/components/Lists/ListPermissao";
 import ListUsuario from "@/components/Lists/ListUsuario";
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import * as Yup from "yup";
 import {
   FormCursoType,
@@ -187,7 +187,8 @@ export default function Alterar() {
     const updatedItem = currentItems.find((item) => item.id === id);
     if (!updatedItem) {
       toast.error(
-        `${listButtons.find((btn) => btn.id === activeId)?.title
+        `${
+          listButtons.find((btn) => btn.id === activeId)?.title
         } não encontrado.`
       );
       return;
@@ -322,7 +323,8 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/aluno?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"
+            `/aluno?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo ? "false" : "true"
             }${filtroTemp ? `&${filtroTemp}` : ""}`
           );
           console.log(response);
@@ -332,7 +334,7 @@ export default function Alterar() {
           if (
             (dataResp as AcademicosApi)?.total !== undefined &&
             pages !==
-            Math.ceil(((dataResp as AcademicosApi).total || 0) / itemsPerPage)
+              Math.ceil(((dataResp as AcademicosApi).total || 0) / itemsPerPage)
           ) {
             setTotalPages(
               Math.ceil(((dataResp as AcademicosApi).total || 0) / itemsPerPage)
@@ -356,7 +358,8 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/professor?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"
+            `/professor?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
           const dataResp = response.data as unknown as ProfessoresApi;
@@ -381,7 +384,8 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/laboratorio?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"
+            `/laboratorio?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
           const dataResp = response.data as unknown as
@@ -390,9 +394,9 @@ export default function Alterar() {
           if (
             (dataResp as LaboratoriosApi)?.total !== undefined &&
             pages !==
-            Math.ceil(
-              ((dataResp as LaboratoriosApi).total || 0) / itemsPerPage
-            )
+              Math.ceil(
+                ((dataResp as LaboratoriosApi).total || 0) / itemsPerPage
+              )
           ) {
             console.log(response);
             setTotalPages(
@@ -418,7 +422,8 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/orientacao?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo == true ? "false" : "true"
+            `/orientacao?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo == true ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
           const dataResp = response.data as unknown as
@@ -427,9 +432,9 @@ export default function Alterar() {
           if (
             (dataResp as OrientacoesApi)?.total !== undefined &&
             pages !==
-            Math.ceil(
-              ((dataResp as OrientacoesApi).total || 0) / itemsPerPage
-            )
+              Math.ceil(
+                ((dataResp as OrientacoesApi).total || 0) / itemsPerPage
+              )
           ) {
             setTotalPages(
               Math.ceil(
@@ -454,14 +459,17 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(Math.ceil(count / itemsPerPage));
           const response: ApiResponse = await apiOnline.get(
-            `/curso?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"
+            `/curso?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
-          const dataResp = response.data as unknown as CursosApi | FormCursoType[];
+          const dataResp = response.data as unknown as
+            | CursosApi
+            | FormCursoType[];
           if (
             (dataResp as CursosApi)?.total !== undefined &&
             pages !==
-            Math.ceil(((dataResp as CursosApi).total || 0) / itemsPerPage)
+              Math.ceil(((dataResp as CursosApi).total || 0) / itemsPerPage)
           ) {
             setTotalPages(
               Math.ceil(((dataResp as CursosApi).total || 0) / itemsPerPage)
@@ -484,7 +492,8 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/permissao?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"
+            `/permissao?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
           const dataResp = response.data as unknown as
@@ -493,7 +502,7 @@ export default function Alterar() {
           if (
             (dataResp as PermissaoApi)?.total !== undefined &&
             pages !==
-            Math.ceil(((dataResp as PermissaoApi).total || 0) / itemsPerPage)
+              Math.ceil(((dataResp as PermissaoApi).total || 0) / itemsPerPage)
           ) {
             console.log(response);
             setTotalPages(
@@ -517,7 +526,8 @@ export default function Alterar() {
           const pages = Math.ceil(count / itemsPerPage);
           setTotalPages(pages);
           const response: ApiResponse = await apiOnline.get(
-            `/usuario?page=${currentPage}&items=${itemsPerPage}&ativo=${Inativo ? "false" : "true"
+            `/usuario?page=${currentPage}&items=${itemsPerPage}&ativo=${
+              Inativo ? "false" : "true"
             }${filtro ? `&nome=${filtro}` : ""}`
           );
           const dataResp = response.data as unknown as
@@ -526,7 +536,7 @@ export default function Alterar() {
           if (
             (dataResp as UsuariosApi)?.total !== undefined &&
             pages !==
-            Math.ceil(((dataResp as UsuariosApi).total || 0) / itemsPerPage)
+              Math.ceil(((dataResp as UsuariosApi).total || 0) / itemsPerPage)
           ) {
             setTotalPages(
               Math.ceil(((dataResp as UsuariosApi).total || 0) / itemsPerPage)
@@ -617,8 +627,9 @@ export default function Alterar() {
           <button
             key={item?.id}
             onClick={() => setActiveId(item.id)}
-            className={`${item?.id === activeId ? "bg-theme-lightBlue" : "bg-theme-blue"
-              } h-12 px-4 rounded-[10px] text-theme-white font-semibold`}
+            className={`${
+              item?.id === activeId ? "bg-theme-lightBlue" : "bg-theme-blue"
+            } h-12 px-4 rounded-[10px] text-theme-white font-semibold`}
           >
             {item?.title}
           </button>
@@ -639,7 +650,8 @@ export default function Alterar() {
 
           <button
             onClick={handleOpenModal}
-            className={`bg-theme-lightBlue add-button h-12 px-4 leading-5 text-[0.9rem] rounded-[10px] text-theme-white font-medium flex items-center gap-4`}>
+            className={`bg-theme-lightBlue add-button h-12 px-4 leading-5 text-[0.9rem] rounded-[10px] text-theme-white font-medium flex items-center gap-4`}
+          >
             <p className="flex gap-1 items-center">
               <span>Cadastrar</span>
               {activeId === 1 && "acadêmico"}
@@ -672,17 +684,20 @@ export default function Alterar() {
               type="submit"
               disabled={!filtro.trim()}
               onClick={() => setBusca(!busca)}
-              className={`${!filtro.trim()
-                ? "bg-gray-200 cursor-not-allowed text-[#c0c0c0]"
-                : "border border-theme-blue hover:bg-theme-blue text-theme-blue hover:text-theme-white"
-                } font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-[150px] rounded-[10px]`}
+              className={`${
+                !filtro.trim()
+                  ? "bg-gray-200 cursor-not-allowed text-[#c0c0c0]"
+                  : "border border-theme-blue hover:bg-theme-blue text-theme-blue hover:text-theme-white"
+              } font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-[150px] rounded-[10px]`}
             >
               Buscar
             </button>
           </div>
 
           <label className="toggle-inativo flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-700 whitespace-nowrap">Mostrar Inativo</span>
+            <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
+              Mostrar Inativo
+            </span>
             <CustomSwitch
               checked={Inativo}
               onChange={() => setInativo(!Inativo)}
@@ -776,8 +791,27 @@ export default function Alterar() {
         open={openAtivar.status}
         onClose={() => setOpenAtivar({ status: false, id: 0 })}
         title="Atenção"
-        message={`Deseja, realmente, ativar esta(e) ${listButtons.find((btn) => btn.id === activeId)?.title || ""
-          }?`}
+        message={(() => {
+          const item = currentItems.find((item) => item.id === openAtivar.id);
+          if (!item) return "";
+
+          if (activeId === 6) {
+            return `Deseja, realmente, ativar ${
+              (item as FormPermissaoType).nomePermissao
+            }?`;
+          } else {
+            return `Deseja, realmente, ativar ${
+              (
+                item as
+                  | FormAcademicoType
+                  | FormProfessorType
+                  | FormLaboratorioType
+                  | FormCursoType
+                  | FormUsuarioType
+              ).nome
+            }?`;
+          }
+        })()}
         onCancel={() => setOpenAtivar({ status: false, id: 0 })}
         onConfirm={() => {
           async function ativar() {
@@ -796,23 +830,49 @@ export default function Alterar() {
             );
             setOpenAtivar({ status: false, id: 0 });
             toast.success(
-              `${listButtons.find((btn) => btn.id === activeId)?.title || ""
+              `${
+                listButtons.find((btn) => btn.id === activeId)?.title || ""
               } ativado com sucesso!`
             );
           }
           ativar();
         }}
         cancelText="Cancelar"
-        confirmText={`Ativar ${listButtons.find((btn) => btn.id === activeId)?.title || ""
-          }`}
+        confirmText={`Ativar ${
+          listButtons.find((btn) => btn.id === activeId)?.title || ""
+        }`}
       />
 
       <CustomModal
         open={openExcluir.status}
         onClose={() => setOpenExcluir({ status: false, id: 0 })}
         title="Atenção"
-        message={`Deseja, realmente, desativar esta(e) ${listButtons.find((btn) => btn.id === activeId)?.title || ""
-          }?`}
+        message={(() => {
+          const item = currentItems.find((item) => item.id === openExcluir.id);
+          if (!item) return "";
+
+          if (activeId === 6) {
+            return `Deseja, realmente, desativar ${
+              (item as FormPermissaoType).nomePermissao
+            }?`;
+          } else if (activeId === 4) {
+            const orientacao = item as FormOrientacaoType;
+            return `Deseja, realmente, desativar a orientação de ${
+              orientacao.aluno?.nome || ""
+            }?`;
+          } else {
+            return `Deseja, realmente, desativar ${
+              (
+                item as
+                  | FormAcademicoType
+                  | FormProfessorType
+                  | FormLaboratorioType
+                  | FormCursoType
+                  | FormUsuarioType
+              ).nome
+            }?`;
+          }
+        })()}
         onCancel={() => setOpenExcluir({ status: false, id: 0 })}
         onConfirm={() => {
           async function desativar() {
@@ -831,15 +891,17 @@ export default function Alterar() {
             );
             setOpenExcluir({ status: false, id: 0 });
             toast.success(
-              `${listButtons.find((btn) => btn.id === activeId)?.title || ""
+              `${
+                listButtons.find((btn) => btn.id === activeId)?.title || ""
               } desativado com sucesso!`
             );
           }
           desativar();
         }}
         cancelText="Cancelar"
-        confirmText={`Desativar ${listButtons.find((btn) => btn.id === activeId)?.title || ""
-          }`}
+        confirmText={`Desativar ${
+          listButtons.find((btn) => btn.id === activeId)?.title || ""
+        }`}
       />
 
       <EditUserModal<typeof formData>
@@ -927,13 +989,17 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormProfessor handleCloseModal={() => setOpenModal(null)}/>
+            <FormProfessor handleCloseModal={() => setOpenModal(null)} />
           </div>
         </Modal>
       )}
 
       {openModal === 3 && (
-        <Modal open={openModal === 3} onClose={handleCloseModal} title="Cadastrar Laboratório">
+        <Modal
+          open={openModal === 3}
+          onClose={handleCloseModal}
+          title="Cadastrar Laboratório"
+        >
           <div
             style={{
               position: "absolute",
@@ -943,13 +1009,17 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormLaboratorio handleCloseModal={() => setOpenModal(null)}/>
+            <FormLaboratorio handleCloseModal={() => setOpenModal(null)} />
           </div>
         </Modal>
       )}
 
       {openModal === 4 && (
-        <Modal open={openModal === 4} onClose={handleCloseModal} title="Cadastrar Laboratório">
+        <Modal
+          open={openModal === 4}
+          onClose={handleCloseModal}
+          title="Cadastrar Laboratório"
+        >
           <div
             style={{
               position: "absolute",
@@ -959,13 +1029,17 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormOrientacao handleCloseModal={() => setOpenModal(null)}/>
+            <FormOrientacao handleCloseModal={() => setOpenModal(null)} />
           </div>
         </Modal>
       )}
 
       {openModal === 5 && (
-        <Modal open={openModal === 5} onClose={handleCloseModal} title="Cadastrar Laboratório">
+        <Modal
+          open={openModal === 5}
+          onClose={handleCloseModal}
+          title="Cadastrar Laboratório"
+        >
           <div
             style={{
               position: "absolute",
@@ -975,13 +1049,17 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormCurso handleCloseModal={() => setOpenModal(null)}/>
+            <FormCurso handleCloseModal={() => setOpenModal(null)} />
           </div>
         </Modal>
       )}
 
       {openModal === 6 && (
-        <Modal open={openModal === 6} onClose={handleCloseModal} title="Cadastrar Laboratório">
+        <Modal
+          open={openModal === 6}
+          onClose={handleCloseModal}
+          title="Cadastrar Laboratório"
+        >
           <div
             style={{
               position: "absolute",
@@ -991,13 +1069,17 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormPermissao handleCloseModal={() => setOpenModal(null)}/>
+            <FormPermissao handleCloseModal={() => setOpenModal(null)} />
           </div>
         </Modal>
       )}
 
       {openModal === 7 && (
-        <Modal open={openModal === 7} onClose={handleCloseModal} title="Cadastrar Laboratório">
+        <Modal
+          open={openModal === 7}
+          onClose={handleCloseModal}
+          title="Cadastrar Laboratório"
+        >
           <div
             style={{
               position: "absolute",
@@ -1007,7 +1089,7 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormUsuario handleCloseModal={() => setOpenModal(null)}/>
+            <FormUsuario handleCloseModal={() => setOpenModal(null)} />
           </div>
         </Modal>
       )}

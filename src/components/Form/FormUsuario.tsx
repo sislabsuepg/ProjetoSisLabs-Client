@@ -29,7 +29,6 @@ type FormAcademicoProps = {
   handleCloseModal: () => void;
 };
 
-
 export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
   const [form, setForm] = useState<FormUsuarioState>({
     nome: "",
@@ -133,7 +132,7 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
           <div className="w-full flex items-center gap-4">
             <TextField
               id="filled-basic"
-              label="Nome completo *"
+              label="Nome completo"
               variant="filled"
               type="text"
               name="nome"
@@ -145,7 +144,7 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
 
             <TextField
               id="filled-basic"
-              label="Login *"
+              label="Login"
               variant="filled"
               type="text"
               name="login"
@@ -154,7 +153,6 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
               required={true}
-
             />
           </div>
 
@@ -191,7 +189,7 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
           <div className="w-full flex items-center gap-4">
             <TextField
               id="filled-basic"
-              label="Senha *"
+              label="Senha"
               variant="filled"
               type="password"
               name="senha"
@@ -204,7 +202,7 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
 
             <TextField
               id="filled-basic"
-              label="Repetir Senha *"
+              label="Repetir Senha"
               variant="filled"
               type="password"
               name="repetirSenha"
@@ -220,7 +218,7 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
         <div className="w-full flex items-center justify-between">
           <button
             type="button"
-           onClick={handleCloseModal}
+            onClick={handleCloseModal}
             className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
           >
             Cancelar
