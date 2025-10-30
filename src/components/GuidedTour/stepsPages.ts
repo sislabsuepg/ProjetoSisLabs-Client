@@ -178,4 +178,36 @@ export const toursByPage: Record<string, StepType[] | Record<string, StepType[]>
       },
     ],
   },
+   "/dashboard/registros": [
+     {
+    selector: ".usuario-filtro",
+    content:
+      "Aqui você pode selecionar um *usuário específico* para visualizar apenas as ações realizadas por ele. Caso não selecione, serão exibidos os registros de todos os usuários.",
+  },
+  {
+    selector: ".data-inicio",
+    content:
+      "Defina a *data inicial* do período que deseja consultar. O sistema listará apenas os registros a partir dessa data.",
+  },
+  {
+    selector: ".data-final",
+    content:
+      "Defina a *data final* do período desejado. Assim, você limita os resultados até essa data.",
+  },
+  {
+    selector: ".botao-buscar",
+    content:
+      "Clique em *Buscar* para aplicar os filtros e visualizar os registros de acordo com o usuário e o período selecionados.",
+  },
+  {
+    selector: ".botao-limpar",
+    content:
+      "Use o botão *Limpar* para remover todos os filtros e exibir novamente todos os registros do sistema.",
+  },
+  {
+    selector: ".tabela-registros",
+    content:
+      "Nesta tabela são exibidos os registros do sistema. Cada linha mostra o *login do usuário*, *nome*, *data/hora da ação* e uma *descrição detalhada* do que foi feito (como criação, remoção ou alteração de dados).",
+  },
+  ],
 };
