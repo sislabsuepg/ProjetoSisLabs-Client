@@ -210,4 +210,58 @@ export const toursByPage: Record<string, StepType[] | Record<string, StepType[]>
       "Nesta tabela são exibidos os registros do sistema. Cada linha mostra o *login do usuário*, *nome*, *data/hora da ação* e uma *descrição detalhada* do que foi feito (como criação, remoção ou alteração de dados).",
   },
   ],
+  "/login": [
+    {
+    selector: "body",
+    content:
+      "Bem-vindo(a) ao *SisLabs*! 👋 Este é o sistema de controle e gerenciamento dos laboratórios do DEINFO. Aqui você realiza o acesso de acordo com o seu perfil.",
+  },
+ {
+    selector: ".input-login",
+    content:
+      "No campo *Login*, insira o seu identificador de acesso:\n\n• Se você é ACADÊMICO, digite o seu **RA**.\n• Se você é LABORATORISTA ou ADMINISTRADOR, digite o seu **nome de usuário** cadastrado no sistema.",
+  },
+  {
+    selector: ".input-senha",
+    content:
+      "Insira sua *senha pessoal* associada ao seu login.",
+  },
+  {
+    selector: ".botao-entrar",
+    content:
+      "Após preencher os campos de login e senha, clique em *Entrar* para acessar o sistema SisLabs.",
+  },
+  ],
+  "/academico": [
+    {
+    selector: ".perfil-header",
+    content:
+      "👋 Bem-vindo(a) à sua área acadêmica!\n\nAqui você pode visualizar e atualizar suas informações, alterar sua senha e solicitar o uso dos laboratórios do DEINFO.",
+  },
+  {
+    selector: ".editar-perfil-section",
+    content:
+      "Atualize seus dados pessoais, como e-mail e telefone, para manter suas informações sempre atualizadas.\n\nApós realizar as alterações, clique em **'Atualizar perfil'** para salvar.",
+  },
+  {
+    selector: ".alterar-senha-section",
+    content:
+      "Por segurança, você pode trocar sua senha de acesso.\n\nInforme sua senha atual, digite a nova senha e confirme antes de clicar em **'Atualizar senha'**.",
+  },
+  {
+    selector: ".solicitar-sala-section",
+    content:
+      "Aqui você pode solicitar o uso de um dos laboratórios disponíveis.\n\n1️⃣ Selecione o laboratório desejado no menu.\n2️⃣ Clique em **'Solicitar sala'** para enviar o pedido.\n3️⃣ Aguarde a confirmação do setor responsável.",
+  },
+  {
+    selector: ".perfil-info-card",
+    content:
+      "Nesta seção você vê seus dados cadastrados: nome, RA, curso e e-mail.\n\nTambém pode conferir o horário do seu último login no sistema.",
+  },
+  {
+    selector: ".logout-button",
+    content:
+      "Ao terminar o uso do sistema, clique em **'Sair'** para encerrar sua sessão com segurança — especialmente em computadores compartilhados.",
+  },
+  ],
 };

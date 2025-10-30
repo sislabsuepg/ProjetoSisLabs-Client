@@ -263,7 +263,7 @@ export default function Login() {
       className={`${styles.sectionLogin} lsm:flex-row flex-col h-screen`}
     >
       <div
-        className={`${styles.sideLogo} lsm:flex hidden dlg:p-[2.5rem] p-[1.5rem] dlg:w-[40%] w-[45%]`}
+        className={`${styles.sideLogo} body lsm:flex hidden dlg:p-[2.5rem] p-[1.5rem] dlg:w-[40%] w-[45%]`}
       >
         <img
           className={`${styles.logoImg}`}
@@ -298,7 +298,7 @@ export default function Login() {
                 value={form.login}
                 onChange={handleChange}
                 disabled={loading}
-                className="w-full p-3 font-normal text-[0.9rem] rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
+                className="input-login w-full p-3 font-normal text-[0.9rem] rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
               />
               <ErrorMessage field="login" />
             </div>
@@ -312,7 +312,7 @@ export default function Login() {
                 value={form.senha}
                 onChange={handleChange}
                 disabled={loading}
-                className="w-full font-normal p-3 text-[0.9rem] rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
+                className="input-senha w-full font-normal p-3 text-[0.9rem] rounded-md border-none outline-none focus:ring-2 focus:ring-transparent bg-theme-inputBg text-[#767676] placeholder-[#767676]"
               />
               <ErrorMessage field="senha" />
             </div>
@@ -320,7 +320,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full px-3 py-2 text-base font-normal rounded-md border-none text-theme-white text-[0.9rem] transition-colors duration-200
+              className={`botao-entrar w-full px-3 py-2 text-base font-normal rounded-md border-none text-theme-white text-[0.9rem] transition-colors duration-200
               ${
                 loading
                   ? "bg-gray-400 cursor-not-allowed"

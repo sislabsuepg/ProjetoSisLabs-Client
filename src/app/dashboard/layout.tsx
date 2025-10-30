@@ -8,11 +8,6 @@ import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from "@mui/material/Badge";
-import HelpIcon from '@mui/icons-material/Help';
-import { useTour } from "@reactour/tour";
-import { usePathname } from "next/navigation";
-import { toursByPage } from "@/components/GuidedTour/stepsPages";
-import { useGuidedTour } from "@/components/GuidedTour/TourContext";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -20,13 +15,10 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const { activeSection } = useGuidedTour();
   const router = useRouter();
   const [cookies] = useCookies(["usuario", "aluno"]);
   const notificationCount = useNotificationStore((state) => state.count);
   const [openModalNotification, setOpenModalNotification] = useState(false);
-  const { setIsOpen: setIsOpenTour, setSteps, setCurrentStep } = useTour();
-  const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
@@ -62,22 +54,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     );
   }
 
-  const handleOpenTour = () => {
-    const tourPage = toursByPage[pathname];
-    if (!tourPage) {
-      alert("Nenhum tour disponível para esta página!");
-      return;
-    }
-
-    const steps = Array.isArray(tourPage) ? tourPage : tourPage[activeSection!];
-
-    setTimeout(() => {
-      setSteps!(steps);
-      setCurrentStep!(0);
-      setIsOpenTour!(true);
-    }, 300);
-  };
-
   return (
     <div className="w-full flex items-start">
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
@@ -105,17 +81,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               }}
             />
           </Badge>
-        </div>
-
-        <div className="fixed bottom-5 right-5 group w-fit">
-          <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-theme-blue text-theme-white font-normal text-sm px-2 py-1 rounded shadow-md whitespace-nowrap">
-            Ajuda!
-          </span>
-
-          <HelpIcon
-            sx={{ fontSize: 40 }}
-            className="cursor-pointer text-theme-blue"
-            onClick={() => handleOpenTour()} />
         </div>
 
         {openModalNotification && (

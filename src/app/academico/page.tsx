@@ -178,26 +178,21 @@ export default function Cronograma() {
   }
 
   return (
-    //Padding geral p-6 em telas pequenas, p-8 em médias e maiores
     <div className="w-full min-h-screen flex flex-col gap-8 p-6 md:p-8 bg-theme-blue ">
-      {/* Breadcrumb / Header */}
-      <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div className="perfil-header w-full flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
           <h1 className="text-theme-white font-semibold text-xl flex items-center gap-2">
             <span className="text-2xl">👨‍🎓</span> Área do Acadêmico
           </h1>
-          {/* Tentativa de alterar a cor, modificar depois */}
           <p className="text-white text-sm mt-1 font-medium">
             Gerencie seu perfil, senha e solicite o uso de laboratórios.
           </p>
         </div>
       </div>
 
-      {/* Grid principal */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Card Perfil */}
         <div className="bg-theme-container rounded-2xl p-6 flex flex-col h-full shadow-sm border border-theme-blue/10">
-          <div className="wrapper">
+          <div className="perfil-info-card wrapper">
             <div className="flex flex-col items-center gap-4 mb-4">
               <div className="border bg-theme-white p-4 border-theme-blue rounded-full">
                 <PersonIcon
@@ -209,12 +204,10 @@ export default function Cronograma() {
                 <p className="font-medium text-sm md:text-base text-theme-blue/90">
                   {cookies?.usuario?.nome}
                 </p>
-                {/* Tentativa de alterar a cor, modificar depois */}
                 <p className="text-gray-600 text-xs md:text-sm font-medium">
                   {cookies?.aluno?.nome}
                 </p>
                 {cookies?.aluno?.telefone && (
-                  // Tentativa de alterar a cor, modificar depois
                   <p className="text-gray-600 text-xs md:text-sm font-medium">
                     {cookies?.aluno?.telefone}
                   </p>
@@ -229,7 +222,6 @@ export default function Cronograma() {
                 <span className="font-bold">Curso:</span>{" "}
                 {cookies?.aluno?.curso?.nome}
               </p>
-              {/* Tentativa de alterar a cor, modificar depois */}
               <p className="text-gray-600 text-xs md:text-sm font-medium">
                 <span className="font-bold text-theme-text">Último login:</span>{" "}
                 {cookies?.aluno?.lastLogin}
@@ -238,7 +230,7 @@ export default function Cronograma() {
           </div>
           <div className="flex flex-col gap-3 mt-auto pt-8">
             <button
-              className="bg-theme-blue/90 hover:bg-theme-blue transition-colors font-medium h-9 text-xs md:text-sm w-full text-white rounded-lg"
+              className="logout-button bg-theme-blue/90 hover:bg-theme-blue transition-colors font-medium h-9 text-xs md:text-sm w-full text-white rounded-lg"
               onClick={() => {
                 removeCookie("aluno", { path: "/" });
                 router.push("/login");
@@ -256,11 +248,10 @@ export default function Cronograma() {
           </div>
         </div>
 
-        {/* Forms Perfil e Senha */}
         <div className="xl:col-span-2 flex flex-col gap-6">
-          <div className="bg-theme-container rounded-2xl p-6 shadow-sm border border-theme-blue/10">
+          <div className="editar-perfil-section bg-theme-container rounded-2xl p-6 shadow-sm border border-theme-blue/10">
             <h2 className="font-semibold text-theme-blue text-lg mb-4 flex items-center gap-2">
-              ✏️ Editar perfil
+              Editar perfil
             </h2>
             <form
               onSubmit={handlePerfilUpdate}
@@ -301,9 +292,9 @@ export default function Cronograma() {
             </form>
           </div>
 
-          <div className="bg-theme-container rounded-2xl p-6 shadow-sm border border-theme-blue/10">
+          <div className="alterar-senha-section bg-theme-container rounded-2xl p-6 shadow-sm border border-theme-blue/10">
             <h2 className="font-semibold text-theme-blue text-lg mb-4 flex items-center gap-2">
-              🔐 Alterar senha
+              Alterar senha
             </h2>
             <form
               noValidate
@@ -356,9 +347,9 @@ export default function Cronograma() {
             </form>
           </div>
 
-          <div className="bg-theme-container rounded-2xl p-6 shadow-sm border border-theme-blue/10">
+          <div className="solicitar-sala-section bg-theme-container rounded-2xl p-6 shadow-sm border border-theme-blue/10">
             <h2 className="font-semibold text-theme-blue text-lg mb-4 flex items-center gap-2">
-              🧪 Solicitar sala
+              Solicitar sala
             </h2>
             <div className="flex flex-col gap-4">
               <FormControl className="w-full" variant="filled" size="small">
