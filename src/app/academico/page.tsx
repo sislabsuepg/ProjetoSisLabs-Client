@@ -178,57 +178,64 @@ export default function Cronograma() {
   }
 
   return (
-    <div className="w-full min-h-screen flex flex-col gap-8 p-6 md:p-8 bg-theme-blue ">
-      <div className="perfil-header w-full flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <div>
-          <h1 className="text-theme-white font-semibold text-xl flex items-center gap-2">
-            <span className="text-2xl">👨‍🎓</span> Área do Acadêmico
-          </h1>
-          <p className="text-white text-sm mt-1 font-medium">
+    <section
+      className={`transition-all duration-500 flex-1 min-h-screen md:min-h-[calc(100vh-2.5rem)] m-5 border-4 p-5 border-[#F3F3F3] rounded-[20px] box-border overflow-x-auto overflow-y-auto`}
+    >
+      <div className="flex items-start mb-4">
+        <div className="flex flex-col items-start">
+          <p className="font-semibold text-[1.2rem] text-theme-blue">
+            Área do Acadêmico
+          </p>
+          <p className="text-sm font-medium text-theme-blue">
             Gerencie seu perfil, senha e solicite o uso de laboratórios.
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="bg-theme-container rounded-2xl p-6 flex flex-col h-full shadow-sm border border-theme-blue/10">
+        <div className="bg-theme-container rounded-2xl p-6 flex flex-col h-full">
           <div className="perfil-info-card wrapper">
             <div className="flex flex-col items-center gap-4 mb-4">
-              <div className="border bg-theme-white p-4 border-theme-blue rounded-full">
-                <PersonIcon
-                  className="text-theme-blue"
-                  sx={{ fontSize: "4rem" }}
-                />
+              <div className="border bg-[#dedede] p-4 border-theme-blue rounded-full">
+                <img src={data_images?.academico} alt="Área do Acadêmico" />
               </div>
               <div className="flex flex-col items-center gap-1">
-                <p className="font-medium text-sm md:text-base text-theme-blue/90">
-                  {cookies?.usuario?.nome}
-                </p>
-                <p className="text-gray-600 text-xs md:text-sm font-medium">
+                <p className="font-semibold text-[1.2rem] leading-5 text-theme-blue mb-1">
                   {cookies?.aluno?.nome}
                 </p>
+                <p className="text-theme-text text-xs md:text-sm font-medium">
+                  {cookies?.usuario?.nome}
+                </p>
                 {cookies?.aluno?.telefone && (
-                  <p className="text-gray-600 text-xs md:text-sm font-medium">
-                    {cookies?.aluno?.telefone}
+                  <p className="text-theme-text text-xs md:text-sm font-medium">
+                    {maskPhone(cookies?.aluno?.telefone)}
                   </p>
                 )}
+                <p className="text-theme-text text-xs md:text-sm font-medium">
+                  {cookies?.aluno?.email}
+                </p>
               </div>
             </div>
             <div className="flex flex-col gap-3 text-center">
-              <p className="bg-[#d1d1d1] text-theme-blue font-medium px-3 py-2 rounded-md text-xs md:text-sm break-all">
-                {cookies?.aluno?.email}
-              </p>
-              <p className="text-theme-text font-semibold text-xs md:text-sm">
-                <span className="font-bold">Curso:</span>{" "}
+              <p className="text-theme-blue bg-[#dedede] rounded-md py-3 font-medium my-2 text-xs md:text-[1rem]">
                 {cookies?.aluno?.curso?.nome}
               </p>
-              <p className="text-gray-600 text-xs md:text-sm font-medium">
-                <span className="font-bold text-theme-text">Último login:</span>{" "}
+              <p className="text-theme-text text-xs md:text-sm font-normal">
+                <span className="font-medium text-theme-text">Último login:</span>{" "}
                 {cookies?.aluno?.lastLogin}
               </p>
             </div>
           </div>
+
           <div className="flex flex-col gap-3 mt-auto pt-8">
+            <div className="flex justify-center mb-4">
+              <img
+                className="w-full max-w-[180px] opacity-85"
+                src={data_images?.logo_uepg_desktop}
+                alt="Logo UEPG"
+              />
+            </div>
+
             <button
               className="logout-button bg-theme-blue/90 hover:bg-theme-blue transition-colors font-medium h-9 text-xs md:text-sm w-full text-white rounded-lg"
               onClick={() => {
@@ -238,18 +245,11 @@ export default function Cronograma() {
             >
               Sair
             </button>
-            <div className="flex justify-center mt-2">
-              <img
-                className="w-full max-w-[255px] opacity-85"
-                src={data_images?.logo_uepg_desktop}
-                alt="Logo UEPG"
-              />
-            </div>
           </div>
         </div>
 
         <div className="xl:col-span-2 flex flex-col gap-6">
-          <div className="editar-perfil-section bg-theme-container rounded-2xl p-6 shadow-sm border border-theme-blue/10">
+          <div className="editar-perfil-section bg-theme-container rounded-2xl py-4 px-5">
             <h2 className="font-semibold text-theme-blue text-lg mb-4 flex items-center gap-2">
               Editar perfil
             </h2>
@@ -292,7 +292,7 @@ export default function Cronograma() {
             </form>
           </div>
 
-          <div className="alterar-senha-section bg-theme-container rounded-2xl p-6 shadow-sm border border-theme-blue/10">
+          <div className="alterar-senha-section bg-theme-container rounded-2xl py-4 px-5">
             <h2 className="font-semibold text-theme-blue text-lg mb-4 flex items-center gap-2">
               Alterar senha
             </h2>
@@ -335,10 +335,10 @@ export default function Cronograma() {
                   text="Atualizar senha"
                   disabled={
                     form.senha_atual.length >= 4 &&
-                    form.senha_atual.length <= 6 &&
-                    form.nova_senha.length >= 4 &&
-                    form.nova_senha.length <= 6 &&
-                    form.nova_senha === form.confirmar_nova_senha
+                      form.senha_atual.length <= 6 &&
+                      form.nova_senha.length >= 4 &&
+                      form.nova_senha.length <= 6 &&
+                      form.nova_senha === form.confirmar_nova_senha
                       ? false
                       : true
                   }
@@ -347,7 +347,7 @@ export default function Cronograma() {
             </form>
           </div>
 
-          <div className="solicitar-sala-section bg-theme-container rounded-2xl p-6 shadow-sm border border-theme-blue/10">
+          <div className="solicitar-sala-section bg-theme-container rounded-2xl py-4 px-5">
             <h2 className="font-semibold text-theme-blue text-lg mb-4 flex items-center gap-2">
               Solicitar sala
             </h2>
@@ -361,9 +361,8 @@ export default function Cronograma() {
                 >
                   <MenuItem value={0}>-- Selecione uma opção --</MenuItem>
                   {laboratorios.map((l) => (
-                    <MenuItem key={l.id} value={l.id}>{`${l.numero} - ${
-                      l.nome
-                    }${l.restrito ? "(Orientação)" : ""}`}</MenuItem>
+                    <MenuItem key={l.id} value={l.id}>{`${l.numero} - ${l.nome
+                      }${l.restrito ? "(Orientação)" : ""}`}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -372,11 +371,10 @@ export default function Cronograma() {
                   type="button"
                   onClick={handleSolicitarSala}
                   disabled={!isFormValid}
-                  className={`bg-theme-blue font-medium h-9 flex items-center justify-center text-sm px-6 text-white rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 ${
-                    !isFormValid
-                      ? "opacity-50 cursor-not-allowed hover:shadow-none hover:translate-y-0"
-                      : ""
-                  }`}
+                  className={`bg-theme-blue font-medium h-9 flex items-center justify-center text-sm px-6 text-white rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 ${!isFormValid
+                    ? "opacity-50 cursor-not-allowed hover:shadow-none hover:translate-y-0"
+                    : ""
+                    }`}
                 >
                   Solicitar sala
                 </button>
@@ -385,6 +383,6 @@ export default function Cronograma() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
