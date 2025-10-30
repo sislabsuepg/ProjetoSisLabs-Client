@@ -11,7 +11,6 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
-import PersonIcon from "@mui/icons-material/Person";
 import { ILaboratorio } from "@/interfaces/interfaces";
 import { apiOnline } from "@/services/services";
 import { AxiosError, AxiosResponse } from "axios";
@@ -182,7 +181,7 @@ export default function Cronograma() {
       className={`transition-all duration-500 flex-1 min-h-screen md:min-h-[calc(100vh-2.5rem)] m-5 border-4 p-5 border-[#F3F3F3] rounded-[20px] box-border overflow-x-auto overflow-y-auto`}
     >
       <div className="flex items-start mb-4">
-        <div className="flex flex-col items-start">
+        <div className="perfil-header flex flex-col items-start">
           <p className="font-semibold text-[1.2rem] text-theme-blue">
             Área do Acadêmico
           </p>

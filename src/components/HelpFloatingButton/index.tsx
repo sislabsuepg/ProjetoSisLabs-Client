@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import HelpIcon from "@mui/icons-material/Help";
 import { usePathname } from "next/navigation";
 import { useTour } from "@reactour/tour";
@@ -28,6 +29,20 @@ export default function HelpFloatingButton() {
       setIsOpen!(true);
     }, 300);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "F1") {
+        event.preventDefault();
+        handleOpenTour();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [pathname, activeSection]); 
 
   return (
     <div className="fixed bottom-5 right-5 group w-fit z-50">
