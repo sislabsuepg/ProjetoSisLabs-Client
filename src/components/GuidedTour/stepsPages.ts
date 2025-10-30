@@ -1,8 +1,6 @@
 import { StepType } from "@reactour/tour";
 
-type SubSections = Record<string, StepType[]>;
-
-export const toursByPage: Record<string, StepType[] | SubSections> = {
+export const toursByPage: Record<string, StepType[] | Record<string, StepType[]>> = {
   "/dashboard": [
   {
     selector: ".status-column",
@@ -130,6 +128,54 @@ export const toursByPage: Record<string, StepType[] | SubSections> = {
         content: "Selecione o laboratório disponível para pesquisa. Só é possível selecionar após validar o aluno.",
       },
 
+    ],
+  },
+  "/dashboard/relatorios": {
+    laboratorio: [
+      {
+        selector: ".lab-relatorio-button",
+        content: "Clique neste botão para gerar relatório dos laboratórios.",
+      },
+      {
+        selector: ".tipo-entrada",
+        content: "Aqui você escolhe o *tipo de entrada* que deseja incluir no relatório. Pode ser 'Empréstimo de chave', 'Orientação/Pesquisa' ou 'Ambos', conforme o tipo de uso do laboratório.",
+      },
+      {
+        selector: ".lab-escolher",
+        content: "Selecione o *laboratório* que deseja incluir no relatório.",
+      },
+      {
+        selector: ".data-inicio",
+        content:
+          "Informe a *data inicial* para filtrar os registros. O relatório mostrará apenas as entradas a partir dessa data.",
+      },
+      {
+        selector: ".data-final",
+        content:
+          "Informe a *data final* do período desejado. Apenas os registros até essa data serão exibidos.",
+      },
+    ],
+    academico: [
+      {
+        selector: ".academico-relatorio-button",
+        content:
+          "Clique neste botão para gerar relatório dos acadêmicos.",
+      },
+      {
+        selector: ".ra-aluno",
+        content: "Digite o RA do aluno para incluir no relatório.",
+      },
+    ],
+    curso: [
+      {
+        selector: ".curso-relatorio-button",
+        content:
+          "Clique neste botão para gerar relatório dos acadêmicos por curso.",
+      },
+      {
+        selector: ".escolher-curso",
+        content: "Escolha o curso para incluir no relatório.",
+      },
     ],
   },
 };

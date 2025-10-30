@@ -5,13 +5,11 @@ import FormLabPesquisa from "@/components/FormEntrega/FormLabPesquisa";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { canAccessPage } from "@/utils/permissions";
-import { toursByPage } from "@/components/GuidedTour/stepsPages";
-import { useTour } from "@reactour/tour";
 import { useGuidedTour } from "@/components/GuidedTour/TourContext";
 
 export default function Entrega() {
   const [activeId, setActiveId] = useState(1);
-  const sectionMap = { 1: "chave", 2: "pesquisa" };
+  const sectionMap: Record<number, string> = { 1: "chave", 2: "pesquisa" };
   const activeSection = sectionMap[activeId];
   const [cookies] = useCookies(["usuario"]);
   const permitido = canAccessPage("emprestimo", cookies);

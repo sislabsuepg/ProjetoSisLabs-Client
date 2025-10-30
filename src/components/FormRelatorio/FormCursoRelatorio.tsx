@@ -76,7 +76,7 @@ export default function FormCursoRelatorio() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-       📊 Gerar relatório por curso
+       Gerar relatório por curso
       </p>
 
       <form
@@ -85,7 +85,7 @@ export default function FormCursoRelatorio() {
         className="mt-4 space-y-4 flex flex-col justify-between w-full h-full"
       >
         <div className="w-full flex items-center gap-4">
-          <FormControl className="w-full font-normal" variant="filled" disabled={isFetchingCursos || isLoading}>
+          <FormControl className="escolher-curso w-full font-normal" variant="filled" disabled={isFetchingCursos || isLoading}>
             <InputLabel id="curso-select-label">Curso</InputLabel>
             <Select
               labelId="curso-select-label"

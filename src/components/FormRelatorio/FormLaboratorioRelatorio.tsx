@@ -102,7 +102,7 @@ export default function FormLaboratorioRelatorio() {
   return (
     <div className="w-full flex flex-col h-full">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        📊 Gerar relatório - Laboratório
+        Gerar relatório - Laboratório
       </p>
 
       <form
@@ -110,7 +110,7 @@ export default function FormLaboratorioRelatorio() {
         className="h-full space-y-6 w-full flex flex-col justify-between"
       >
         <div className="w-full flex flex-col gap-4">
-          <div className="w-full bg-theme-container py-3 px-5 rounded-[10px] relative">
+          <div className="tipo-entrada w-full bg-theme-container py-3 px-5 rounded-[10px] relative">
             <p className="font-semibold text-theme-blue mb-2">
               Tipo de entrada
             </p>
@@ -142,7 +142,7 @@ export default function FormLaboratorioRelatorio() {
 
           <div className="w-full flex flex-col gap-4">
             <FormControl
-              className="w-full"
+              className="lab-escolher w-full"
               variant="filled"
               disabled={isFetchingLabs || isLoading}
             >
@@ -168,6 +168,7 @@ export default function FormLaboratorioRelatorio() {
               <div className="w-full flex gap-4 flex-col md:flex-row">
                 <DatePicker
                   label="Data inicial"
+                  className="data-inicio"
                   format="DD/MM/YYYY"
                   value={form.periodo.de}
                   onChange={(newValue) => {
@@ -200,6 +201,7 @@ export default function FormLaboratorioRelatorio() {
 
                 <DatePicker
                   label="Data final"
+                  className="data-final"
                   value={form.periodo.ate}
                   minDate={form.periodo.de?.add(1, "day") || undefined}
                   onChange={(newValue) =>
