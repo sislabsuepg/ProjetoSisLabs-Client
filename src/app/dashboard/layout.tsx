@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const [cookies] = useCookies(["usuario", "aluno"]);
-  const notificationCount = useNotificationStore((state) => state.count);
+  const unreadCount = useNotificationStore((state) => state.unreadCount);
   const [openModalNotification, setOpenModalNotification] = useState(false);
 
   useEffect(() => {
@@ -69,9 +69,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </span>
 
           <Badge
-            badgeContent={notificationCount}
+            badgeContent={unreadCount}
             color="error"
-            invisible={notificationCount === 0}
+            invisible={unreadCount === 0}
           >
             <NotificationsIcon
               sx={{ fontSize: 40 }}

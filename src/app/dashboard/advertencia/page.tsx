@@ -62,6 +62,28 @@ export default function Advertencia() {
           "/emprestimo?ativo=true"
         );
         setEmprestimos(response.data || []);
+        
+        // Verificar se há dados do empréstimo vindo da tela inicial
+        const emprestimoData = sessionStorage.getItem('emprestimoParaAdvertencia');
+        if (emprestimoData) {
+          try {
+            const dados = JSON.parse(emprestimoData);
+            setForm((f) => ({ 
+              ...f, 
+              emprestimoId: String(dados.emprestimoId),
+              motivo: 'naoDevolucaoChave' // Pré-seleciona motivo padrão
+            }));
+            
+            toast.info(
+              `Empréstimo selecionado: ${dados.alunoNome} - ${dados.laboratorioNome} (${dados.diasEmAberto} dia${dados.diasEmAberto > 1 ? 's' : ''} em aberto)`
+            );
+            
+            // Limpar dados do sessionStorage
+            sessionStorage.removeItem('emprestimoParaAdvertencia');
+          } catch (err) {
+            console.error('Erro ao processar dados do empréstimo:', err);
+          }
+        }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("Falha ao carregar alunos com empréstimos em aberto.");

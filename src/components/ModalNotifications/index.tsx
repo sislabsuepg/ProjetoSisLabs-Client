@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   CircularProgress,
   Modal,
@@ -16,6 +16,7 @@ import style from "./ModalNotification.module.scss";
 import { maskDate } from "@/utils/maskDate";
 import { useNotificationStore } from "@/store";
 import { fetchAndCountNotifications } from "@/utils/fetchNotifications";
+import { markAllAsRead } from "@/utils/notificationStorage";
 
 interface ModalNotificationProps {
   open: boolean;
@@ -31,6 +32,7 @@ const recados = useNotificationStore(s => s.recados);
 const setEventos = useNotificationStore(s => s.setEventos);
 const setRecados = useNotificationStore(s => s.setRecados);
 const loading = useNotificationStore(s => s.loading);
+const setUnreadCount = useNotificationStore(s => s.setUnreadCount);
 
   const [openEditEvento, setOpenEditEvento] = useState(false);
   const [openEditRecado, setOpenEditRecado] = useState(false);
@@ -40,6 +42,24 @@ const loading = useNotificationStore(s => s.loading);
   }>(null);
   const [draftEvento, setDraftEvento] = useState<Partial<IEvento>>({});
   const [draftRecado, setDraftRecado] = useState<Partial<IRecado>>({});
+
+  // Marca todas as notificações como lidas quando o modal é aberto
+  useEffect(() => {
+    if (open && (eventos.length > 0 || recados.length > 0)) {
+      const eventoIds = eventos.map(e => e.id);
+      const recadoIds = recados.map(r => r.id);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔓 Modal aberto, marcando como lidas:', {
+          eventos: eventoIds,
+          recados: recadoIds,
+        });
+      }
+      
+      markAllAsRead(eventoIds, recadoIds);
+      setUnreadCount(0); // Atualiza o contador imediatamente
+    }
+  }, [open, eventos, recados, setUnreadCount]);
 
   const colors = [
     "divider-green",
