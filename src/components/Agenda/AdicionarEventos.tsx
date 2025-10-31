@@ -83,7 +83,7 @@ export default function AdicionarEventos() {
       try {
         const laboratoriosResponse = await apiOnline.get<
           ILaboratorio[] | { data: ILaboratorio[] }
-        >("/laboratorio");
+        >("/laboratorio?ativo=true");
         console.log(laboratoriosResponse);
         const responseData = laboratoriosResponse as {
           data: ILaboratorio[] | { data?: ILaboratorio[] };
@@ -146,9 +146,10 @@ export default function AdicionarEventos() {
               <TextField
                 id="data-evento"
                 variant="filled"
+                label="Data do evento"
                 type="date"
                 name="data"
-                value={form.data}
+                value={form.data || new Date().toISOString().split("T")[0]}
                 onChange={handleChange}
                 className="w-full font-normal p-3 text-[0.9rem] rounded-md"
               />
@@ -156,9 +157,10 @@ export default function AdicionarEventos() {
               <TextField
                 id="hora-evento"
                 variant="filled"
+                label="Hora do evento"
                 type="time"
                 name="hora"
-                value={form.hora}
+                value={form.hora || "00:00"}
                 onChange={handleChange}
                 className="w-full font-normal p-3 text-[0.9rem] rounded-md"
               />

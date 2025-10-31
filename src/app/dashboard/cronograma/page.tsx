@@ -879,16 +879,36 @@ export default function Cronograma() {
     }
   };
 
-  const isTabelaVazia = useMemo(() => {
+  const temMudancas = useMemo(() => {
     const matrizEdit = editaveis[activeId];
-    if (!matrizEdit) return true;
-    for (let i = 0; i < tabelaAtiva.length; i++) {
-      for (let j = 0; j < tabelaAtiva[i].length; j++) {
-        if (matrizEdit[i]?.[j] && tabelaAtiva[i][j].trim() !== "") return false;
+    if (!matrizEdit) return false;
+    const orig = todosHorarios.filter((h) => h.idLaboratorio === activeId);
+    const chaveMap = (dia: number, horario: string) => `${dia}-${horario}`;
+    const mapaOrig = new Map<string, IHorario>(
+      orig.map((h) => [chaveMap(h.diaSemana, h.horario), h])
+    );
+
+    for (let linha = 0; linha < tabelaAtiva.length; linha++) {
+      for (let coluna = 0; coluna < tabelaAtiva[linha].length; coluna++) {
+        if (!matrizEdit[linha]?.[coluna]) continue;
+        const nome = tabelaAtiva[linha][coluna].trim();
+        const diaSemana = colunaParaDiaSemana(coluna);
+        const horario = horarios[linha];
+        const key = chaveMap(diaSemana, horario);
+        const original = mapaOrig.get(key);
+        
+        // Mudança: removeu professor que existia
+        if (!nome && original?.idProfessor) return true;
+        
+        // Mudança: adicionou/alterou professor
+        if (nome) {
+          const idProfessor = nomeParaProfessorId(nome);
+          if (idProfessor && original?.idProfessor !== idProfessor) return true;
+        }
       }
     }
-    return true;
-  }, [tabelaAtiva, editaveis, activeId]);
+    return false;
+  }, [tabelaAtiva, editaveis, activeId, todosHorarios, horarios, professores]);
 
   // Conflitos decorrentes das edições na tabela ativa (mostrar abaixo do cronograma)
   const conflitosEdicaoPorProfessor = useMemo(() => {
@@ -1394,9 +1414,9 @@ export default function Cronograma() {
           <button
             type="button"
             onClick={salvarTabela}
-            disabled={isTabelaVazia || salvando}
+            disabled={!temMudancas || salvando}
             className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] ${
-              isTabelaVazia || salvando ? "opacity-50 cursor-not-allowed" : ""
+              !temMudancas || salvando ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             {salvando ? "Salvando..." : "Salvar"}

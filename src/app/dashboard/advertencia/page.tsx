@@ -160,8 +160,13 @@ export default function Advertencia() {
       (form.assuntoOutro.trim() !== "" && form.corpoOutro.trim() !== ""));
 
   useEffect(() => {
-    const steps = toursByPage["/dashboard/advertencia"] || [];
-    setSteps!(steps);
+    const maybeSteps = toursByPage["/dashboard/advertencia"];
+    if (Array.isArray(maybeSteps)) {
+      setSteps!(maybeSteps);
+    } else if (maybeSteps) {
+      const firstKey = Object.keys(maybeSteps)[0];
+      if (firstKey) setSteps!(maybeSteps[firstKey]);
+    }
   }, [setSteps]);
 
   useEffect(() => {

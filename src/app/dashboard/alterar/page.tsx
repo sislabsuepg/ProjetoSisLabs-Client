@@ -40,6 +40,7 @@ import { toast } from "react-toastify";
 import { CircularProgress, Modal, styled, Switch } from "@mui/material";
 import { ApiResponse, IPermissao } from "@/interfaces/interfaces";
 import { AxiosError } from "axios";
+import { ApiError } from "@/utils/tipos";
 import FormAcademico from "@/components/Form/FormAcademico";
 import FormProfessor from "@/components/Form/FormProfessor";
 import FormLaboratorio from "@/components/Form/FormLaboratorio";
@@ -816,24 +817,34 @@ export default function Alterar() {
         onConfirm={() => {
           async function ativar() {
             if (openAtivar.id === 0) return;
+            let ok = false;
             try {
               await apiOnline.put(`/${mapRoutes[activeId]}/${openAtivar.id}`, {
                 ativo: true,
               });
-            } catch (err) {
-              const error = (err as AxiosError).response?.data as ApiResponse;
+              ok = true;
+            } catch (err: unknown) {
+              const error = err as ApiError;
               console.error("Erro ao ativar no backend:", error);
+              if (error.response?.data?.erros) {
+                error.response.data.erros.forEach((e) => toast.error(e));
+              } else {
+                toast.error(error.message || "Falha ao ativar. Tente novamente.");
+              }
             }
 
-            setCurrentItems((prev) =>
-              prev.filter((el) => el.id !== openAtivar.id)
-            );
+            if (ok) {
+              setCurrentItems((prev) =>
+                prev.filter((el) => el.id !== openAtivar.id)
+              );
+              toast.success(
+                `${
+                  listButtons.find((btn) => btn.id === activeId)?.title || ""
+                } ativado com sucesso!`
+              );
+            }
+
             setOpenAtivar({ status: false, id: 0 });
-            toast.success(
-              `${
-                listButtons.find((btn) => btn.id === activeId)?.title || ""
-              } ativado com sucesso!`
-            );
           }
           ativar();
         }}
@@ -877,24 +888,34 @@ export default function Alterar() {
         onConfirm={() => {
           async function desativar() {
             if (openExcluir.id === 0) return;
+            let ok = false;
             try {
               await apiOnline.delete(
                 `/${mapRoutes[activeId]}/${openExcluir.id}`
               );
-            } catch (err) {
-              const error = (err as AxiosError).response?.data as ApiResponse;
+              ok = true;
+            } catch (err: unknown) {
+              const error = err as ApiError;
               console.error("Erro ao desativar:", error);
+              if (error.response?.data?.erros) {
+                error.response.data.erros.forEach((e) => toast.error(e));
+              } else {
+                toast.error(error.message || "Falha ao desativar. Tente novamente.");
+              }
             }
 
-            setCurrentItems((prev) =>
-              prev.filter((el) => el.id !== openExcluir.id)
-            );
+            if (ok) {
+              setCurrentItems((prev) =>
+                prev.filter((el) => el.id !== openExcluir.id)
+              );
+              toast.success(
+                `${
+                  listButtons.find((btn) => btn.id === activeId)?.title || ""
+                } desativado com sucesso!`
+              );
+            }
+
             setOpenExcluir({ status: false, id: 0 });
-            toast.success(
-              `${
-                listButtons.find((btn) => btn.id === activeId)?.title || ""
-              } desativado com sucesso!`
-            );
           }
           desativar();
         }}

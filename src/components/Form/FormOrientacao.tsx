@@ -113,7 +113,7 @@ export default function FormOrientacao({
       try {
         const [professoresResponse, laboratoriosResponse] = await Promise.all([
           apiOnline.get<IProfessor[]>("/professor?ativo=true"),
-          apiOnline.get<ILaboratorio[]>("/laboratorio?restrito=true"),
+          apiOnline.get<ILaboratorio[]>("/laboratorio?restrito=true&ativo=true"),
         ]);
         setProfessores(
           (

@@ -3,19 +3,19 @@
 import Popover from "@/components/Popover";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
-import { FormPermissao } from "./types";
+import { FormPermissaoType } from "./types";
 import { PersonAdd } from "@mui/icons-material";
 
 interface Props {
-  list: FormPermissao[];
-  dados: FormPermissao[];
-  setFormData: (data: FormPermissao) => void;
+  list: FormPermissaoType[];
+  dados: FormPermissaoType[];
+  setFormData: (data: FormPermissaoType) => void;
   setOpenEditUser: (state: { status: boolean; id: number }) => void;
   setOpenExcluir: (state: { status: boolean; id: number }) => void;
   setOpenAtivar: (state: { status: boolean; id: number }) => void;
 }
 
-export default function ListLaboratorio({
+export default function ListPermissao({
   list,
   dados,
   setFormData,

@@ -4,13 +4,13 @@ import Popover from "@/components/Popover";
 import { maskDate } from "@/utils/maskDate";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
-import { FormOrientacao } from "./types";
+import { FormOrientacaoType } from "./types";
 
 interface Props {
-  list: FormOrientacao[];
-  dados: FormOrientacao[];
+  list: FormOrientacaoType[];
+  dados: FormOrientacaoType[];
   inactive: boolean;
-  setFormData: (data: FormOrientacao) => void;
+  setFormData: (data: FormOrientacaoType) => void;
   setOpenEditUser: (state: { status: boolean; id: number }) => void;
   setOpenExcluir: (state: { status: boolean; id: number }) => void;
 }

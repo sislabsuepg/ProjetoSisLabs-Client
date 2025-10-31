@@ -3,13 +3,13 @@
 import Popover from "@/components/Popover";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
-import { FormCurso } from "./types";
+import { FormCursoType } from "./types";
 import { PersonAdd } from "@mui/icons-material";
 
 interface Props {
-  list: FormCurso[];
-  dados: FormCurso[];
-  setFormData: (data: FormCurso) => void;
+  list: FormCursoType[];
+  dados: FormCursoType[];
+  setFormData: (data: FormCursoType) => void;
   setOpenEditUser: (state: { status: boolean; id: number }) => void;
   setOpenExcluir: (state: { status: boolean; id: number }) => void;
   setOpenAtivar: (state: { status: boolean; id: number }) => void;

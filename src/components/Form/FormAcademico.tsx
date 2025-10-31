@@ -120,7 +120,7 @@ export default function FormAcademico({
     const fetchCursos = async () => {
       try {
         const response = await apiOnline.get<ICurso[] | { data: ICurso[] }>(
-          "/curso"
+          "/curso?ativo=true"
         );
         const respWrapped = response as {
           data: ICurso[] | { data?: ICurso[] };
