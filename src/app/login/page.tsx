@@ -334,7 +334,7 @@ export default function Login() {
         </div>
       </div>
 
-      <div className="w-full h-[300px] bg-[#263E66] rounded-t-[100%] flex lsm:hidden items-center justify-center mt-10">
+      <div className="w-full h-[300px] bg-[#263E66] rounded-t-[100%] flex lsm:hidden items-center justify-center">
         <img
           src={data_images?.logo_uepg_mobile}
           alt={"Logo UEPG MOBILE"}

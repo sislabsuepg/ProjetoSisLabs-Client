@@ -14,7 +14,7 @@ export default function GuidedTourProvider({ children }: { children: ReactNode }
           backgroundColor: "#ffffff",
           color: "#1e293b",
           fontWeight: 400,
-          left: 20,
+          left: 5,
           boxShadow: "0 2px 15px rgba(0,0,0,0.1)",
         }),
         maskArea: (base) => ({ ...base, rx: 8 }),

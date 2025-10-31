@@ -934,7 +934,7 @@ export default function Cronograma() {
         select#labSelect optgroup { color:#0f172a; background:#ffffff; }
       `}</style>
       {/* Aulas de Hoje */}
-      <div className="w-full flex flex-col">
+      <div className="aulas-hoje-section w-full flex flex-col">
         <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
           Aulas de Hoje
         </p>
@@ -943,7 +943,7 @@ export default function Cronograma() {
             <span className="text-theme-blue font-medium capitalize">
               {dataHojeFormatada}
             </span>
-            <span className="text-[0.65rem] px-2 py-1 rounded-full bg-theme-blue text-theme-white font-semibold tracking-wide">
+            <span className="contador-aulas text-[0.65rem] px-2 py-1 rounded-full bg-theme-blue text-theme-white font-semibold tracking-wide">
               {aulasOrdenadas.length}{" "}
               {aulasOrdenadas.length === 1 ? "aula" : "aulas"}
             </span>
@@ -961,7 +961,7 @@ export default function Cronograma() {
               <p className="font-medium mb-1">
                 Nenhuma aula com professor cadastrada para hoje
               </p>
-              <p className="text-[0.7rem] max-w-[240px] leading-snug">
+              <p className="text-[0.7rem] max-w-[240px] font-normal leading-snug">
                 Adicione professores às aulas ou cadastre novas para
                 visualizá-las aqui.
               </p>
@@ -1142,9 +1142,9 @@ export default function Cronograma() {
       <div className="w-full flex flex-col">
         <div className="w-full h-9/10 flex flex-col mb-4 gap-3">
           <p className="font-semibold text-[1.2rem] text-theme-blue">
-            📅 Cronograma de aulas
+            Cronograma de aulas
           </p>
-          <div className="w-full max-w-xs">
+          <div className="lab-select w-full max-w-xs">
             <label className="sr-only" htmlFor="labSelect">
               Laboratório
             </label>
@@ -1171,8 +1171,9 @@ export default function Cronograma() {
             </select>
           </div>
         </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+          <table id="tabela-cronograma" className="w-full border-collapse">
             <thead className="bg-theme-blue">
               <tr>
                 <th className="border border-gray-400 text-theme-white px-2 py-1 w-[90px] text-center">

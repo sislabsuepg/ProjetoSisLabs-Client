@@ -264,4 +264,23 @@ export const toursByPage: Record<string, StepType[] | Record<string, StepType[]>
       "Ao terminar o uso do sistema, clique em **'Sair'** para encerrar sua sessão com segurança — especialmente em computadores compartilhados.",
   },
   ],
+  "/dashboard/cronograma": [
+  {
+    selector: ".aulas-hoje-section",
+    content: "Nesta seção você visualiza as aulas agendadas para o dia atual. Caso não haja aulas, será exibida uma mensagem informando isso.",
+  },
+  {
+    selector: ".contador-aulas",
+    content: "Este indicador mostra a quantidade total de aulas cadastradas para o dia em questão.",
+  },
+  {
+    selector: ".lab-select",
+    content: "Use este seletor para alternar entre os diferentes laboratórios ou salas, visualizando o cronograma específico de cada um.",
+  },
+  {
+    selector: "#tabela-cronograma",
+    content: "Esta tabela exibe os horários de aula, os dias da semana e os respectivos professores cadastrados para cada horário.",
+  },
+
+],
 };
