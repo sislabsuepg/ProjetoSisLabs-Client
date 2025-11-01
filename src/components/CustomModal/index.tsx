@@ -1,5 +1,5 @@
-import { Modal } from '@mui/material';
-import React from 'react';
+import { Modal } from "@mui/material";
+import React from "react";
 
 interface CustomModalProps {
   open: boolean;
@@ -19,30 +19,32 @@ const CustomModal: React.FC<CustomModalProps> = ({
   message,
   onConfirm,
   onCancel,
-  confirmText = 'Confirmar',
-  cancelText = 'Cancelar',
+  confirmText = "Confirmar",
+  cancelText = "Cancelar",
 }) => {
   return (
     <Modal open={open} onClose={onClose}>
       <div
         style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'white',
-          borderRadius: '16px',
-          boxShadow: '0px 4px 24px rgba(0, 0, 0, 0.2)',
-          padding: '24px',
-          minWidth: '400px',
-          minHeight: '300px',
-          textAlign: 'center',
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          backgroundColor: "white",
+          borderRadius: "16px",
+          boxShadow: "0px 4px 24px rgba(0, 0, 0, 0.2)",
+          padding: "24px",
+          minWidth: "400px",
+          minHeight: "300px",
+          textAlign: "center",
         }}
         className="flex items-center justify-between flex-col"
       >
         {title && <p className="text-[1.5rem] font-medium">{title}</p>}
 
-        <p className="font-normal leading-4 text-theme-blue">{message}</p>
+        <p className="font-normal leading-5 text-theme-blue whitespace-pre-line">
+          {message}
+        </p>
 
         <div className="flex items-center justify-between w-full gap-4">
           {onCancel && (

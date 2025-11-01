@@ -66,8 +66,6 @@ export default function Cronograma() {
       hora: string;
     }>
   >([]);
-  // Número de linhas extras necessárias para acomodar eventos longos
-  const [extraRows, setExtraRows] = useState(0);
 
   const diaSemanaAtual = new Date().getDay();
 
@@ -506,11 +504,6 @@ export default function Cronograma() {
       return;
     }
 
-    // Calcula a altura média de uma linha para extrapolar linhas extras
-    const avgRowHeight = rowBottoms.length > 0 
-      ? (rowBottoms[rowBottoms.length - 1] - rowTops[0]) / rowBottoms.length 
-      : 56;
-
     // Função para converter minuto do dia -> Y absoluto
     const getYForMinute = (min: number): number => {
       for (let i = 0; i < tabelaAulasHoje.horarios.length; i++) {
@@ -525,28 +518,17 @@ export default function Cronograma() {
           return y0 + t * (y1 - y0);
         }
       }
-      // Fora do range: extrapolar proporcionalmente
+      // Fora do range: clamp
       const hFirst = tabelaAulasHoje.horarios[0];
       const hLast = tabelaAulasHoje.horarios[tabelaAulasHoje.horarios.length - 1];
       const sFirst = toMin(hFirst);
-      const idxLast = horarios.findIndex((x) => x === hLast);
-      const eLast = slotEndAt(idxLast);
-      const lastRowBottom = rowBottoms[rowBottoms.length - 1];
-      
+      const eLast = slotEndAt(horarios.findIndex((x) => x === hLast));
       if (min < sFirst) return rowTops[0];
-      if (min >= eLast) {
-        // Extrapolar além da última linha
-        const minutesBeyond = min - eLast;
-        const slotDuration = eLast - toMin(hLast);
-        const extraHeight = (minutesBeyond / slotDuration) * avgRowHeight;
-        return lastRowBottom + extraHeight;
-      }
+      if (min >= eLast) return rowBottoms[rowBottoms.length - 1];
       return rowTops[0];
     };
 
   const novos: Array<{ key: string; left: number; width: number; top: number; height: number; nome: string; responsavel?: string; hora: string }> = [];
-    let maxEndMinute = 0;
-    
     for (const ev of todosEventos) {
       const labId = ev.idLaboratorio;
       if (!labId) continue;
@@ -556,19 +538,12 @@ export default function Cronograma() {
   const startMin = dt.getHours() * 60 + dt.getMinutes();
   const dur = typeof ev.duracao === 'number' && ev.duracao > 0 ? ev.duracao : 1;
   const endMin = startMin + dur;
-  
-  // Rastrear o horário máximo necessário
-  if (endMin > maxEndMinute) {
-    maxEndMinute = endMin;
-  }
-  
   const endDt = new Date(dt.getTime() + dur * 60 * 1000);
   const pad2 = (n: number) => (n < 10 ? `0${n}` : String(n));
   const hora = `${pad2(dt.getHours())}:${pad2(dt.getMinutes())} – ${pad2(endDt.getHours())}:${pad2(endDt.getMinutes())}`;
       const top = getYForMinute(startMin);
       const bottom = getYForMinute(endMin);
       const height = Math.max(2, bottom - top);
-      
       // reduzir um pouco a largura para evitar overflow horizontal/scroll
       const pad = 4; // px de margem interna à esquerda e direita
       const leftAdj = col.left + pad;
@@ -584,25 +559,6 @@ export default function Cronograma() {
         hora,
       });
     }
-    
-    // Calcular quantas linhas extras são necessárias
-    if (tabelaAulasHoje.horarios.length > 0 && maxEndMinute > 0) {
-      const hLast = tabelaAulasHoje.horarios[tabelaAulasHoje.horarios.length - 1];
-      const idxLast = horarios.findIndex((x) => x === hLast);
-      const eLast = slotEndAt(idxLast);
-      
-      if (maxEndMinute > eLast) {
-        // Calcular quantas linhas de ~50min precisamos adicionar
-        const minutesBeyond = maxEndMinute - eLast;
-        const rowsNeeded = Math.ceil(minutesBeyond / 50); // ~50 min por slot
-        setExtraRows(rowsNeeded);
-      } else {
-        setExtraRows(0);
-      }
-    } else {
-      setExtraRows(0);
-    }
-    
     setEventOverlays(novos);
 
     const onResize = () => {
@@ -879,36 +835,16 @@ export default function Cronograma() {
     }
   };
 
-  const temMudancas = useMemo(() => {
+  const isTabelaVazia = useMemo(() => {
     const matrizEdit = editaveis[activeId];
-    if (!matrizEdit) return false;
-    const orig = todosHorarios.filter((h) => h.idLaboratorio === activeId);
-    const chaveMap = (dia: number, horario: string) => `${dia}-${horario}`;
-    const mapaOrig = new Map<string, IHorario>(
-      orig.map((h) => [chaveMap(h.diaSemana, h.horario), h])
-    );
-
-    for (let linha = 0; linha < tabelaAtiva.length; linha++) {
-      for (let coluna = 0; coluna < tabelaAtiva[linha].length; coluna++) {
-        if (!matrizEdit[linha]?.[coluna]) continue;
-        const nome = tabelaAtiva[linha][coluna].trim();
-        const diaSemana = colunaParaDiaSemana(coluna);
-        const horario = horarios[linha];
-        const key = chaveMap(diaSemana, horario);
-        const original = mapaOrig.get(key);
-        
-        // Mudança: removeu professor que existia
-        if (!nome && original?.idProfessor) return true;
-        
-        // Mudança: adicionou/alterou professor
-        if (nome) {
-          const idProfessor = nomeParaProfessorId(nome);
-          if (idProfessor && original?.idProfessor !== idProfessor) return true;
-        }
+    if (!matrizEdit) return true;
+    for (let i = 0; i < tabelaAtiva.length; i++) {
+      for (let j = 0; j < tabelaAtiva[i].length; j++) {
+        if (matrizEdit[i]?.[j] && tabelaAtiva[i][j].trim() !== "") return false;
       }
     }
-    return false;
-  }, [tabelaAtiva, editaveis, activeId, todosHorarios, horarios, professores]);
+    return true;
+  }, [tabelaAtiva, editaveis, activeId]);
 
   // Conflitos decorrentes das edições na tabela ativa (mostrar abaixo do cronograma)
   const conflitosEdicaoPorProfessor = useMemo(() => {
@@ -1127,27 +1063,6 @@ export default function Cronograma() {
                       </>
                     );
                   })}
-                  {/* Linhas extras para acomodar eventos longos */}
-                  {extraRows > 0 && Array.from({ length: extraRows }).map((_, idx) => (
-                    <tr
-                      key={`extra-row-${idx}`}
-                      className={
-                        (tabelaAulasHoje.horarios.length + idx) % 2 === 0 ? "bg-theme-blue/5" : "bg-white"
-                      }
-                    >
-                      <td className="sticky left-0 z-10 bg-theme-blue/50 text-theme-white/60 font-semibold px-3 border border-theme-blue/20 whitespace-nowrap">
-                        <div className="h-14 flex items-center text-xs italic">—</div>
-                      </td>
-                      {tabelaAulasHoje.laboratorios.map((labObj) => (
-                        <td
-                          key={`${labObj.id}_extra_${idx}`}
-                          className={`${compactMode ? "px-1" : "px-2"} ${compactMode ? "min-w-[90px]" : "min-w-[140px]"} border border-theme-blue/15 align-top`}
-                        >
-                          <div className="relative h-14"></div>
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
                 </tbody>
               </table>
               {/* Overlay de eventos flutuando acima das células */}
@@ -1414,9 +1329,9 @@ export default function Cronograma() {
           <button
             type="button"
             onClick={salvarTabela}
-            disabled={!temMudancas || salvando}
+            disabled={isTabelaVazia || salvando}
             className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] ${
-              !temMudancas || salvando ? "opacity-50 cursor-not-allowed" : ""
+              isTabelaVazia || salvando ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             {salvando ? "Salvando..." : "Salvar"}

@@ -88,7 +88,7 @@ export default function Alterar() {
   const [openAtivar, setOpenAtivar] = useState({ status: false, id: 0 });
   const [currentItems, setCurrentItems] = useState<IData[]>([]);
   const [formData, setFormData] = useState<IData>(formMap[activeId]);
-  const itemsPerPage = 6;
+  const itemsPerPage = 9;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -829,7 +829,9 @@ export default function Alterar() {
               if (error.response?.data?.erros) {
                 error.response.data.erros.forEach((e) => toast.error(e));
               } else {
-                toast.error(error.message || "Falha ao ativar. Tente novamente.");
+                toast.error(
+                  error.message || "Falha ao ativar. Tente novamente."
+                );
               }
             }
 
@@ -871,6 +873,11 @@ export default function Alterar() {
             return `Deseja, realmente, desativar a orientação de ${
               orientacao.aluno?.nome || ""
             }?`;
+          } else if (activeId === 5) {
+            // Curso - aviso especial sobre alunos
+            return `Deseja, realmente, desativar ${
+              (item as FormCursoType).nome
+            }?\n\n⚠️ ATENÇÃO: Todos os alunos vinculados a este curso também serão desativados.`;
           } else {
             return `Deseja, realmente, desativar ${
               (
@@ -900,7 +907,9 @@ export default function Alterar() {
               if (error.response?.data?.erros) {
                 error.response.data.erros.forEach((e) => toast.error(e));
               } else {
-                toast.error(error.message || "Falha ao desativar. Tente novamente.");
+                toast.error(
+                  error.message || "Falha ao desativar. Tente novamente."
+                );
               }
             }
 
