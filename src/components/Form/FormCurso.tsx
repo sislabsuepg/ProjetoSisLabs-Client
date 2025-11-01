@@ -13,7 +13,10 @@ type FormAcademicoProps = {
   onSuccess?: () => void;
 };
 
-export default function FormCurso({ handleCloseModal, onSuccess }: FormAcademicoProps) {
+export default function FormCurso({
+  handleCloseModal,
+  onSuccess,
+}: FormAcademicoProps) {
   const [form, setForm] = useState({
     nome: "",
     anosMaximo: 0,

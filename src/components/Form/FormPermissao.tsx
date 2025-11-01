@@ -15,7 +15,10 @@ type FormAcademicoProps = {
   onSuccess?: () => void;
 };
 
-export default function FormPermissao({ handleCloseModal, onSuccess }: FormAcademicoProps) {
+export default function FormPermissao({
+  handleCloseModal,
+  onSuccess,
+}: FormAcademicoProps) {
   const [form, setForm] = useState({
     nomePermissao: "",
     geral: false,
@@ -230,7 +233,7 @@ export default function FormPermissao({ handleCloseModal, onSuccess }: FormAcade
         <div className="w-full flex items-center justify-between">
           <button
             type="button"
-           onClick={handleCloseModal}
+            onClick={handleCloseModal}
             className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
           >
             Cancelar

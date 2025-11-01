@@ -30,7 +30,10 @@ type FormAcademicoProps = {
   onSuccess?: () => void;
 };
 
-export default function FormUsuario({ handleCloseModal, onSuccess }: FormAcademicoProps) {
+export default function FormUsuario({
+  handleCloseModal,
+  onSuccess,
+}: FormAcademicoProps) {
   const [form, setForm] = useState<FormUsuarioState>({
     nome: "",
     login: "",

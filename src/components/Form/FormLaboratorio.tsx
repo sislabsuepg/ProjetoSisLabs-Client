@@ -1,24 +1,27 @@
-'use client';
+"use client";
 
-import { cadastro_laboratorio } from '@/schemas';
-import Switch from '@mui/material/Switch';
-import { ChangeEvent, useState } from 'react';
-import { toast } from 'react-toastify';
-import * as Yup from 'yup';
-import { apiOnline } from '@/services/services';
-import { styled, TextField } from '@mui/material';
-import { capitalize } from '@/utils/capitalize';
-import { ApiError } from '@/utils/tipos';
+import { cadastro_laboratorio } from "@/schemas";
+import Switch from "@mui/material/Switch";
+import { ChangeEvent, useState } from "react";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
+import { apiOnline } from "@/services/services";
+import { styled, TextField } from "@mui/material";
+import { capitalize } from "@/utils/capitalize";
+import { ApiError } from "@/utils/tipos";
 
 type FormAcademicoProps = {
   handleCloseModal: () => void;
   onSuccess?: () => void;
 };
 
-export default function FormLaboratorio({ handleCloseModal, onSuccess }: FormAcademicoProps) {
+export default function FormLaboratorio({
+  handleCloseModal,
+  onSuccess,
+}: FormAcademicoProps) {
   const [form, setForm] = useState({
-    nome: '',
-    numero: '',
+    nome: "",
+    numero: "",
     restrito: false,
     gerarHorarios: false,
   });
@@ -27,42 +30,44 @@ export default function FormLaboratorio({ handleCloseModal, onSuccess }: FormAca
     width: 42,
     height: 26,
     padding: 0,
-    '& .MuiSwitch-switchBase': {
+    "& .MuiSwitch-switchBase": {
       padding: 0,
       margin: 2,
-      transitionDuration: '300ms',
-      '&.Mui-checked': {
-        transform: 'translateX(16px)',
-        color: '#fff',
-        '& + .MuiSwitch-track': {
-          backgroundColor: '#65C466',
+      transitionDuration: "300ms",
+      "&.Mui-checked": {
+        transform: "translateX(16px)",
+        color: "#fff",
+        "& + .MuiSwitch-track": {
+          backgroundColor: "#65C466",
           opacity: 1,
           border: 0,
-          ...theme.applyStyles('dark', {
-            backgroundColor: '#2ECA45',
+          ...theme.applyStyles("dark", {
+            backgroundColor: "#2ECA45",
           }),
         },
       },
     },
-    '& .MuiSwitch-thumb': {
-      boxSizing: 'border-box',
+    "& .MuiSwitch-thumb": {
+      boxSizing: "border-box",
       width: 22,
       height: 22,
     },
-    '& .MuiSwitch-track': {
+    "& .MuiSwitch-track": {
       borderRadius: 26 / 2,
-      backgroundColor: '#E9E9EA',
+      backgroundColor: "#E9E9EA",
       opacity: 1,
-      transition: theme.transitions.create(['background-color'], {
+      transition: theme.transitions.create(["background-color"], {
         duration: 500,
       }),
-      ...theme.applyStyles('dark', {
-        backgroundColor: '#39393D',
+      ...theme.applyStyles("dark", {
+        backgroundColor: "#39393D",
       }),
     },
   }));
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     let newValue: string | boolean = value;
     if (name === "nome" || name === "numero") {
@@ -76,18 +81,18 @@ export default function FormLaboratorio({ handleCloseModal, onSuccess }: FormAca
     e.preventDefault();
     try {
       await cadastro_laboratorio.validate(form);
-      await apiOnline.post('/laboratorio', form);
-      toast.success('Cadastro do laboratório realizado com sucesso!');
+      await apiOnline.post("/laboratorio", form);
+      toast.success("Cadastro do laboratório realizado com sucesso!");
       setForm({
-        nome: '',
-        numero: '',
+        nome: "",
+        numero: "",
         restrito: false,
         gerarHorarios: false,
       });
       // Notifica o componente pai para atualizar a lista e fecha o modal
       onSuccess?.();
       handleCloseModal();
-      console.log('✅ Dados válidos:', form);
+      console.log("✅ Dados válidos:", form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
@@ -103,13 +108,13 @@ export default function FormLaboratorio({ handleCloseModal, onSuccess }: FormAca
   };
 
   const isFormValid = Object.values(form).every(
-    (value) => String(value).trim() !== '',
+    (value) => String(value).trim() !== ""
   );
 
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-       Cadastro do laboratório
+        Cadastro do laboratório
       </p>
 
       <form
@@ -119,17 +124,29 @@ export default function FormLaboratorio({ handleCloseModal, onSuccess }: FormAca
       >
         <div className="space-y-4">
           <div className="w-full flex items-center gap-4">
-            <TextField id="filled-basic" label="Nome do laboratório" variant="filled" type="text"
+            <TextField
+              id="filled-basic"
+              label="Nome do laboratório"
+              variant="filled"
+              type="text"
               name="nome"
-              value={form.nome ? capitalize(form.nome) : ''}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md"
-              required={true} />
+              value={form.nome ? capitalize(form.nome) : ""}
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
+            />
 
-            <TextField id="filled-basic" label="Número" variant="filled" type="text"
+            <TextField
+              id="filled-basic"
+              label="Número"
+              variant="filled"
+              type="text"
               name="numero"
               value={form.numero}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md"
-              required={true} />
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
+            />
           </div>
 
           <div className="w-full flex items-center gap-4">
@@ -152,7 +169,10 @@ export default function FormLaboratorio({ handleCloseModal, onSuccess }: FormAca
               <CustomSwitch
                 checked={form.gerarHorarios}
                 onChange={(e) =>
-                  setForm((prev) => ({ ...prev, gerarHorarios: e.target.checked }))
+                  setForm((prev) => ({
+                    ...prev,
+                    gerarHorarios: e.target.checked,
+                  }))
                 }
                 name="gerarHorarios"
               />
@@ -163,7 +183,7 @@ export default function FormLaboratorio({ handleCloseModal, onSuccess }: FormAca
         <div className="w-full flex items-center justify-between">
           <button
             type="button"
-           onClick={handleCloseModal}
+            onClick={handleCloseModal}
             className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
           >
             Cancelar
@@ -172,7 +192,7 @@ export default function FormLaboratorio({ handleCloseModal, onSuccess }: FormAca
             type="submit"
             disabled={!isFormValid}
             className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] 
-              ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+              ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             Cadastrar
           </button>
