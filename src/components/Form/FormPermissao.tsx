@@ -12,9 +12,10 @@ import * as Yup from "yup";
 
 type FormAcademicoProps = {
   handleCloseModal: () => void;
+  onSuccess?: () => void;
 };
 
-export default function FormPermissao({ handleCloseModal }: FormAcademicoProps) {
+export default function FormPermissao({ handleCloseModal, onSuccess }: FormAcademicoProps) {
   const [form, setForm] = useState({
     nomePermissao: "",
     geral: false,
@@ -40,6 +41,9 @@ export default function FormPermissao({ handleCloseModal }: FormAcademicoProps) 
         relatorio: false,
         advertencia: false,
       });
+      // Notifica o pai para atualizar a lista e fecha o modal
+      onSuccess?.();
+      handleCloseModal();
       console.log("✅ Dados válidos:", form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {

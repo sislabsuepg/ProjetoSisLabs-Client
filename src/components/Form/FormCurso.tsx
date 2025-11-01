@@ -10,9 +10,10 @@ import { TextField } from "@mui/material";
 
 type FormAcademicoProps = {
   handleCloseModal: () => void;
+  onSuccess?: () => void;
 };
 
-export default function FormCurso({ handleCloseModal }: FormAcademicoProps) {
+export default function FormCurso({ handleCloseModal, onSuccess }: FormAcademicoProps) {
   const [form, setForm] = useState({
     nome: "",
     anosMaximo: 0,
@@ -26,21 +27,28 @@ export default function FormCurso({ handleCloseModal }: FormAcademicoProps) {
     if (name === "anosMaximo") {
       setForm((f) => ({ ...f, [name]: Number(value) }));
     } else {
-      setForm((f) => ({ ...f, [name]: value.trim() }));
+      // Não remova espaços enquanto digita; deixe o usuário inserir espaços normalmente
+      setForm((f) => ({ ...f, [name]: value }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await cadastro_curso.validate(form);
-      await apiOnline.post("/curso", {
-        nome: form.nome,
+      // Sanitize/normalize only no envio/validação
+      const payload = {
+        nome: form.nome.trim(),
         anosMaximo: form.anosMaximo,
-      });
+      };
+
+      await cadastro_curso.validate(payload);
+      await apiOnline.post("/curso", payload);
       toast.success("Cadastro do curso realizado com sucesso!");
       setForm({ nome: "", anosMaximo: 0 });
-      console.log("✅ Dados válidos:", form);
+      console.log("✅ Dados válidos:", payload);
+      // Notifica o pai para atualizar a lista e fecha o modal
+      onSuccess?.();
+      handleCloseModal();
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
@@ -107,7 +115,7 @@ export default function FormCurso({ handleCloseModal }: FormAcademicoProps) {
         <div className="w-full flex items-center justify-between">
           <button
             type="button"
-           onClick={handleCloseModal}
+            onClick={handleCloseModal}
             className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
           >
             Cancelar

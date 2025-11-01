@@ -1003,7 +1003,10 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormAcademico handleCloseModal={() => setOpenModal(null)} />
+            <FormAcademico
+              handleCloseModal={() => setOpenModal(null)}
+              onSuccess={() => setBusca((b) => !b)}
+            />
           </div>
         </Modal>
       )}
@@ -1019,7 +1022,10 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormProfessor handleCloseModal={() => setOpenModal(null)} />
+            <FormProfessor
+              handleCloseModal={() => setOpenModal(null)}
+              onSuccess={() => setBusca((b) => !b)}
+            />
           </div>
         </Modal>
       )}
@@ -1039,7 +1045,10 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormLaboratorio handleCloseModal={() => setOpenModal(null)} />
+            <FormLaboratorio
+              handleCloseModal={() => setOpenModal(null)}
+              onSuccess={() => setBusca((b) => !b)}
+            />
           </div>
         </Modal>
       )}
@@ -1059,7 +1068,10 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormOrientacao handleCloseModal={() => setOpenModal(null)} />
+            <FormOrientacao
+              handleCloseModal={() => setOpenModal(null)}
+              onSuccess={() => setBusca((b) => !b)}
+            />
           </div>
         </Modal>
       )}
@@ -1079,7 +1091,10 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormCurso handleCloseModal={() => setOpenModal(null)} />
+            <FormCurso
+              handleCloseModal={() => setOpenModal(null)}
+              onSuccess={() => setBusca((b) => !b)}
+            />
           </div>
         </Modal>
       )}
@@ -1099,7 +1114,10 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormPermissao handleCloseModal={() => setOpenModal(null)} />
+            <FormPermissao
+              handleCloseModal={() => setOpenModal(null)}
+              onSuccess={() => setBusca((b) => !b)}
+            />
           </div>
         </Modal>
       )}
@@ -1119,7 +1137,10 @@ export default function Alterar() {
             }}
             className="bg-white rounded-[12px] p-8 w-[80%] max-w-[800px] shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           >
-            <FormUsuario handleCloseModal={() => setOpenModal(null)} />
+            <FormUsuario
+              handleCloseModal={() => setOpenModal(null)}
+              onSuccess={() => setBusca((b) => !b)}
+            />
           </div>
         </Modal>
       )}

@@ -27,9 +27,10 @@ interface FormUsuarioState {
 
 type FormAcademicoProps = {
   handleCloseModal: () => void;
+  onSuccess?: () => void;
 };
 
-export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
+export default function FormUsuario({ handleCloseModal, onSuccess }: FormAcademicoProps) {
   const [form, setForm] = useState<FormUsuarioState>({
     nome: "",
     login: "",
@@ -58,6 +59,9 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
         repetirSenha: "",
         idPermissao: 0,
       });
+      // Notifica o pai para atualizar a lista e fecha o modal
+      onSuccess?.();
+      handleCloseModal();
     } catch (err) {
       const error = err as ApiError;
       if (error.response?.data?.erros) {
@@ -136,7 +140,7 @@ export default function FormUsuario({ handleCloseModal }: FormAcademicoProps) {
               variant="filled"
               type="text"
               name="nome"
-              value={form.nome ? capitalize(form.nome) : ""}
+              value={form.nome ? capitalize(form.nome).replace(/\d+/g, "") : ""}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
               required={true}

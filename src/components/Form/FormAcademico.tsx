@@ -21,10 +21,12 @@ import { ApiError } from "@/utils/tipos";
 
 type FormAcademicoProps = {
   handleCloseModal: () => void;
+  onSuccess?: () => void;
 };
 
 export default function FormAcademico({
   handleCloseModal,
+  onSuccess,
 }: FormAcademicoProps) {
   const [form, setForm] = useState({
     nome: "",
@@ -92,6 +94,9 @@ export default function FormAcademico({
         senha: "",
         repetirSenha: "",
       });
+      // Notifica o pai para atualizar a lista e fecha o modal
+      onSuccess?.();
+      handleCloseModal();
       console.log("✅ Dados válidos:", form);
     } catch (err) {
       const error = err as ApiError;
@@ -167,7 +172,7 @@ export default function FormAcademico({
               variant="filled"
               type="text"
               name="nome"
-              value={form.nome ? capitalize(form.nome) : ""}
+              value={form.nome ? capitalize(form.nome).replace(/\d+/g, "") : ""}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
               required={true}

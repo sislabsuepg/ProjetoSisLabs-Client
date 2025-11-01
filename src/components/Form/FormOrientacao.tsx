@@ -22,10 +22,12 @@ import {
 
 type FormAcademicoProps = {
   handleCloseModal: () => void;
+  onSuccess?: () => void;
 };
 
 export default function FormOrientacao({
   handleCloseModal,
+  onSuccess,
 }: FormAcademicoProps) {
   const [form, setForm] = useState<{
     dataInicio: Dayjs | null;
@@ -88,6 +90,9 @@ export default function FormOrientacao({
       });
       setRa("");
       toast.success("Cadastro da orientação realizado com sucesso!");
+      // Notifica o pai para atualizar a lista e fecha o modal
+      onSuccess?.();
+      handleCloseModal();
     } catch (err: unknown) {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
@@ -113,7 +118,9 @@ export default function FormOrientacao({
       try {
         const [professoresResponse, laboratoriosResponse] = await Promise.all([
           apiOnline.get<IProfessor[]>("/professor?ativo=true"),
-          apiOnline.get<ILaboratorio[]>("/laboratorio?restrito=true&ativo=true"),
+          apiOnline.get<ILaboratorio[]>(
+            "/laboratorio?restrito=true&ativo=true"
+          ),
         ]);
         setProfessores(
           (
@@ -219,7 +226,7 @@ export default function FormOrientacao({
               variant="filled"
               name="ra"
               value={ra}
-              onChange={(e) => setRa(e.target.value)}
+              onChange={(e) => setRa(e.target.value.replace(/\D+/g, ""))}
               inputProps={{ maxLength: 13 }}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
               required={true}

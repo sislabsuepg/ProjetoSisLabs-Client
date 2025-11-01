@@ -12,9 +12,10 @@ import { ApiError } from '@/utils/tipos';
 
 type FormAcademicoProps = {
   handleCloseModal: () => void;
+  onSuccess?: () => void;
 };
 
-export default function FormLaboratorio({ handleCloseModal }: FormAcademicoProps) {
+export default function FormLaboratorio({ handleCloseModal, onSuccess }: FormAcademicoProps) {
   const [form, setForm] = useState({
     nome: '',
     numero: '',
@@ -83,6 +84,9 @@ export default function FormLaboratorio({ handleCloseModal }: FormAcademicoProps
         restrito: false,
         gerarHorarios: false,
       });
+      // Notifica o componente pai para atualizar a lista e fecha o modal
+      onSuccess?.();
+      handleCloseModal();
       console.log('✅ Dados válidos:', form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
