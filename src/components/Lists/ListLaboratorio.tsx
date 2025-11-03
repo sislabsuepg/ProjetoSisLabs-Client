@@ -30,10 +30,10 @@ export default function ListLaboratorio({
           <thead>
             <tr>
               <th className="px-4 py-2 text-left text-xs font-medium text-theme-blue uppercase">
-                Nome
+                Número
               </th>
               <th className="px-4 py-2 text-left text-xs font-medium text-theme-blue uppercase">
-                Número
+                Nome
               </th>
               <th className="px-4 py-2 text-left text-xs font-medium text-theme-blue uppercase">
                 Restrito
@@ -45,73 +45,79 @@ export default function ListLaboratorio({
           </thead>
           <tbody>
             {list.length > 0 ? (
-              list.map((item, index) => (
-                <tr
-                  key={item.id}
-                  className={`${
-                    index % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
-                  } border-b last:border-0`}
-                >
-                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.nome}>{item.nome}</Popover>
-                  </td>
-                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.numero}>{item.numero}</Popover>
-                  </td>
-                  <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
-                    <Popover title={item.restrito ? "Sim" : "Não"}>
-                      {item.restrito ? "Sim" : "Não"}
-                    </Popover>
-                  </td>
-                  <td className="px-4 py-3 text-[0.8rem] font-medium w-[100px]">
-                    <div className="flex items-center justify-center gap-3">
-                      <Popover title="Editar">
-                        <button
-                          onClick={() => {
-                            const user = dados.find((d) => d.id === item.id);
-                            if (user) {
-                              setFormData({ ...user });
-                              setOpenEditUser({ status: true, id: item.id });
-                            }
-                          }}
-                        >
-                          <BorderColorIcon
-                            className="text-theme-blue"
-                            sx={{ width: 20, height: 20 }}
-                          />
-                        </button>
+              [...list]
+                .sort((a, b) =>
+                  (a.numero || "").localeCompare(b.numero || "", "pt", {
+                    sensitivity: "base",
+                  })
+                )
+                .map((item, index) => (
+                  <tr
+                    key={item.id}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
+                    } border-b last:border-0`}
+                  >
+                    <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/6">
+                      <Popover title={item.numero}>{item.numero}</Popover>
+                    </td>
+                    <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
+                      <Popover title={item.nome}>{item.nome}</Popover>
+                    </td>
+                    <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
+                      <Popover title={item.restrito ? "Sim" : "Não"}>
+                        {item.restrito ? "Sim" : "Não"}
                       </Popover>
-                      {item.ativo ? (
-                        <Popover title="Desativar">
+                    </td>
+                    <td className="px-4 py-3 text-[0.8rem] font-medium w-[100px]">
+                      <div className="flex items-center justify-center gap-3">
+                        <Popover title="Editar">
                           <button
-                            onClick={() =>
-                              setOpenExcluir({ status: true, id: item.id })
-                            }
+                            onClick={() => {
+                              const user = dados.find((d) => d.id === item.id);
+                              if (user) {
+                                setFormData({ ...user });
+                                setOpenEditUser({ status: true, id: item.id });
+                              }
+                            }}
                           >
-                            <PersonRemoveIcon
+                            <BorderColorIcon
                               className="text-theme-blue"
-                              sx={{ width: 22, height: 22 }}
+                              sx={{ width: 20, height: 20 }}
                             />
                           </button>
                         </Popover>
-                      ) : (
-                        <Popover title="Ativar">
-                          <button
-                            onClick={() =>
-                              setOpenAtivar({ status: true, id: item.id })
-                            }
-                          >
-                            <PersonAdd
-                              className="text-theme-blue"
-                              sx={{ width: 22, height: 22 }}
-                            />
-                          </button>
-                        </Popover>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
+                        {item.ativo ? (
+                          <Popover title="Desativar">
+                            <button
+                              onClick={() =>
+                                setOpenExcluir({ status: true, id: item.id })
+                              }
+                            >
+                              <PersonRemoveIcon
+                                className="text-theme-blue"
+                                sx={{ width: 22, height: 22 }}
+                              />
+                            </button>
+                          </Popover>
+                        ) : (
+                          <Popover title="Ativar">
+                            <button
+                              onClick={() =>
+                                setOpenAtivar({ status: true, id: item.id })
+                              }
+                            >
+                              <PersonAdd
+                                className="text-theme-blue"
+                                sx={{ width: 22, height: 22 }}
+                              />
+                            </button>
+                          </Popover>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
             ) : (
               <tr>
                 <td

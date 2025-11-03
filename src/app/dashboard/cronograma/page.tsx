@@ -132,21 +132,19 @@ export default function Cronograma() {
           (resp.data && Array.isArray(resp.data)
             ? resp.data
             : (resp as { eventos?: IEvento[] }).eventos) || [];
-        const filtrados = lista.filter((e)=>{
-          const hoje = new Date().setHours(0,0,0,0);
-          const hojeFim = new Date().setHours(23,59,59,999);
+        const filtrados = lista.filter((e) => {
+          const hoje = new Date().setHours(0, 0, 0, 0);
+          const hojeFim = new Date().setHours(23, 59, 59, 999);
           const evento = new Date(e.data).getTime();
           return evento > hoje && evento < hojeFim;
-        })
+        });
         if (lista.length) setTodosEventos(filtrados);
       } catch (e) {
         console.error("Erro ao buscar eventos", e);
       }
-    }
-    carregaEventos()
-
+    };
+    carregaEventos();
   }, []);
-
 
   // Carrega horários para o laboratório ativo se ainda não carregado (com tabela editável)
   useEffect(() => {
@@ -321,7 +319,11 @@ export default function Cronograma() {
 
   // Utils para normalização/comparação de nomes e resolução de ID por nome
   const normalizeStr = (s?: string) =>
-    (s || "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+    (s || "")
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLowerCase()
+      .trim();
 
   const nomeParaProfessorId = (nome: string): number | undefined => {
     const normalizado = normalizeStr(nome);
@@ -335,7 +337,10 @@ export default function Cronograma() {
     if (!id) return undefined;
     const l = laboratorios.find((lab) => lab.id === id);
     if (!l) return undefined;
-    return `${l.nome}${l.numero ? ` - ${l.numero}` : ""}`;
+    // Número primeiro
+    const numero = (l.numero || "").trim();
+    const nome = (l.nome || "").trim();
+    return numero ? `${numero} - ${nome}` : nome;
   };
 
   const aulasHoje = useMemo(() => {
@@ -361,10 +366,11 @@ export default function Cronograma() {
         professor:
           a.professor?.nome || getProfessorNomeById(a.idProfessor) || "",
         professorId: a.idProfessor,
+        // Sigla primeiro quando houver dados do laboratório
         laboratorio: a.laboratorio?.nome
-          ? `${a.laboratorio.nome}${
-              a.laboratorio.numero ? ` - ${a.laboratorio.numero}` : ""
-            }`
+          ? `${(a.laboratorio.numero || "").trim()} - ${(
+              a.laboratorio.nome || ""
+            ).trim()}`
           : getLaboratorioNomeById(a.idLaboratorio) || "",
         idLaboratorio: a.idLaboratorio,
       }));
@@ -391,13 +397,23 @@ export default function Cronograma() {
       if (a.idLaboratorio && !map.has(a.idLaboratorio)) {
         map.set(a.idLaboratorio, {
           id: a.idLaboratorio,
-          nome: a.laboratorio.split(" - ")[0] || "Lab",
-          numero: a.laboratorio.split(" - ")[1] || "",
+          // Agora o formato é "sigla - nome"
+          numero: a.laboratorio.split(" - ")[0] || "",
+          nome: a.laboratorio.split(" - ")[1] || "Lab",
           restrito: false,
         } as ILaboratorio);
       }
     });
-    return Array.from(map.values()).sort((a, b) => a.id! - b.id!);
+    // Ordena por sigla (numero) e depois por nome
+    return Array.from(map.values()).sort((a, b) => {
+      const an = (a.numero || "").toString().toLowerCase();
+      const bn = (b.numero || "").toString().toLowerCase();
+      const cmp = an.localeCompare(bn, "pt", { sensitivity: "base" });
+      if (cmp !== 0) return cmp;
+      return (a.nome || "").localeCompare(b.nome || "", "pt", {
+        sensitivity: "base",
+      });
+    });
   }, [laboratorios, aulasOrdenadas]);
 
   useEffect(() => {
@@ -429,12 +445,24 @@ export default function Cronograma() {
     });
     todosEventos.forEach((ev) => {
       if (!ev.idLaboratorio) return;
-      const label = getLaboratorioNomeById(ev.idLaboratorio) || `Lab ${ev.idLaboratorio}`;
+      const label =
+        getLaboratorioNomeById(ev.idLaboratorio) || `Lab ${ev.idLaboratorio}`;
       if (!labsMap.has(ev.idLaboratorio)) labsMap.set(ev.idLaboratorio, label);
     });
     const labs = Array.from(labsMap.entries())
-      .map(([id, label]) => ({ id, label }))
-      .sort((a, b) => a.id - b.id);
+      .map(([id]) => {
+        const l = laboratorios.find((x) => x.id === id);
+        const sigla = (l?.numero || "").trim();
+        const nome = (l?.nome || "").trim();
+        const label = sigla ? `${sigla} - ${nome}` : nome;
+        return { id, label, sigla };
+      })
+      .sort((a, b) =>
+        (a.sigla || "").localeCompare(b.sigla || "", "pt", {
+          sensitivity: "base",
+        })
+      )
+      .map(({ id, label }) => ({ id, label }));
 
     // Horários (linhas) presentes em aulas ou que tenham interseção com algum evento
     const horasSet = new Set<string>();
@@ -446,7 +474,8 @@ export default function Cronograma() {
         const intersects = todosEventos.some((ev) => {
           const dt = new Date(ev.data);
           const evStart = dt.getHours() * 60 + dt.getMinutes();
-          const dur = typeof ev.duracao === "number" && ev.duracao > 0 ? ev.duracao : 1;
+          const dur =
+            typeof ev.duracao === "number" && ev.duracao > 0 ? ev.duracao : 1;
           const evEnd = evStart + dur;
           return Math.max(s, evStart) < Math.min(e, evEnd);
         });
@@ -455,7 +484,7 @@ export default function Cronograma() {
     }
     const idxMap = new Map(horarios.map((h, i) => [h, i] as const));
     const hrs = Array.from(horasSet.values()).sort(
-      (a, b) => (idxMap.get(a)! - idxMap.get(b)!)
+      (a, b) => idxMap.get(a)! - idxMap.get(b)!
     );
 
     // Mapa de aulas (professor por chave horario__lab)
@@ -474,7 +503,10 @@ export default function Cronograma() {
   useEffect(() => {
     const wrapper = overlayWrapperRef.current;
     if (!wrapper) return;
-    if (!tabelaAulasHoje.horarios.length || !tabelaAulasHoje.laboratorios.length) {
+    if (
+      !tabelaAulasHoje.horarios.length ||
+      !tabelaAulasHoje.laboratorios.length
+    ) {
       setEventOverlays([]);
       return;
     }
@@ -520,7 +552,8 @@ export default function Cronograma() {
       }
       // Fora do range: clamp
       const hFirst = tabelaAulasHoje.horarios[0];
-      const hLast = tabelaAulasHoje.horarios[tabelaAulasHoje.horarios.length - 1];
+      const hLast =
+        tabelaAulasHoje.horarios[tabelaAulasHoje.horarios.length - 1];
       const sFirst = toMin(hFirst);
       const eLast = slotEndAt(horarios.findIndex((x) => x === hLast));
       if (min < sFirst) return rowTops[0];
@@ -528,19 +561,31 @@ export default function Cronograma() {
       return rowTops[0];
     };
 
-  const novos: Array<{ key: string; left: number; width: number; top: number; height: number; nome: string; responsavel?: string; hora: string }> = [];
+    const novos: Array<{
+      key: string;
+      left: number;
+      width: number;
+      top: number;
+      height: number;
+      nome: string;
+      responsavel?: string;
+      hora: string;
+    }> = [];
     for (const ev of todosEventos) {
       const labId = ev.idLaboratorio;
       if (!labId) continue;
       const col = colGeom.get(labId);
       if (!col) continue;
-  const dt = new Date(ev.data);
-  const startMin = dt.getHours() * 60 + dt.getMinutes();
-  const dur = typeof ev.duracao === 'number' && ev.duracao > 0 ? ev.duracao : 1;
-  const endMin = startMin + dur;
-  const endDt = new Date(dt.getTime() + dur * 60 * 1000);
-  const pad2 = (n: number) => (n < 10 ? `0${n}` : String(n));
-  const hora = `${pad2(dt.getHours())}:${pad2(dt.getMinutes())} – ${pad2(endDt.getHours())}:${pad2(endDt.getMinutes())}`;
+      const dt = new Date(ev.data);
+      const startMin = dt.getHours() * 60 + dt.getMinutes();
+      const dur =
+        typeof ev.duracao === "number" && ev.duracao > 0 ? ev.duracao : 1;
+      const endMin = startMin + dur;
+      const endDt = new Date(dt.getTime() + dur * 60 * 1000);
+      const pad2 = (n: number) => (n < 10 ? `0${n}` : String(n));
+      const hora = `${pad2(dt.getHours())}:${pad2(dt.getMinutes())} – ${pad2(
+        endDt.getHours()
+      )}:${pad2(endDt.getMinutes())}`;
       const top = getYForMinute(startMin);
       const bottom = getYForMinute(endMin);
       const height = Math.max(2, bottom - top);
@@ -568,8 +613,8 @@ export default function Cronograma() {
         setEventOverlays((prev) => [...prev]);
       }, 50);
     };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, [todosEventos, tabelaAulasHoje, horarios]);
 
   // Índice do primeiro horário considerado "noite" (>= 18:00)
@@ -604,8 +649,12 @@ export default function Cronograma() {
       horarios: PorHora[];
     };
     const byProfessor = new Map<string | number, PorProfessor>();
-    const byKey = (profId?: number, nome?: string) => (profId ?? normalizeStr(nome));
-    const tmpByHora = new Map<string, { profKey: string | number; data: PorHora }>();
+    const byKey = (profId?: number, nome?: string) =>
+      profId ?? normalizeStr(nome);
+    const tmpByHora = new Map<
+      string,
+      { profKey: string | number; data: PorHora }
+    >();
     for (const a of aulasOrdenadas as Array<{
       horario: string;
       professor: string;
@@ -622,7 +671,8 @@ export default function Cronograma() {
         entry = { profKey, data: { horario: a.horario, labs: [lab] } };
         tmpByHora.set(horaKey, entry);
       } else {
-        if (!entry.data.labs.some((l) => l.id === lab.id)) entry.data.labs.push(lab);
+        if (!entry.data.labs.some((l) => l.id === lab.id))
+          entry.data.labs.push(lab);
       }
     }
     // Transfere apenas horas com 2+ labs
@@ -631,18 +681,28 @@ export default function Cronograma() {
       let grupo = byProfessor.get(profKey);
       if (!grupo) {
         // Recupera o nome legível
-        const nome = typeof profKey === 'number'
-          ? getProfessorNomeById(profKey) || ''
-          : aulasOrdenadas.find(a => normalizeStr(a.professor) === profKey)?.professor || '';
-        grupo = { professor: nome, professorId: typeof profKey === 'number' ? profKey : undefined, horarios: [] };
+        const nome =
+          typeof profKey === "number"
+            ? getProfessorNomeById(profKey) || ""
+            : aulasOrdenadas.find((a) => normalizeStr(a.professor) === profKey)
+                ?.professor || "";
+        grupo = {
+          professor: nome,
+          professorId: typeof profKey === "number" ? profKey : undefined,
+          horarios: [],
+        };
         byProfessor.set(profKey, grupo);
       }
       data.labs.sort((a, b) => a.id - b.id);
       grupo.horarios.push(data);
     }
     const lista = Array.from(byProfessor.values());
-    lista.forEach((g) => g.horarios.sort((a, b) => a.horario.localeCompare(b.horario, 'pt')));
-    lista.sort((a, b) => a.professor.localeCompare(b.professor, 'pt', { sensitivity: 'base' }));
+    lista.forEach((g) =>
+      g.horarios.sort((a, b) => a.horario.localeCompare(b.horario, "pt"))
+    );
+    lista.sort((a, b) =>
+      a.professor.localeCompare(b.professor, "pt", { sensitivity: "base" })
+    );
     return lista;
   }, [aulasOrdenadas]);
 
@@ -848,16 +908,35 @@ export default function Cronograma() {
 
   // Conflitos decorrentes das edições na tabela ativa (mostrar abaixo do cronograma)
   const conflitosEdicaoPorProfessor = useMemo(() => {
-    type Item = { diaIdx: number; horario: string; labId: number; labLabel: string };
+    type Item = {
+      diaIdx: number;
+      horario: string;
+      labId: number;
+      labLabel: string;
+    };
     type Card = { professor: string; professorId?: number; itens: Item[] };
     const byProf = new Map<string | number, Card>();
-    const addItem = (profKey: string | number, nome: string, profId: number | undefined, item: Item) => {
+    const addItem = (
+      profKey: string | number,
+      nome: string,
+      profId: number | undefined,
+      item: Item
+    ) => {
       let card = byProf.get(profKey);
       if (!card) {
-        card = { professor: profId ? (getProfessorNomeById(profId) || nome) : nome, professorId: profId, itens: [] };
+        card = {
+          professor: profId ? getProfessorNomeById(profId) || nome : nome,
+          professorId: profId,
+          itens: [],
+        };
         byProf.set(profKey, card);
       }
-      const exists = card.itens.some((i) => i.diaIdx === item.diaIdx && i.horario === item.horario && i.labId === item.labId);
+      const exists = card.itens.some(
+        (i) =>
+          i.diaIdx === item.diaIdx &&
+          i.horario === item.horario &&
+          i.labId === item.labId
+      );
       if (!exists) card.itens.push(item);
     };
 
@@ -880,11 +959,22 @@ export default function Cronograma() {
           if (!h.idLaboratorio || h.idLaboratorio === activeId) continue;
           if (h.diaSemana !== diaSemana || h.horario !== horario) continue;
           const matchId = profId && h.idProfessor && h.idProfessor === profId;
-          const matchNome = !profId && normalizeStr(h.professor?.nome) === normalizeStr(nome);
+          const matchNome =
+            !profId && normalizeStr(h.professor?.nome) === normalizeStr(nome);
           if (matchId || matchNome) {
-            const labLabel = getLaboratorioNomeById(h.idLaboratorio) ||
-              (h.laboratorio?.nome ? `${h.laboratorio.nome}${h.laboratorio.numero ? ` - ${h.laboratorio.numero}` : ''}` : `Lab ${h.idLaboratorio}`);
-            addItem(profKey, nome, profId, { diaIdx, horario, labId: h.idLaboratorio, labLabel });
+            const labLabel =
+              getLaboratorioNomeById(h.idLaboratorio) ||
+              (h.laboratorio?.nome
+                ? `${h.laboratorio.nome}${
+                    h.laboratorio.numero ? ` - ${h.laboratorio.numero}` : ""
+                  }`
+                : `Lab ${h.idLaboratorio}`);
+            addItem(profKey, nome, profId, {
+              diaIdx,
+              horario,
+              labId: h.idLaboratorio,
+              labLabel,
+            });
           }
         }
 
@@ -896,18 +986,30 @@ export default function Cronograma() {
           const editMat = editaveis[labId];
           if (!mat || !editMat) continue;
           if (!editMat[linha]?.[coluna]) continue; // slot não existe
-          const cell = mat[linha]?.[coluna] || '';
+          const cell = mat[linha]?.[coluna] || "";
           if (normalizeStr(cell) === normalizeStr(nome)) {
             const labLabel = getLaboratorioNomeById(labId) || `Lab ${labId}`;
-            addItem(profKey, nome, profId, { diaIdx, horario, labId, labLabel });
+            addItem(profKey, nome, profId, {
+              diaIdx,
+              horario,
+              labId,
+              labLabel,
+            });
           }
         }
       }
     }
 
     const cards = Array.from(byProf.values());
-    cards.forEach((c) => c.itens.sort((a, b) => a.diaIdx - b.diaIdx || a.horario.localeCompare(b.horario, 'pt')));
-    cards.sort((a, b) => a.professor.localeCompare(b.professor, 'pt', { sensitivity: 'base' }));
+    cards.forEach((c) =>
+      c.itens.sort(
+        (a, b) =>
+          a.diaIdx - b.diaIdx || a.horario.localeCompare(b.horario, "pt")
+      )
+    );
+    cards.sort((a, b) =>
+      a.professor.localeCompare(b.professor, "pt", { sensitivity: "base" })
+    );
     return cards;
   }, [tabelaAtiva, editaveis, activeId, todosHorarios, tabelas, professores]);
 
@@ -969,137 +1071,194 @@ export default function Cronograma() {
           ) : (
             <div className="overflow-x-auto">
               <div className="relative" ref={overlayWrapperRef}>
-              <table
-                className={`min-w-full border-separate border-spacing-0 text-[0.65rem] ${
-                  compactMode ? "table-fixed" : ""
-                }`}
-              >
-                <thead>
-                  <tr>
-                    <th
-                      className={`sticky left-0 z-20 bg-theme-blue text-theme-white font-semibold ${
-                        compactMode ? "px-2 w-[70px]" : "px-3 w-[110px]"
-                      } py-2 text-left rounded-l-md border border-theme-blue/20`}
-                    >
-                      Horário
-                    </th>
-                    {tabelaAulasHoje.laboratorios.map((labObj) => (
+                <table
+                  className={`min-w-full border-separate border-spacing-0 text-[0.65rem] ${
+                    compactMode ? "table-fixed" : ""
+                  }`}
+                >
+                  <thead>
+                    <tr>
                       <th
-                        key={labObj.id}
-                        ref={(el) => { thRefs.current[labObj.id] = el; }}
-                        className={`bg-theme-blue text-theme-white font-semibold ${
-                          compactMode ? "px-2 py-2 text-[0.6rem]" : "px-3 py-2"
-                        } text-left border border-theme-blue/20 ${
-                          compactMode ? "min-w-[90px]" : "min-w-[140px]"
-                        } whitespace-nowrap`}
+                        className={`sticky left-0 z-20 bg-theme-blue text-theme-white font-semibold ${
+                          compactMode ? "px-2 w-[70px]" : "px-3 w-[110px]"
+                        } py-2 text-left rounded-l-md border border-theme-blue/20`}
                       >
-                        {labObj.label}
+                        Horário
                       </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {tabelaAulasHoje.horarios.map((hora, idxHora) => {
-                    // Separador noite agora baseado na primeira hora de noite realmente presente no dia
-                    const isNightSeparator =
-                      separadoresHoje.precisaSeparadorNoite &&
-                      separadoresHoje.primeiraNoite === hora &&
-                      idxHora !== 0; // evita separador no topo
-                    // Separador tarde agora dinâmico: antes da primeira hora efetiva da tarde presente
-                    const isAfternoonSeparator =
-                      separadoresHoje.precisaSeparadorTarde &&
-                      separadoresHoje.primeiraTarde === hora &&
-                      idxHora !== 0;
-                    return (
-                      <>
-                        {isAfternoonSeparator && (
-                          <tr key={hora + "_sep_tarde"}>
-                            <td
-                              colSpan={1 + tabelaAulasHoje.laboratorios.length}
-                              className="bg-gradient-to-r from-transparent via-amber-300/40 to-transparent h-[6px] p-0"
-                              title="Intervalo"
-                            />
-                          </tr>
-                        )}
-                        {isNightSeparator && (
-                          <tr key={hora + "_sep"}>
-                            <td
-                              colSpan={1 + tabelaAulasHoje.laboratorios.length}
-                              className="bg-gradient-to-r from-transparent via-theme-blue/20 to-transparent h-[6px] p-0"
-                              title="Intervalo"
-                            />
-                          </tr>
-                        )}
-                        <tr
-                          key={hora}
-                          className={
-                            idxHora % 2 === 0 ? "bg-theme-blue/5" : "bg-white"
-                          }
+                      {tabelaAulasHoje.laboratorios.map((labObj) => (
+                        <th
+                          key={labObj.id}
+                          ref={(el) => {
+                            thRefs.current[labObj.id] = el;
+                          }}
+                          className={`bg-theme-blue text-theme-white font-semibold ${
+                            compactMode
+                              ? "px-2 py-2 text-[0.6rem]"
+                              : "px-3 py-2"
+                          } text-left border border-theme-blue/20 ${
+                            compactMode ? "min-w-[90px]" : "min-w-[140px]"
+                          } whitespace-nowrap`}
                         >
-                          <td ref={(el)=>{ rowRefs.current[hora] = el; }} className="sticky left-0 z-10 bg-theme-blue/90 text-theme-white font-semibold px-3 border border-theme-blue/20 whitespace-nowrap">
-                            <div className="h-14 flex items-center">{hora}</div>
-                          </td>
-                          {tabelaAulasHoje.laboratorios.map((labObj) => {
-                            const chave = `${hora}__${labObj.id}`;
-                            const professor = tabelaAulasHoje.mapa[chave];
-                            return (
+                          {labObj.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tabelaAulasHoje.horarios.map((hora, idxHora) => {
+                      // Separador noite agora baseado na primeira hora de noite realmente presente no dia
+                      const isNightSeparator =
+                        separadoresHoje.precisaSeparadorNoite &&
+                        separadoresHoje.primeiraNoite === hora &&
+                        idxHora !== 0; // evita separador no topo
+                      // Separador tarde agora dinâmico: antes da primeira hora efetiva da tarde presente
+                      const isAfternoonSeparator =
+                        separadoresHoje.precisaSeparadorTarde &&
+                        separadoresHoje.primeiraTarde === hora &&
+                        idxHora !== 0;
+                      return (
+                        <>
+                          {isAfternoonSeparator && (
+                            <tr key={hora + "_sep_tarde"}>
                               <td
-                                key={labObj.id + "_" + hora}
-                                className={`${compactMode ? "px-1" : "px-2"} ${compactMode ? "min-w-[90px]" : "min-w-[140px]"} border border-theme-blue/15 align-top`}
-                              >
-                                <div className="relative h-14">
-                                  {professor ? (
-                                    <div className="absolute inset-0 flex items-center justify-start pr-1">
-                                      <span className="font-bold text-theme-blue truncate" title={professor}>{professor}</span>
-                                    </div>
-                                  ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center text-theme-blue/30 select-none">—</div>
-                                  )}
-                                </div>
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      </>
+                                colSpan={
+                                  1 + tabelaAulasHoje.laboratorios.length
+                                }
+                                className="bg-gradient-to-r from-transparent via-amber-300/40 to-transparent h-[6px] p-0"
+                                title="Intervalo"
+                              />
+                            </tr>
+                          )}
+                          {isNightSeparator && (
+                            <tr key={hora + "_sep"}>
+                              <td
+                                colSpan={
+                                  1 + tabelaAulasHoje.laboratorios.length
+                                }
+                                className="bg-gradient-to-r from-transparent via-theme-blue/20 to-transparent h-[6px] p-0"
+                                title="Intervalo"
+                              />
+                            </tr>
+                          )}
+                          <tr
+                            key={hora}
+                            className={
+                              idxHora % 2 === 0 ? "bg-theme-blue/5" : "bg-white"
+                            }
+                          >
+                            <td
+                              ref={(el) => {
+                                rowRefs.current[hora] = el;
+                              }}
+                              className="sticky left-0 z-10 bg-theme-blue/90 text-theme-white font-semibold px-3 border border-theme-blue/20 whitespace-nowrap"
+                            >
+                              <div className="h-14 flex items-center">
+                                {hora}
+                              </div>
+                            </td>
+                            {tabelaAulasHoje.laboratorios.map((labObj) => {
+                              const chave = `${hora}__${labObj.id}`;
+                              const professor = tabelaAulasHoje.mapa[chave];
+                              return (
+                                <td
+                                  key={labObj.id + "_" + hora}
+                                  className={`${
+                                    compactMode ? "px-1" : "px-2"
+                                  } ${
+                                    compactMode
+                                      ? "min-w-[90px]"
+                                      : "min-w-[140px]"
+                                  } border border-theme-blue/15 align-top`}
+                                >
+                                  <div className="relative h-14">
+                                    {professor ? (
+                                      <div className="absolute inset-0 flex items-center justify-start pr-1">
+                                        <span
+                                          className="font-bold text-theme-blue truncate"
+                                          title={professor}
+                                        >
+                                          {professor}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <div className="absolute inset-0 flex items-center justify-center text-theme-blue/30 select-none">
+                                        —
+                                      </div>
+                                    )}
+                                  </div>
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        </>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                {/* Overlay de eventos flutuando acima das células */}
+                <div className="pointer-events-none absolute inset-0 z-30">
+                  {eventOverlays.map((o) => {
+                    const small = o.height < 22; // mostra somente título
+                    const medium = !small && o.height < 36; // mostra título + horário
+                    const padClass = small
+                      ? "px-1.5 py-0.5 gap-0.5"
+                      : medium
+                      ? "px-2 py-0.5 gap-0.5"
+                      : "px-2.5 py-1 gap-1";
+                    return (
+                      <div
+                        key={o.key}
+                        className="absolute rounded-md border border-sky-800 bg-sky-700/95 text-white shadow-md overflow-hidden"
+                        style={{
+                          left: o.left,
+                          width: o.width,
+                          top: o.top,
+                          height: o.height,
+                        }}
+                        title={
+                          o.responsavel
+                            ? `${o.nome} — ${o.responsavel} (${o.hora})`
+                            : `${o.nome} (${o.hora})`
+                        }
+                        aria-label={
+                          o.responsavel
+                            ? `${o.nome}, ${o.hora}, responsável ${o.responsavel}`
+                            : `${o.nome}, ${o.hora}`
+                        }
+                      >
+                        <div
+                          className={`h-full flex flex-col items-center justify-center text-center ${padClass}`}
+                        >
+                          <div
+                            className={
+                              small
+                                ? "text-[0.75rem] font-semibold leading-tight truncate w-full"
+                                : "text-[0.9rem] font-bold leading-snug truncate w-full"
+                            }
+                          >
+                            {o.nome}
+                          </div>
+                          {!small && (
+                            <div
+                              className={
+                                medium
+                                  ? "text-[0.7rem] font-semibold leading-tight truncate w-full"
+                                  : "text-[0.8rem] font-semibold leading-snug truncate w-full"
+                              }
+                            >
+                              {o.hora}
+                            </div>
+                          )}
+                          {!small && !medium && o.responsavel ? (
+                            <div className="text-[0.75rem] font-medium leading-snug truncate w-full opacity-95">
+                              {o.responsavel}
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
                     );
                   })}
-                </tbody>
-              </table>
-              {/* Overlay de eventos flutuando acima das células */}
-              <div className="pointer-events-none absolute inset-0 z-30">
-                {eventOverlays.map((o) => {
-                  const small = o.height < 22; // mostra somente título
-                  const medium = !small && o.height < 36; // mostra título + horário
-                  const padClass = small
-                    ? "px-1.5 py-0.5 gap-0.5"
-                    : medium
-                    ? "px-2 py-0.5 gap-0.5"
-                    : "px-2.5 py-1 gap-1";
-                  return (
-                    <div
-                      key={o.key}
-                      className="absolute rounded-md border border-sky-800 bg-sky-700/95 text-white shadow-md overflow-hidden"
-                      style={{ left: o.left, width: o.width, top: o.top, height: o.height }}
-                      title={o.responsavel ? `${o.nome} — ${o.responsavel} (${o.hora})` : `${o.nome} (${o.hora})`}
-                      aria-label={o.responsavel ? `${o.nome}, ${o.hora}, responsável ${o.responsavel}` : `${o.nome}, ${o.hora}`}
-                    >
-                      <div className={`h-full flex flex-col items-center justify-center text-center ${padClass}`}>
-                        <div className={small ? "text-[0.75rem] font-semibold leading-tight truncate w-full" : "text-[0.9rem] font-bold leading-snug truncate w-full"}>
-                          {o.nome}
-                        </div>
-                        {!small && (
-                          <div className={medium ? "text-[0.7rem] font-semibold leading-tight truncate w-full" : "text-[0.8rem] font-semibold leading-snug truncate w-full"}>
-                            {o.hora}
-                          </div>
-                        )}
-                        {!small && !medium && o.responsavel ? (
-                          <div className="text-[0.75rem] font-medium leading-snug truncate w-full opacity-95">{o.responsavel}</div>
-                        ) : null}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                </div>
               </div>
             </div>
           )}
@@ -1112,14 +1271,23 @@ export default function Cronograma() {
           {conflitosHojePorProfessor.map((prof) => {
             // Unifica todos os labs envolvidos (sem detalhar horários)
             const labsMap = new Map<number, string>();
-            prof.horarios.forEach(h => h.labs.forEach(l => labsMap.set(l.id, l.label)));
+            prof.horarios.forEach((h) =>
+              h.labs.forEach((l) => labsMap.set(l.id, l.label))
+            );
             return (
-              <div key={prof.professor + (prof.professorId ?? '')} className="rounded-[12px] border border-yellow-500 bg-yellow-50 text-yellow-900 p-3 shadow-sm">
+              <div
+                key={prof.professor + (prof.professorId ?? "")}
+                className="rounded-[12px] border border-yellow-500 bg-yellow-50 text-yellow-900 p-3 shadow-sm"
+              >
                 <div className="mb-1 inline-flex items-center gap-1 text-[0.8rem] font-semibold text-yellow-950">
                   <span className="text-[0.9rem]">⚠️</span>
-                  <span className="uppercase tracking-wide">Conflito de horário</span>
+                  <span className="uppercase tracking-wide">
+                    Conflito de horário
+                  </span>
                 </div>
-                <div className="font-semibold text-[1rem] leading-snug">{prof.professor}</div>
+                <div className="font-semibold text-[1rem] leading-snug">
+                  {prof.professor}
+                </div>
                 <div className="mb-2">
                   <span className="inline-flex items-center rounded-full bg-yellow-200 text-yellow-950 px-2 py-0.5 text-[0.8rem] font-semibold tracking-wide">
                     Hoje
@@ -1127,7 +1295,10 @@ export default function Cronograma() {
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {Array.from(labsMap.entries()).map(([id, label]) => (
-                    <span key={id} className="inline-flex items-center gap-1 rounded-full bg-yellow-100 text-yellow-900 border border-yellow-300 px-2 py-0.5 text-[0.75rem] font-medium">
+                    <span
+                      key={id}
+                      className="inline-flex items-center gap-1 rounded-full bg-yellow-100 text-yellow-900 border border-yellow-300 px-2 py-0.5 text-[0.75rem] font-medium"
+                    >
                       {label}
                     </span>
                   ))}
@@ -1165,7 +1336,7 @@ export default function Cronograma() {
               </option>
               {laboratoriosUnificados.map((lab) => (
                 <option key={lab.id} value={lab.id}>
-                  {lab.nome} - {lab.numero}
+                  {(lab.numero || "").trim()} - {(lab.nome || "").trim()}
                 </option>
               ))}
             </select>
@@ -1282,21 +1453,38 @@ export default function Cronograma() {
             <div className="w-full grid gap-3 md:grid-cols-2 mt-3">
               {cards.map((prof) => {
                 // Unifica por (dia, lab) ignorando horário
-                const pares = new Map<string, { diaIdx: number; labLabel: string }>();
-                prof.itens.forEach(it => {
+                const pares = new Map<
+                  string,
+                  { diaIdx: number; labLabel: string }
+                >();
+                prof.itens.forEach((it) => {
                   const key = `${it.diaIdx}__${it.labLabel}`;
-                  if (!pares.has(key)) pares.set(key, { diaIdx: it.diaIdx, labLabel: it.labLabel });
+                  if (!pares.has(key))
+                    pares.set(key, {
+                      diaIdx: it.diaIdx,
+                      labLabel: it.labLabel,
+                    });
                 });
                 return (
-                  <div key={prof.professor + (prof.professorId ?? '')} className="rounded-[12px] border border-yellow-500 bg-yellow-50 text-yellow-900 p-3 shadow-sm">
+                  <div
+                    key={prof.professor + (prof.professorId ?? "")}
+                    className="rounded-[12px] border border-yellow-500 bg-yellow-50 text-yellow-900 p-3 shadow-sm"
+                  >
                     <div className="mb-1 inline-flex items-center gap-1 text-[0.8rem] font-semibold text-yellow-950">
                       <span className="text-[0.9rem]">⚠️</span>
-                      <span className="uppercase tracking-wide">Conflito de horário</span>
+                      <span className="uppercase tracking-wide">
+                        Conflito de horário
+                      </span>
                     </div>
-                    <div className="font-semibold text-[1rem] leading-snug mb-1">{prof.professor}</div>
+                    <div className="font-semibold text-[1rem] leading-snug mb-1">
+                      {prof.professor}
+                    </div>
                     <div className="flex flex-wrap gap-1.5">
                       {Array.from(pares.values()).map((p) => (
-                        <span key={`${p.diaIdx}__${p.labLabel}`} className="inline-flex items-center gap-1 rounded-full bg-yellow-100 text-yellow-900 border border-yellow-300 px-2 py-0.5 text-[0.75rem] font-medium">
+                        <span
+                          key={`${p.diaIdx}__${p.labLabel}`}
+                          className="inline-flex items-center gap-1 rounded-full bg-yellow-100 text-yellow-900 border border-yellow-300 px-2 py-0.5 text-[0.75rem] font-medium"
+                        >
                           <strong>{dias[p.diaIdx]}</strong> — {p.labLabel}
                         </span>
                       ))}
@@ -1318,9 +1506,7 @@ export default function Cronograma() {
             <button
               type="button"
               className="bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]"
-              onClick={
-                () => setModalOpen(true)
-              }
+              onClick={() => setModalOpen(true)}
             >
               Limpar Horários
             </button>
@@ -1347,7 +1533,7 @@ export default function Cronograma() {
         cancelText="Cancelar"
         onConfirm={async () => {
           try {
-            apiOnline.post('/reseter/reset')
+            apiOnline.post("/reseter/reset");
             toast.success("Horários limpos com sucesso.");
             // Força recarregar dados
             setTabelas({});
@@ -1360,11 +1546,10 @@ export default function Cronograma() {
 
           setModalOpen(false);
         }}
-        onCancel={async ()=>{
+        onCancel={async () => {
           setModalOpen(false);
         }}
       />
-        
     </div>
   );
 }
