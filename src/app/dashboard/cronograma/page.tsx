@@ -895,7 +895,7 @@ export default function Cronograma() {
     }
   };
 
-  const isTabelaVazia = useMemo(() => {
+  /* const isTabelaVazia = useMemo(() => {
     const matrizEdit = editaveis[activeId];
     if (!matrizEdit) return true;
     for (let i = 0; i < tabelaAtiva.length; i++) {
@@ -904,7 +904,7 @@ export default function Cronograma() {
       }
     }
     return true;
-  }, [tabelaAtiva, editaveis, activeId]);
+  }, [tabelaAtiva, editaveis, activeId]); */
 
   // Conflitos decorrentes das edições na tabela ativa (mostrar abaixo do cronograma)
   const conflitosEdicaoPorProfessor = useMemo(() => {
@@ -1515,9 +1515,9 @@ export default function Cronograma() {
           <button
             type="button"
             onClick={salvarTabela}
-            disabled={isTabelaVazia || salvando}
+            disabled={salvando}
             className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] ${
-              isTabelaVazia || salvando ? "opacity-50 cursor-not-allowed" : ""
+              salvando ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             {salvando ? "Salvando..." : "Salvar"}
