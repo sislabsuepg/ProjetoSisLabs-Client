@@ -41,7 +41,7 @@ export default function RegistrosPage() {
   const [totalPaginas, setTotalPaginas] = useState<number>(1);
   // Removido totalRegistros não utilizado para atender lint
   const [, setTotalRegistros] = useState<number>(0);
-  const itensPorPagina = 10;
+  const itensPorPagina = 7;
 
   useEffect(() => {
     setLoading(true);
@@ -117,17 +117,15 @@ export default function RegistrosPage() {
   if (loading) return <Loading />;
 
   return (
-    <div className="w-full p-4 flex flex-col h-full">
+    <div className="w-full flex flex-col h-full">
       <h1 className="font-semibold text-[1.2rem] text-theme-blue">Registros</h1>
-      <div className="mt-4 flex flex-wrap gap-4 items-end bg-theme-white rounded-lg p-4 border">
+      <div className="mt-4 flex flex-wrap gap-4 items-center justify-between rounded-md bg-theme-white p-4">
         <div className="flex min-w-[220px] items-center align-middle">
           <FormControl
-            className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+            className="usuario-filtro w-full font-normal p-3 text-[0.9rem] rounded-md"
             variant="filled"
           >
-            <InputLabel id="demo-simple-select-filled-label">
-              Usuário
-            </InputLabel>
+            <InputLabel>Usuário</InputLabel>
             <Select
               labelId="demo-simple-select-filled-label"
               value={usuarioSelecionado ?? ""}
@@ -151,6 +149,7 @@ export default function RegistrosPage() {
             <span>
               <DatePicker
                 label="Data de início"
+                className="data-inicio"
                 format="DD/MM/YYYY"
                 value={datas.inicio ? dayjs(datas.inicio) : null}
                 onChange={(newValue) =>
@@ -175,6 +174,7 @@ export default function RegistrosPage() {
             <span>
               <DatePicker
                 label="Data final"
+                className="data-final"
                 format="DD/MM/YYYY"
                 value={datas.fim ? dayjs(datas.fim) : null}
                 minDate={
@@ -208,10 +208,10 @@ export default function RegistrosPage() {
           </LocalizationProvider>
         </div>
 
-        <span className="flex gap-2 mr-auto">
+        <div className="flex items-center justify-center gap-2 flex-1">
           <button
             type="button"
-            className="bg-theme-blue h-10 px-4 rounded-[10px] text-theme-white font-semibold"
+            className="botao-buscar w-full bg-theme-blue h-10 px-4 rounded-[10px] text-theme-white font-medium"
             onClick={() => {
               setBuscaRegistros(!buscaRegistros);
             }}
@@ -220,7 +220,7 @@ export default function RegistrosPage() {
           </button>
           <button
             type="button"
-            className="bg-theme-blue h-10 px-4 rounded-[10px] text-theme-white font-semibold"
+            className="botao-limpar w-full bg-theme-blue h-10 px-4 rounded-[10px] text-theme-white font-medium"
             onClick={() => {
               setUsuarioSelecionado(0);
               setDatas({ inicio: null, fim: null });
@@ -229,11 +229,11 @@ export default function RegistrosPage() {
           >
             Limpar
           </button>
-        </span>
+        </div>
       </div>
 
       <div className="w-full h-full flex flex-col justify-between mt-5">
-        <div className="h-full overflow-y-auto rounded-lg bg-theme-white">
+        <div className="tabela-registros h-full overflow-y-auto rounded-lg bg-theme-white">
           <ListaRegistros list={registros} />
         </div>
         {registros && registros.length > 0 && (

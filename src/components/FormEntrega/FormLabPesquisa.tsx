@@ -161,7 +161,7 @@ export default function FormEntregaPesquisa() {
                     });
                 }
               }}
-              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              className="ra-guia w-full font-normal p-3 text-[0.9rem] rounded-md"
             />
 
             <TextField
@@ -207,10 +207,10 @@ export default function FormEntregaPesquisa() {
                 }
               }}
               disabled={form.idAluno === 0}
-              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              className="senha-guia w-full font-normal p-3 text-[0.9rem] rounded-md"
             />
             <FormControl
-              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              className="lab-select-guia w-full font-normal p-3 text-[0.9rem] rounded-md"
               variant="filled"
             >
               <InputLabel id="lab-label">Laboratório</InputLabel>

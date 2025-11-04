@@ -18,6 +18,8 @@ import { canAccessPage } from "@/utils/permissions";
 import { toast } from "react-toastify";
 import { apiOnline } from "@/services/services";
 import { Aluno, Laboratorio } from "@/utils/tipos";
+import { toursByPage } from "@/components/GuidedTour/stepsPages";
+import { useTour } from "@reactour/tour";
 
 interface EmprestimoAtivo {
   id: number;
@@ -49,6 +51,7 @@ export default function Advertencia() {
   const [outroMotivo, setOutroMotivo] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingData, setIsFetchingData] = useState(true);
+  const { setSteps, isOpen } = useTour();
 
   //Buscar empréstimos ativos
   useEffect(() => {
@@ -59,6 +62,28 @@ export default function Advertencia() {
           "/emprestimo?ativo=true"
         );
         setEmprestimos(response.data || []);
+        
+        // Verificar se há dados do empréstimo vindo da tela inicial
+        const emprestimoData = sessionStorage.getItem('emprestimoParaAdvertencia');
+        if (emprestimoData) {
+          try {
+            const dados = JSON.parse(emprestimoData);
+            setForm((f) => ({ 
+              ...f, 
+              emprestimoId: String(dados.emprestimoId),
+              motivo: 'naoDevolucaoChave' // Pré-seleciona motivo padrão
+            }));
+            
+            toast.info(
+              `Empréstimo selecionado: ${dados.alunoNome} - ${dados.laboratorioNome} (${dados.diasEmAberto} dia${dados.diasEmAberto > 1 ? 's' : ''} em aberto)`
+            );
+            
+            // Limpar dados do sessionStorage
+            sessionStorage.removeItem('emprestimoParaAdvertencia');
+          } catch (err) {
+            console.error('Erro ao processar dados do empréstimo:', err);
+          }
+        }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("Falha ao carregar alunos com empréstimos em aberto.");
@@ -134,20 +159,36 @@ export default function Advertencia() {
     (form.motivo !== "outro" ||
       (form.assuntoOutro.trim() !== "" && form.corpoOutro.trim() !== ""));
 
+  useEffect(() => {
+    const maybeSteps = toursByPage["/dashboard/advertencia"];
+    if (Array.isArray(maybeSteps)) {
+      setSteps!(maybeSteps);
+    } else if (maybeSteps) {
+      const firstKey = Object.keys(maybeSteps)[0];
+      if (firstKey) setSteps!(maybeSteps[firstKey]);
+    }
+  }, [setSteps]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setForm((f) => ({ ...f, motivo: "outro" }));
+      setOutroMotivo(true);
+    }
+  }, [isOpen]);
+
   return (
     <div className="w-full flex flex-col h-full items-start">
       <p className="text-theme-blue font-semibold text-[1.2rem] w-full text-start">
-        ⚠️ Emitir advertência
+        Emitir advertência
       </p>
-      {/* ... Funciona pls ... */}
+
       <form
         onSubmit={handleSubmit}
         className="mt-4 space-y-4 w-full h-full flex flex-col justify-between"
       >
         <div className="flex flex-col space-y-4 w-full">
-          {/* Select de Alunos/Empréstimos */}
           <FormControl
-            className="w-full"
+            className="dropdown-academico w-full"
             variant="filled"
             disabled={isFetchingData || isLoading}
           >
@@ -163,12 +204,11 @@ export default function Advertencia() {
             </Select>
           </FormControl>
 
-          {/* Motivos da advertência */}
           <div className="w-full bg-theme-container py-3 px-5 rounded-[10px] relative">
             <p className="font-semibold text-theme-blue mb-2">
               Motivo da advertência
             </p>
-            <FormControl className="w-full">
+            <FormControl className="radio-advertencia w-full">
               <RadioGroup value={form.motivo} onChange={handleRadioChange}>
                 <FormControlLabel
                   value="naoDevolucaoChave"
@@ -189,7 +229,6 @@ export default function Advertencia() {
             </FormControl>
           </div>
 
-          {/* Campos condicionais para outro motivo */}
           {outroMotivo && (
             <div className="w-full flex flex-col gap-4">
               <TextField
@@ -199,7 +238,7 @@ export default function Advertencia() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, assuntoOutro: e.target.value }))
                 }
-                className="w-full"
+                className="input-assunto-email w-full"
               />
               <TextField
                 label="Escreva o Corpo do E-mail"
@@ -211,7 +250,7 @@ export default function Advertencia() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, corpoOutro: e.target.value }))
                 }
-                className="w-full"
+                className="textarea-corpo-email w-full"
               />
             </div>
           )}
@@ -232,9 +271,8 @@ export default function Advertencia() {
           <button
             type="submit"
             disabled={!isFormValid || isLoading}
-            className={`bg-theme-blue font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-full max-w-[170px] text-white rounded-[10px] ${
-              !isFormValid || isLoading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`bg-theme-blue font-medium h-[40px] flex items-center justify-center text-[0.9rem] w-full max-w-[170px] text-white rounded-[10px] ${!isFormValid || isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
           >
             {isLoading ? (
               <CircularProgress size={24} color="inherit" />

@@ -8,7 +8,15 @@ import { apiOnline } from "@/services/services";
 import { ApiError } from "@/utils/tipos";
 import { TextField } from "@mui/material";
 
-export default function FormCurso() {
+type FormAcademicoProps = {
+  handleCloseModal: () => void;
+  onSuccess?: () => void;
+};
+
+export default function FormCurso({
+  handleCloseModal,
+  onSuccess,
+}: FormAcademicoProps) {
   const [form, setForm] = useState({
     nome: "",
     anosMaximo: 0,
@@ -22,21 +30,28 @@ export default function FormCurso() {
     if (name === "anosMaximo") {
       setForm((f) => ({ ...f, [name]: Number(value) }));
     } else {
-      setForm((f) => ({ ...f, [name]: value.trim() }));
+      // Não remova espaços enquanto digita; deixe o usuário inserir espaços normalmente
+      setForm((f) => ({ ...f, [name]: value }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await cadastro_curso.validate(form);
-      await apiOnline.post("/curso", {
-        nome: form.nome,
+      // Sanitize/normalize only no envio/validação
+      const payload = {
+        nome: form.nome.trim(),
         anosMaximo: form.anosMaximo,
-      });
+      };
+
+      await cadastro_curso.validate(payload);
+      await apiOnline.post("/curso", payload);
       toast.success("Cadastro do curso realizado com sucesso!");
       setForm({ nome: "", anosMaximo: 0 });
-      console.log("✅ Dados válidos:", form);
+      console.log("✅ Dados válidos:", payload);
+      // Notifica o pai para atualizar a lista e fecha o modal
+      onSuccess?.();
+      handleCloseModal();
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
@@ -62,7 +77,7 @@ export default function FormCurso() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        📝 Cadastro do curso
+        Cadastro do curso
       </p>
 
       <form
@@ -81,6 +96,7 @@ export default function FormCurso() {
               value={form.nome ? form.nome : ""}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
 
             <TextField
@@ -94,11 +110,19 @@ export default function FormCurso() {
               onClick={(e) => (e.target as HTMLInputElement).select()}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-between">
+          <button
+            type="button"
+            onClick={handleCloseModal}
+            className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={!isFormValid}

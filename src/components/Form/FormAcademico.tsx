@@ -19,14 +19,22 @@ import {
 import { capitalize } from "@/utils/capitalize";
 import { ApiError } from "@/utils/tipos";
 
-export default function FormAcademico() {
+type FormAcademicoProps = {
+  handleCloseModal: () => void;
+  onSuccess?: () => void;
+};
+
+export default function FormAcademico({
+  handleCloseModal,
+  onSuccess,
+}: FormAcademicoProps) {
   const [form, setForm] = useState({
     nome: "",
     ra: "",
     email: "",
     telefone: "",
     idCurso: 0,
-    anoCurso: 0,
+    anoCurso: 1,
     senha: "",
     repetirSenha: "",
   });
@@ -86,6 +94,9 @@ export default function FormAcademico() {
         senha: "",
         repetirSenha: "",
       });
+      // Notifica o pai para atualizar a lista e fecha o modal
+      onSuccess?.();
+      handleCloseModal();
       console.log("✅ Dados válidos:", form);
     } catch (err) {
       const error = err as ApiError;
@@ -114,7 +125,7 @@ export default function FormAcademico() {
     const fetchCursos = async () => {
       try {
         const response = await apiOnline.get<ICurso[] | { data: ICurso[] }>(
-          "/curso"
+          "/curso?ativo=true"
         );
         const respWrapped = response as {
           data: ICurso[] | { data?: ICurso[] };
@@ -145,7 +156,7 @@ export default function FormAcademico() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        📝 Cadastro do acadêmico
+        Cadastro do acadêmico
       </p>
 
       <form
@@ -161,9 +172,10 @@ export default function FormAcademico() {
               variant="filled"
               type="text"
               name="nome"
-              value={form.nome ? capitalize(form.nome) : ""}
+              value={form.nome ? capitalize(form.nome).replace(/\d+/g, "") : ""}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
 
             <TextField
@@ -176,6 +188,7 @@ export default function FormAcademico() {
               inputProps={{ maxLength: 13 }}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
           </div>
 
@@ -210,7 +223,7 @@ export default function FormAcademico() {
               variant="filled"
             >
               <InputLabel id="demo-simple-select-filled-label">
-                Curso
+                Curso *
               </InputLabel>
               <Select
                 labelId="demo-simple-select-filled-label"
@@ -220,6 +233,7 @@ export default function FormAcademico() {
                 onChange={(e: SelectChangeEvent<number>) =>
                   setForm((f) => ({ ...f, idCurso: Number(e.target.value) }))
                 }
+                required={true}
               >
                 <MenuItem value="">-- Selecione uma opção --</MenuItem>
                 {cursos?.map((el) => (
@@ -240,11 +254,12 @@ export default function FormAcademico() {
               inputProps={{
                 max:
                   cursos.find((c) => c.id === Number(form.idCurso))
-                    ?.anosMaximo || 0,
+                    ?.anosMaximo || 1,
                 min: 1,
               }}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
           </div>
 
@@ -259,6 +274,7 @@ export default function FormAcademico() {
               value={removeLetters(form.senha)}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
 
             <TextField
@@ -271,11 +287,20 @@ export default function FormAcademico() {
               value={removeLetters(form.repetirSenha)}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-between">
+          <button
+            type="button"
+            onClick={handleCloseModal}
+            className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
+          >
+            Cancelar
+          </button>
+
           <button
             type="submit"
             disabled={!isFormValid}

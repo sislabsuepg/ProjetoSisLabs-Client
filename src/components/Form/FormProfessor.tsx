@@ -1,36 +1,53 @@
-'use client';
+"use client";
 
-import { ChangeEvent, useState } from 'react';
-import { toast } from 'react-toastify';
-import * as Yup from 'yup';
+import { ChangeEvent, useState } from "react";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
 
-import { cadastro_professor } from '@/schemas';
-import { capitalize, TextField } from '@mui/material';
-import { apiOnline } from '@/services/services';
-import { ApiError } from '@/utils/tipos';
+import { cadastro_professor } from "@/schemas";
+import { capitalize, TextField } from "@mui/material";
+import { apiOnline } from "@/services/services";
+import { ApiError } from "@/utils/tipos";
 
-export default function FormAcademico() {
+type FormAcademicoProps = {
+  handleCloseModal: () => void;
+  onSuccess?: () => void;
+};
+
+export default function FormAcademico({
+  handleCloseModal,
+  onSuccess,
+}: FormAcademicoProps) {
   const [form, setForm] = useState({
-    nome: '',
-    email: '',
+    nome: "",
+    email: "",
   });
 
-const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-  const { name, value } = e.target;
-  setForm((f) => ({ ...f, [name]: value }));
-};
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    if (name === "nome") {
+      setForm((f) => ({ ...f, [name]: value.replace(/\d+/g, "") }));
+    } else {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await cadastro_professor.validate(form);
-      await apiOnline.post('/professor', form);
-      toast.success('Cadastro do professor realizado com sucesso!');
+      await apiOnline.post("/professor", form);
+      toast.success("Cadastro do professor realizado com sucesso!");
       setForm({
-        nome: '',
-        email: '',
+        nome: "",
+        email: "",
       });
-      console.log('✅ Dados válidos:', form);
+      // Notifica o pai para atualizar a lista e fecha o modal
+      onSuccess?.();
+      handleCloseModal();
+      console.log("✅ Dados válidos:", form);
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
@@ -45,12 +62,12 @@ const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     }
   };
 
-  const isFormValid = Object.values(form).every((value) => value.trim() !== '');
+  const isFormValid = Object.values(form).every((value) => value.trim() !== "");
 
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-       📝 Cadastro do professor
+        Cadastro do professor
       </p>
 
       <form
@@ -60,24 +77,45 @@ const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       >
         <div className="space-y-4">
           <div className="w-full flex items-center gap-4">
-            <TextField id="filled-basic" label="Nome completo" variant="filled" type="text"
+            <TextField
+              id="filled-basic"
+              label="Nome completo"
+              variant="filled"
+              type="text"
               name="nome"
-              value={form.nome ? capitalize(form.nome) : ''}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              value={form.nome ? capitalize(form.nome) : ""}
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
+            />
 
-            <TextField id="filled-basic" label="E-Mail" variant="filled" type="text"
+            <TextField
+              id="filled-basic"
+              label="E-Mail"
+              variant="filled"
+              type="text"
               name="email"
               value={form.email}
-              onChange={handleChange} className="w-full font-normal p-3 text-[0.9rem] rounded-md" />
+              onChange={handleChange}
+              className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
+            />
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-between">
+          <button
+            type="button"
+            onClick={handleCloseModal}
+            className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={!isFormValid}
             className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] 
-              ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+              ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             Cadastrar
           </button>

@@ -62,7 +62,7 @@ export default function FormAcademicoRelatorio() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-       📊 Gerar relatório - Acadêmico
+       Gerar relatório - Acadêmico
       </p>
 
       <form onSubmit={handleSubmit} noValidate className="mt-4 space-y-4 flex flex-col justify-between w-full h-full">
@@ -75,7 +75,7 @@ export default function FormAcademicoRelatorio() {
             onChange={(e) => setRa(e.target.value)}
             disabled={isLoading}
             InputProps={{
-              className: "font-normal text-[0.9rem] rounded-md"
+              className: "ra-aluno font-normal text-[0.9rem] rounded-md"
             }}
           />
         </div>

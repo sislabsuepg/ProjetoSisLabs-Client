@@ -1,4 +1,4 @@
-import { apiOnline } from "@/services/services";
+import { useState, useEffect } from "react";
 import {
   CircularProgress,
   Modal,
@@ -6,19 +6,34 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { useEffect, useState } from "react";
-import { ApiResponse, IEvento, IRecado } from "../Lists/types";
-import { maskDate } from "@/utils/maskDate";
-import style from "./EventosRecados.module.scss";
 import { toast } from "react-toastify";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
+import { apiOnline } from "@/services/services";
+import { IEvento, IRecado } from "../Lists/types";
+import style from "./ModalNotification.module.scss";
+import { maskDate } from "@/utils/maskDate";
+import { useNotificationStore } from "@/store";
+import { fetchAndCountNotifications } from "@/utils/fetchNotifications";
+import { markAllAsRead } from "@/utils/notificationStorage";
 
-export default function EventosRecados() {
-  const [eventos, setEventos] = useState<IEvento[]>([]);
-  const [recados, setRecados] = useState<IRecado[]>([]);
-  const [loading, setLoading] = useState(true);
+interface ModalNotificationProps {
+  open: boolean;
+  setOpen: (value: boolean) => void;
+}
+
+export default function ModalNotification({
+  open,
+  setOpen,
+}: ModalNotificationProps) {
+const eventos = useNotificationStore(s => s.eventos);
+const recados = useNotificationStore(s => s.recados);
+const setEventos = useNotificationStore(s => s.setEventos);
+const setRecados = useNotificationStore(s => s.setRecados);
+const loading = useNotificationStore(s => s.loading);
+const setUnreadCount = useNotificationStore(s => s.setUnreadCount);
+
   const [openEditEvento, setOpenEditEvento] = useState(false);
   const [openEditRecado, setOpenEditRecado] = useState(false);
   const [openDelete, setOpenDelete] = useState<null | {
@@ -27,6 +42,24 @@ export default function EventosRecados() {
   }>(null);
   const [draftEvento, setDraftEvento] = useState<Partial<IEvento>>({});
   const [draftRecado, setDraftRecado] = useState<Partial<IRecado>>({});
+
+  // Marca todas as notificações como lidas quando o modal é aberto
+  useEffect(() => {
+    if (open && (eventos.length > 0 || recados.length > 0)) {
+      const eventoIds = eventos.map(e => e.id);
+      const recadoIds = recados.map(r => r.id);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔓 Modal aberto, marcando como lidas:', {
+          eventos: eventoIds,
+          recados: recadoIds,
+        });
+      }
+      
+      markAllAsRead(eventoIds, recadoIds);
+      setUnreadCount(0); // Atualiza o contador imediatamente
+    }
+  }, [open, eventos, recados, setUnreadCount]);
 
   const colors = [
     "divider-green",
@@ -44,36 +77,6 @@ export default function EventosRecados() {
       return `${duracao} minuto(s)`;
     }
   }
-
-  useEffect(() => {
-    async function fetchData() {
-      Promise.allSettled([
-        apiOnline.get<ApiResponse<IEvento[]>>("/evento"),
-        apiOnline.get<ApiResponse<IRecado[]>>("/recado"),
-      ]).then(([eventosResponse, recadosResponse]) => {
-        if (eventosResponse.status === "fulfilled") {
-          const orderedEventos = [...eventosResponse.value.data].sort(
-            (a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()
-          );
-          setEventos(orderedEventos);
-        } else {
-          console.error("Erro ao buscar eventos:", eventosResponse.reason);
-        }
-
-        if (recadosResponse.status === "fulfilled") {
-          const orderedRecados = [...recadosResponse.value.data].sort(
-            (a, b) => a.id - b.id
-          );
-          setRecados(orderedRecados);
-        } else {
-          console.error("Erro ao buscar recados:", recadosResponse.reason);
-        }
-        setLoading(false);
-      });
-    }
-
-    fetchData();
-  }, []);
 
   function openEventoForEdit(e: IEvento) {
     const data = new Date(e.data);
@@ -166,6 +169,8 @@ export default function EventosRecados() {
           prev.filter((r) => r.id !== openDelete.id).sort((a, b) => a.id - b.id)
         );
       }
+
+      await fetchAndCountNotifications();
       toast.success("Excluído com sucesso!");
     } catch {
       toast.error("Erro ao excluir.");
@@ -176,159 +181,170 @@ export default function EventosRecados() {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
-        <CircularProgress size={40} />
-      </div>
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <div className="w-full h-full flex justify-center items-center">
+          <CircularProgress />
+        </div>
+      </Modal>
     );
   }
 
   return (
-    <div className="w-full h-full flex flex-col justify-start">
-      <div className="w-full flex items-center gap-4 min-h-[75vh]">
-        <div className={`${style.container} w-1/2 flex flex-col`}>
-          <p className="text-theme-blue font-medium">Eventos</p>
-          <div
-            className={`${style.scrollbarContainer} flex flex-col gap-2 overflow-y-auto overflow-x-hidden p-1 h-[70vh]`}
-          >
-            {eventos.length > 0 ? (
-              eventos.map((evento, index) => {
-                const colorClass = colors[index % colors.length];
+    <>
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <div className={`${style.container} flex lmd:flex-row flex-col bg-theme-white w-[90%] overflow-y-auto max-w-[1300px] h-[90vh] max-h-[600px] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg p-5`}>
+          <CloseIcon onClick={() => setOpen(false)} className="cursor-pointer absolute top-3 right-3"/>
 
-                return (
-                  <div
-                    key={evento.id}
-                    className={`${style.card} group relative flex items-center gap-2 rounded-[15px] cursor-pointer`}
-                    onClick={() => openEventoForEdit(evento)}
-                  >
+          <div className="lmd:w-1/2 w-full flex flex-col">
+            <p className="text-theme-blue font-semibold text-[1.4rem] pl-4">Recados</p>
+            <div
+              className={`${style.scrollbarContainer} flex flex-col gap-2 overflow-y-auto p-4`}
+            >
+              {recados.length > 0 ? (
+                recados.map((recado, index) => {
+                  const colorClass = colors[index % colors.length];
+                  return (
                     <div
-                      className={`${style.divider} ${style[colorClass]}`}
-                    ></div>
-                    <div>
-                      <p className="font-medium text-[0.9rem] leading-4 mb-1">
-                        {evento.nome}
-                      </p>
-                      <p className="font-normal text-[0.8rem] text-theme-text flex items-center gap-1">
-                        <span>
-                          {maskDate(
-                            new Date(evento.data)
-                              .toISOString()
-                              .split("T")[0]
-                              .replace(/-/g, "/")
-                          )}
-                        </span>
-                        <span>às</span>
-                        <span>
-                          {new Date(evento.data).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </span>
-                      </p>
-                      <p className="font-normal text-[0.8rem] text-theme-text">
-                        <span>Duração: {parseDuracao(evento.duracao)}</span>
-                      </p>
-                      <p className="font-normal text-[0.8rem] text-theme-text">
-                        <span>Responsável: {evento.responsavel}</span>
-                      </p>
-                      <p className="font-normal text-[0.9rem] text-theme-text mt-1">
-                        <span>
-                          Local: {evento.laboratorio?.numero} -{" "}
-                          {evento.laboratorio?.nome}
-                        </span>
-                      </p>
+                      key={recado.id}
+                      className={`${style.card} w-full group relative flex items-center gap-2 rounded-[15px] cursor-pointer`}
+                      onClick={() => openRecadoForEdit(recado)}
+                    >
+                      <div
+                        className={`${style.divider2} ${style[colorClass]}`}
+                      ></div>
+                      <div className="w-full">
+                        <p className="font-normal text-[0.9rem] text-theme-text w-[calc(100%-50px)]">
+                          {recado.texto}
+                        </p>
+                      </div>
+                      <div className="absolute top-1 right-1 hidden group-hover:flex gap-1">
+                        <Tooltip title="Editar" placement="top">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openRecadoForEdit(recado);
+                            }}
+                          >
+                            <EditIcon fontSize="inherit" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Excluir" placement="top">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenDelete({ type: "recado", id: recado.id });
+                            }}
+                          >
+                            <DeleteIcon fontSize="inherit" />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
                     </div>
-                    <div className="absolute top-1 right-1 hidden group-hover:flex gap-1">
-                      <Tooltip title="Editar" placement="top">
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openEventoForEdit(evento);
-                          }}
-                        >
-                          <EditIcon fontSize="inherit" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Excluir" placement="top">
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenDelete({ type: "evento", id: evento.id });
-                          }}
-                        >
-                          <DeleteIcon fontSize="inherit" />
-                        </IconButton>
-                      </Tooltip>
+                  );
+                })
+              ) : (
+                <p className="text-theme-text font-normal">
+                  Nenhum recado disponível.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className={`lmd:w-1/2 w-full flex flex-col`}>
+            <p className="text-theme-blue font-semibold text-[1.4rem] pl-4">Eventos</p>
+            <div
+              className={`${style.scrollbarContainer} flex flex-col gap-2 overflow-y-auto overflow-x-hidden p-1`}
+            >
+              {eventos.length > 0 ? (
+                eventos.map((evento, index) => {
+                  const colorClass = colors[index % colors.length];
+
+                  return (
+                    <div
+                      key={evento.id}
+                      className={`${style.card} group relative flex items-center gap-2 rounded-[15px] cursor-pointer`}
+                      onClick={() => openEventoForEdit(evento)}
+                    >
+                      <div
+                        className={`${style.divider} ${style[colorClass]}`}
+                      ></div>
+                      <div className="w-full">
+                        <p className="font-medium text-[0.9rem] leading-4 mb-1 w-[calc(100%-50px)]">
+                          {evento.nome}
+                        </p>
+                        <p className="font-normal text-[0.8rem] text-theme-text flex items-center gap-1">
+                          <span>
+                            {maskDate(
+                              new Date(evento.data)
+                                .toISOString()
+                                .split("T")[0]
+                                .replace(/-/g, "/")
+                            )}
+                          </span>
+                          <span>às</span>
+                          <span>
+                            {new Date(evento.data).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                        </p>
+                        <p className="font-normal text-[0.8rem] text-theme-text">
+                          <span>Duração: {parseDuracao(evento.duracao)}</span>
+                        </p>
+                        <p className="font-normal text-[0.8rem] text-theme-text">
+                          <span>Responsável: {evento.responsavel}</span>
+                        </p>
+                        <p className="font-normal text-[0.9rem] text-theme-text mt-1">
+                          <span>
+                            Local: {evento.laboratorio?.numero} -{" "}
+                            {evento.laboratorio?.nome}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="absolute top-1 right-1 hidden group-hover:flex">
+                        <Tooltip title="Editar" placement="top">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEventoForEdit(evento);
+                            }}
+                          >
+                            <EditIcon fontSize="inherit" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Excluir" placement="top">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenDelete({ type: "evento", id: evento.id });
+                            }}
+                          >
+                            <DeleteIcon fontSize="inherit" />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
                     </div>
-                  </div>
-                );
-              })
-            ) : (
-              <p className="text-theme-text font-normal">
-                Nenhum evento disponível.
-              </p>
-            )}
+                  );
+                })
+              ) : (
+                <p className="text-theme-text font-normal">
+                  Nenhum evento disponível.
+                </p>
+              )}
+            </div>
           </div>
         </div>
-
-        <div className={`${style.container} w-1/2 flex flex-col `}>
-          <p className="text-theme-blue font-medium">Recados</p>
-          <div
-            className={`${style.scrollbarContainer} flex flex-col gap-2 overflow-y-auto p-1 h-[70vh]`}
-          >
-            {recados.length > 0 ? (
-              recados.map((recado, index) => {
-                const colorClass = colors[index % colors.length];
-                return (
-                  <div
-                    key={recado.id}
-                    className={`${style.card} group relative flex items-center gap-2 rounded-[15px] cursor-pointer`}
-                    onClick={() => openRecadoForEdit(recado)}
-                  >
-                    <div
-                      className={`${style.divider2} ${style[colorClass]}`}
-                    ></div>
-                    <div>
-                      <p className="font-normal text-[0.9rem] text-theme-text">
-                        {recado.texto}
-                      </p>
-                    </div>
-                    <div className="absolute top-1 right-1 hidden group-hover:flex gap-1">
-                      <Tooltip title="Editar" placement="top">
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openRecadoForEdit(recado);
-                          }}
-                        >
-                          <EditIcon fontSize="inherit" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Excluir" placement="top">
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenDelete({ type: "recado", id: recado.id });
-                          }}
-                        >
-                          <DeleteIcon fontSize="inherit" />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <p className="text-theme-text font-normal">
-                Nenhum recado disponível.
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
+      </Modal>
 
       {/* Modal editar evento */}
       <Modal open={openEditEvento} onClose={() => setOpenEditEvento(false)}>
@@ -399,10 +415,9 @@ export default function EventosRecados() {
                   setDraftEvento((d) => ({
                     ...d,
                     data: new Date(
-                      `${e.target.value}T${
-                        new Date(d!.data || new Date())
-                          .toISOString()
-                          .split("T")[1]
+                      `${e.target.value}T${new Date(d!.data || new Date())
+                        .toISOString()
+                        .split("T")[1]
                       }`
                     ),
                   }))
@@ -417,9 +432,9 @@ export default function EventosRecados() {
                 value={
                   draftEvento.data
                     ? new Date(draftEvento.data).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
                     : ""
                 }
                 onChange={(e) => {
@@ -454,7 +469,7 @@ export default function EventosRecados() {
       </Modal>
 
       {/* Modal editar recado */}
-      <Modal open={openEditRecado} onClose={() => setOpenEditRecado(false)}>
+      < Modal open={openEditRecado} onClose={() => setOpenEditRecado(false)}>
         <div
           style={{
             position: "absolute",
@@ -504,10 +519,10 @@ export default function EventosRecados() {
             </div>
           </form>
         </div>
-      </Modal>
+      </ Modal>
 
       {/* Modal excluir */}
-      <Modal open={!!openDelete} onClose={() => setOpenDelete(null)}>
+      < Modal open={!!openDelete} onClose={() => setOpenDelete(null)}>
         <div
           style={{
             position: "absolute",
@@ -540,7 +555,7 @@ export default function EventosRecados() {
             </button>
           </div>
         </div>
-      </Modal>
-    </div>
-  );
+      </ Modal>
+    </>
+  )
 }

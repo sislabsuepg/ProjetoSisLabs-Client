@@ -14,9 +14,11 @@ import logo_uepg_desktop_white from "../assets/images/logosUEPG/logo_uepg_deskto
 import logo_uepg_mobile from "../assets/images/logosUEPG/logo_uepg_mobile.png";
 import user_login from "../assets/images/user_login.webp";
 import icon_logs from "../assets/images/icon_logs.png";
+import academico from "../assets/images/academico.png";
 
 export const data_images = {
   logo_uepg_desktop: logo_uepg_desktop.src,
+  academico: academico.src,
   logo_uepg_desktop_white: logo_uepg_desktop_white.src,
   logo_uepg_mobile: logo_uepg_mobile.src,
   user_login: user_login.src,

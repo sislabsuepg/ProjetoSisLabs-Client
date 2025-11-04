@@ -59,7 +59,7 @@ export default function FormEntregaChave() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        🔑 Entrega de chave
+        Entrega de chave
       </p>
 
       <form
@@ -212,7 +212,7 @@ export default function FormEntregaChave() {
             </FormControl>
           </div>
 
-          {form.ra && form.idLaboratorio && (
+          {(form.ra && form.idLaboratorio) ? (
             <div className="w-full bg-theme-container rounded-[10px] p-4 flex flex-col gap-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">
@@ -257,6 +257,8 @@ export default function FormEntregaChave() {
                 </div>
               </div>
             </div>
+          ) : (
+            ''
           )}
         </div>
 

@@ -1,6 +1,6 @@
 import { ILaboratorio } from "@/interfaces/interfaces";
 
-export interface FormAcademico {
+export interface FormAcademicoType {
   id: number;
   ra: string;
   nome: string;
@@ -8,18 +8,18 @@ export interface FormAcademico {
   telefone?: string;
   idCurso: number;
   anoCurso: number;
-  curso?: FormCurso;
+  curso?: FormCursoType;
   ativo?: boolean;
 }
 
-export interface FormProfessor {
+export interface FormProfessorType {
   id: number;
   nome: string;
   email: string;
   ativo?: boolean;
 }
 
-export interface FormLaboratorio {
+export interface FormLaboratorioType {
   id: number;
   nome: string;
   numero: string;
@@ -27,26 +27,26 @@ export interface FormLaboratorio {
   ativo?: boolean;
 }
 
-export interface FormOrientacao {
+export interface FormOrientacaoType {
   id: number;
   idAluno: number;
   idProfessor: number;
   idLaboratorio: number;
   dataInicio: string;
   dataFim: string;
-  laboratorio?: FormLaboratorio;
-  aluno?: FormAcademico;
-  professor?: FormProfessor;
+  laboratorio?: FormLaboratorioType;
+  aluno?: FormAcademicoType;
+  professor?: FormProfessorType;
 }
 
-export interface FormCurso {
+export interface FormCursoType {
   id: number;
   nome: string;
   anosMaximo: number;
   ativo?: boolean;
 }
 
-export interface FormPermissao {
+export interface FormPermissaoType {
   id: number;
   nomePermissao: string;
   geral?: boolean;
@@ -57,14 +57,14 @@ export interface FormPermissao {
   ativo?: boolean;
 }
 
-export interface FormUsuario {
+export interface FormUsuarioType {
   id: number;
   nome: string;
   login: string;
   senha: string;
   ativo?: boolean;
   idPermissao: number;
-  permissaoUsuario?: FormPermissao;
+  permissaoUsuario?: FormPermissaoType;
 }
 
 export interface ILog {
@@ -94,10 +94,10 @@ export interface IEvento {
 }
 
 export type IData =
-  | FormAcademico
-  | FormProfessor
-  | FormLaboratorio
-  | FormOrientacao
-  | FormCurso
-  | FormPermissao
-  | FormUsuario;
+  | FormAcademicoType
+  | FormProfessorType
+  | FormLaboratorioType
+  | FormOrientacaoType
+  | FormCursoType
+  | FormPermissaoType
+  | FormUsuarioType;

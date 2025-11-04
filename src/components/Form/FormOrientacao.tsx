@@ -20,7 +20,15 @@ import {
   TextField,
 } from "@mui/material";
 
-export default function FormOrientacao() {
+type FormAcademicoProps = {
+  handleCloseModal: () => void;
+  onSuccess?: () => void;
+};
+
+export default function FormOrientacao({
+  handleCloseModal,
+  onSuccess,
+}: FormAcademicoProps) {
   const [form, setForm] = useState<{
     dataInicio: Dayjs | null;
     dataFim: Dayjs | null;
@@ -82,6 +90,9 @@ export default function FormOrientacao() {
       });
       setRa("");
       toast.success("Cadastro da orientação realizado com sucesso!");
+      // Notifica o pai para atualizar a lista e fecha o modal
+      onSuccess?.();
+      handleCloseModal();
     } catch (err: unknown) {
       if (err instanceof Yup.ValidationError) {
         toast.error(err.message);
@@ -107,7 +118,9 @@ export default function FormOrientacao() {
       try {
         const [professoresResponse, laboratoriosResponse] = await Promise.all([
           apiOnline.get<IProfessor[]>("/professor?ativo=true"),
-          apiOnline.get<ILaboratorio[]>("/laboratorio?restrito=true"),
+          apiOnline.get<ILaboratorio[]>(
+            "/laboratorio?restrito=true&ativo=true"
+          ),
         ]);
         setProfessores(
           (
@@ -149,7 +162,7 @@ export default function FormOrientacao() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        📝 Cadastro da orientação
+        Cadastro da orientação
       </p>
 
       <form
@@ -161,7 +174,7 @@ export default function FormOrientacao() {
           <div className="w-full flex items-center gap-4">
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label="Data de início"
+                label="Data de início *"
                 format="DD/MM/YYYY"
                 value={form.dataInicio}
                 minDate={dayjs()}
@@ -185,7 +198,7 @@ export default function FormOrientacao() {
               />
 
               <DatePicker
-                label="Data final"
+                label="Data final *"
                 format="DD/MM/YYYY"
                 value={form.dataFim}
                 minDate={
@@ -213,13 +226,14 @@ export default function FormOrientacao() {
               variant="filled"
               name="ra"
               value={ra}
-              onChange={(e) => setRa(e.target.value)}
+              onChange={(e) => setRa(e.target.value.replace(/\D+/g, ""))}
               inputProps={{ maxLength: 13 }}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
 
             <FormControl className="w-full" variant="filled">
-              <InputLabel>Professor</InputLabel>
+              <InputLabel>Professor *</InputLabel>
               <Select
                 name="idProfessor"
                 value={form.idProfessor}
@@ -237,7 +251,7 @@ export default function FormOrientacao() {
 
           <div className="w-full flex items-center gap-4">
             <FormControl className="w-full" variant="filled">
-              <InputLabel>Laboratório</InputLabel>
+              <InputLabel>Laboratório *</InputLabel>
               <Select
                 name="idLaboratorio"
                 value={form.idLaboratorio}
@@ -254,7 +268,14 @@ export default function FormOrientacao() {
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-between">
+          <button
+            type="button"
+            onClick={handleCloseModal}
+            className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={!isFormValid}

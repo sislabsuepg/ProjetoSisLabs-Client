@@ -25,7 +25,15 @@ interface FormUsuarioState {
   idPermissao: number;
 }
 
-export default function FormUsuario() {
+type FormAcademicoProps = {
+  handleCloseModal: () => void;
+  onSuccess?: () => void;
+};
+
+export default function FormUsuario({
+  handleCloseModal,
+  onSuccess,
+}: FormAcademicoProps) {
   const [form, setForm] = useState<FormUsuarioState>({
     nome: "",
     login: "",
@@ -54,6 +62,9 @@ export default function FormUsuario() {
         repetirSenha: "",
         idPermissao: 0,
       });
+      // Notifica o pai para atualizar a lista e fecha o modal
+      onSuccess?.();
+      handleCloseModal();
     } catch (err) {
       const error = err as ApiError;
       if (error.response?.data?.erros) {
@@ -116,7 +127,7 @@ export default function FormUsuario() {
   return (
     <div className="w-full h-full flex flex-col justify-start">
       <p className="font-semibold text-[1.2rem] text-theme-blue mb-4">
-        📝 Cadastro do usuário
+        Cadastro do usuário
       </p>
 
       <form
@@ -132,9 +143,10 @@ export default function FormUsuario() {
               variant="filled"
               type="text"
               name="nome"
-              value={form.nome ? capitalize(form.nome) : ""}
+              value={form.nome ? capitalize(form.nome).replace(/\d+/g, "") : ""}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
 
             <TextField
@@ -147,6 +159,7 @@ export default function FormUsuario() {
               inputProps={{ minLength: 3, maxLength: 20 }}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
           </div>
 
@@ -156,7 +169,7 @@ export default function FormUsuario() {
               variant="filled"
             >
               <InputLabel id="demo-simple-select-filled-label">
-                Permissão
+                Permissão *
               </InputLabel>
               <Select
                 labelId="demo-simple-select-filled-label"
@@ -190,6 +203,7 @@ export default function FormUsuario() {
               inputProps={{ minLength: 6, maxLength: 12 }}
               value={form.senha}
               onChange={handleChange}
+              required={true}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
             />
 
@@ -203,11 +217,19 @@ export default function FormUsuario() {
               value={form.repetirSenha}
               onChange={handleChange}
               className="w-full font-normal p-3 text-[0.9rem] rounded-md"
+              required={true}
             />
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-between">
+          <button
+            type="button"
+            onClick={handleCloseModal}
+            className={`bg-theme-red font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]`}
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={!isFormValid}

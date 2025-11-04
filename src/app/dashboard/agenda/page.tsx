@@ -2,16 +2,14 @@
 
 import AdicionarRecados from "@/components/Agenda/AdicionarRecados";
 import AdicionarEventos from "@/components/Agenda/AdicionarEventos";
-import EventosRecados from "@/components/Agenda/EventosRecados";
 import { useState } from "react";
 
 export default function Cronograma() {
   const [activeId, setActiveId] = useState(1);
 
   const listButtons = [
-    { id: 1, title: "Eventos e Recados", component: <EventosRecados /> },
-    { id: 2, title: "Adicionar eventos", component: <AdicionarEventos /> },
-    { id: 3, title: "Adicionar recados", component: <AdicionarRecados /> },
+    { id: 1, title: "Adicionar eventos", component: <AdicionarEventos />, extendClass: "add-evento-button" },
+    { id: 2, title: "Adicionar recados", component: <AdicionarRecados />, extendClass: "add-recado-button" },
   ];
 
   return (
@@ -21,9 +19,8 @@ export default function Cronograma() {
           <button
             key={item.id}
             onClick={() => setActiveId(item.id)}
-            className={`${
-              item.id === activeId ? "bg-theme-lightBlue" : "bg-theme-blue"
-            } h-12 px-4 rounded-[10px] text-theme-white font-semibold`}
+            className={`${item.id === activeId ? "bg-theme-lightBlue" : "bg-theme-blue"
+              } ${item.extendClass} h-12 px-4 rounded-[10px] text-theme-white font-semibold`}
           >
             {item.title}
           </button>

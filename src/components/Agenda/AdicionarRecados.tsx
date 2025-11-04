@@ -2,6 +2,7 @@ import { useState } from "react";
 import { TextareaAutosize } from "@mui/material";
 import { apiOnline } from "@/services/services";
 import { toast } from "react-toastify";
+import { fetchAndCountNotifications } from "@/utils/fetchNotifications";
 
 export default function AdicionarRecados() {
   const [texto, setTexto] = useState("");
@@ -15,6 +16,7 @@ export default function AdicionarRecados() {
       await apiOnline.post("/recado", { texto });
       toast.success("Recado adicionado com sucesso!");
       setTexto("");
+      await fetchAndCountNotifications();
     } catch (error: unknown) {
       const errObj = error as { response?: { data?: { erros?: string[] } } };
       if (errObj?.response?.data?.erros) {
@@ -33,7 +35,7 @@ export default function AdicionarRecados() {
       <div className="w-full h-full flex flex-col justify-between">
         <div className="flex flex-col">
           <p className="font-semibold text-[1.2rem] text-theme-blue mb-2">
-            📝 Adicionar recados
+            Adicionar recados
           </p>
 
           <TextareaAutosize
