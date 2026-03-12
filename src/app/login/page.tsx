@@ -7,6 +7,7 @@ import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
 import styles from "./Login.module.scss";
 import { IAcademico, IUsuario } from "@/interfaces/interfaces";
+import { hasAnyGrantedPermission } from "@/utils/permissions";
 
 interface CustomAxiosError {
   isAxiosError: boolean;
@@ -167,7 +168,7 @@ export default function Login() {
           {
             path: "/",
             expires: new Date(Date.now() + 8 * 60 * 60 * 1000), // Expira em 4 horas
-          }
+          },
         );
       }
       if (isAcademico(data.data) && !isUsuario(data.data)) {
@@ -187,7 +188,7 @@ export default function Login() {
           {
             path: "/",
             expires: new Date(Date.now() + 8 * 60 * 60 * 1000), // Expira em 4 horas
-          }
+          },
         );
       }
 
@@ -197,7 +198,12 @@ export default function Login() {
       // Pequeno delay para garantir que o cookie foi salvo antes da navegação
       setTimeout(() => {
         if (data.data && isUsuario(data.data)) {
-          router.push("/dashboard");
+          const redirectPath = hasAnyGrantedPermission(
+            data.data.permissaoUsuario,
+          )
+            ? "/dashboard"
+            : "/dashboard/cronograma";
+          router.push(redirectPath);
         } else {
           if (data.data && isAcademico(data.data)) {
             router.push("/academico");
@@ -222,7 +228,7 @@ export default function Login() {
           toast.error(`Erro de conexão: ${err.message}`);
         } else {
           toast.error(
-            "Ocorreu um erro desconhecido ao tentar conectar com o servidor."
+            "Ocorreu um erro desconhecido ao tentar conectar com o servidor.",
           );
         }
       } else if (err instanceof Error) {

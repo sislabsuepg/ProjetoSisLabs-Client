@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import CustomModal from "@/components/CustomModal";
 import { IEvento } from "@/components/Lists/types";
+import { canExecuteAction } from "@/utils/permissions";
 
 const dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const horarios = [
@@ -50,6 +51,7 @@ export default function Cronograma() {
   const [editaveis, setEditaveis] = useState<Record<number, boolean[][]>>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [cookies] = useCookies(["usuario"]);
+  const canEditCronograma = canExecuteAction("editar-cronograma", cookies);
   // Refs para overlay de eventos (Aulas de Hoje)
   const overlayWrapperRef = useRef<HTMLDivElement | null>(null);
   const thRefs = useRef<Record<number, HTMLTableCellElement | null>>({});
@@ -87,8 +89,8 @@ export default function Cronograma() {
           : [];
         setProfessores(
           [...lista].sort((a, b) =>
-            a.nome.localeCompare(b.nome, "pt", { sensitivity: "base" })
-          )
+            a.nome.localeCompare(b.nome, "pt", { sensitivity: "base" }),
+          ),
         );
       } catch (e) {
         console.error("Erro ao buscar professores", e);
@@ -173,10 +175,10 @@ export default function Cronograma() {
         });
         // Monta tabela ativa e mapa de células editáveis. Agora SOMENTE células com horário existente podem receber professor.
         const matriz = Array.from({ length: horarios.length }, () =>
-          Array(dias.length).fill("")
+          Array(dias.length).fill(""),
         );
         const matrizEdit = Array.from({ length: horarios.length }, () =>
-          Array(dias.length).fill(false)
+          Array(dias.length).fill(false),
         );
         lista.forEach((h) => {
           if (!h.horario || h.diaSemana == null) return;
@@ -218,7 +220,7 @@ export default function Cronograma() {
   useEffect(() => {
     if (!laboratorios.length) return;
     const faltando = laboratorios.filter(
-      (l) => l.id != null && !labsCarregados.has(l.id)
+      (l) => l.id != null && !labsCarregados.has(l.id),
     );
     if (!faltando.length) return;
     let cancelado = false;
@@ -252,7 +254,7 @@ export default function Cronograma() {
               `${h.idLaboratorio}-${h.diaSemana}-${h.horario}`;
             const existentes = new Set(prev.map(key));
             const add = lista.filter(
-              (h) => h.idLaboratorio && !existentes.has(key(h))
+              (h) => h.idLaboratorio && !existentes.has(key(h)),
             );
             return add.length ? [...prev, ...add] : prev;
           });
@@ -261,7 +263,7 @@ export default function Cronograma() {
             if (!lab.id) return prev;
             if (prev[lab.id]) return prev; // já existe
             const matrizEdit = Array.from({ length: horarios.length }, () =>
-              Array(dias.length).fill(false)
+              Array(dias.length).fill(false),
             );
             lista.forEach((h) => {
               if (!h.horario || h.diaSemana == null) return;
@@ -287,7 +289,7 @@ export default function Cronograma() {
           console.error(
             "Erro ao pré-carregar horários do laboratório",
             lab.id,
-            e
+            e,
           );
           setLabsCarregados((prev) => {
             const n = new Set(prev);
@@ -306,7 +308,7 @@ export default function Cronograma() {
   const tabelaAtiva = useMemo(() => {
     if (!tabelas[activeId]) {
       return Array.from({ length: horarios.length }, () =>
-        Array(dias.length).fill("")
+        Array(dias.length).fill(""),
       );
     }
     return tabelas[activeId];
@@ -460,7 +462,7 @@ export default function Cronograma() {
       .sort((a, b) =>
         (a.sigla || "").localeCompare(b.sigla || "", "pt", {
           sensitivity: "base",
-        })
+        }),
       )
       .map(({ id, label }) => ({ id, label }));
 
@@ -484,7 +486,7 @@ export default function Cronograma() {
     }
     const idxMap = new Map(horarios.map((h, i) => [h, i] as const));
     const hrs = Array.from(horasSet.values()).sort(
-      (a, b) => idxMap.get(a)! - idxMap.get(b)!
+      (a, b) => idxMap.get(a)! - idxMap.get(b)!,
     );
 
     // Mapa de aulas (professor por chave horario__lab)
@@ -584,7 +586,7 @@ export default function Cronograma() {
       const endDt = new Date(dt.getTime() + dur * 60 * 1000);
       const pad2 = (n: number) => (n < 10 ? `0${n}` : String(n));
       const hora = `${pad2(dt.getHours())}:${pad2(dt.getMinutes())} – ${pad2(
-        endDt.getHours()
+        endDt.getHours(),
       )}:${pad2(endDt.getMinutes())}`;
       const top = getYForMinute(startMin);
       const bottom = getYForMinute(endMin);
@@ -637,7 +639,7 @@ export default function Cronograma() {
 
   const compactMode = useMemo(
     () => tabelaAulasHoje.laboratorios.length > 6,
-    [tabelaAulasHoje.laboratorios]
+    [tabelaAulasHoje.laboratorios],
   );
 
   // Conflitos de hoje agrupados por professor (um card por professor)
@@ -698,10 +700,10 @@ export default function Cronograma() {
     }
     const lista = Array.from(byProfessor.values());
     lista.forEach((g) =>
-      g.horarios.sort((a, b) => a.horario.localeCompare(b.horario, "pt"))
+      g.horarios.sort((a, b) => a.horario.localeCompare(b.horario, "pt")),
     );
     lista.sort((a, b) =>
-      a.professor.localeCompare(b.professor, "pt", { sensitivity: "base" })
+      a.professor.localeCompare(b.professor, "pt", { sensitivity: "base" }),
     );
     return lista;
   }, [aulasOrdenadas]);
@@ -748,9 +750,9 @@ export default function Cronograma() {
   const dadosIncompletos = useMemo(
     () =>
       laboratoriosUnificados.some(
-        (l) => l.id != null && !labsCarregados.has(l.id!)
+        (l) => l.id != null && !labsCarregados.has(l.id!),
       ),
-    [laboratoriosUnificados, labsCarregados]
+    [laboratoriosUnificados, labsCarregados],
   );
 
   const dataHojeFormatada = useMemo(
@@ -761,16 +763,17 @@ export default function Cronograma() {
         month: "2-digit",
         year: "numeric",
       }),
-    []
+    [],
   );
 
   const atualizarCelula = (linha: number, coluna: number, valor: string) => {
+    if (!canEditCronograma) return;
     setTabelas((prev) => {
       const copia = { ...prev };
       const tabela = copia[activeId]
         ? copia[activeId].map((l) => [...l])
         : Array.from({ length: horarios.length }, () =>
-            Array(dias.length).fill("")
+            Array(dias.length).fill(""),
           );
       tabela[linha][coluna] = valor;
       copia[activeId] = tabela;
@@ -779,13 +782,17 @@ export default function Cronograma() {
   };
 
   const salvarTabela = async () => {
+    if (!canEditCronograma) {
+      toast.error("Você não tem permissão para editar o cronograma.");
+      return;
+    }
     if (salvando) return;
     setSalvando(true);
     try {
       const orig = todosHorarios.filter((h) => h.idLaboratorio === activeId);
       const chaveMap = (dia: number, horario: string) => `${dia}-${horario}`;
       const mapaOrig = new Map<string, IHorario>(
-        orig.map((h) => [chaveMap(h.diaSemana, h.horario), h])
+        orig.map((h) => [chaveMap(h.diaSemana, h.horario), h]),
       );
       const updates: { id: number; idProfessor: number }[] = [];
       const desconhecidos: string[] = [];
@@ -823,7 +830,7 @@ export default function Cronograma() {
       }
       if (desconhecidos.length) {
         toast.warning(
-          `Professores não reconhecidos ignorados: ${desconhecidos.join(", ")}`
+          `Professores não reconhecidos ignorados: ${desconhecidos.join(", ")}`,
         );
       }
       let ok = 0;
@@ -853,7 +860,7 @@ export default function Cronograma() {
               };
             }
             return h;
-          })
+          }),
         );
       }
       // Limpeza (idProfessor: null)
@@ -880,7 +887,7 @@ export default function Cronograma() {
               };
             }
             return h;
-          })
+          }),
         );
       }
       if (fail && (ok || okRem))
@@ -920,7 +927,7 @@ export default function Cronograma() {
       profKey: string | number,
       nome: string,
       profId: number | undefined,
-      item: Item
+      item: Item,
     ) => {
       let card = byProf.get(profKey);
       if (!card) {
@@ -935,7 +942,7 @@ export default function Cronograma() {
         (i) =>
           i.diaIdx === item.diaIdx &&
           i.horario === item.horario &&
-          i.labId === item.labId
+          i.labId === item.labId,
       );
       if (!exists) card.itens.push(item);
     };
@@ -1004,11 +1011,11 @@ export default function Cronograma() {
     cards.forEach((c) =>
       c.itens.sort(
         (a, b) =>
-          a.diaIdx - b.diaIdx || a.horario.localeCompare(b.horario, "pt")
-      )
+          a.diaIdx - b.diaIdx || a.horario.localeCompare(b.horario, "pt"),
+      ),
     );
     cards.sort((a, b) =>
-      a.professor.localeCompare(b.professor, "pt", { sensitivity: "base" })
+      a.professor.localeCompare(b.professor, "pt", { sensitivity: "base" }),
     );
     return cards;
   }, [tabelaAtiva, editaveis, activeId, todosHorarios, tabelas, professores]);
@@ -1019,7 +1026,7 @@ export default function Cronograma() {
       setTabelas((prev) => ({
         ...prev,
         [activeId]: Array.from({ length: horarios.length }, () =>
-          Array(dias.length).fill("")
+          Array(dias.length).fill(""),
         ),
       }));
     }
@@ -1203,8 +1210,8 @@ export default function Cronograma() {
                     const padClass = small
                       ? "px-1.5 py-0.5 gap-0.5"
                       : medium
-                      ? "px-2 py-0.5 gap-0.5"
-                      : "px-2.5 py-1 gap-1";
+                        ? "px-2 py-0.5 gap-0.5"
+                        : "px-2.5 py-1 gap-1";
                     return (
                       <div
                         key={o.key}
@@ -1272,7 +1279,7 @@ export default function Cronograma() {
             // Unifica todos os labs envolvidos (sem detalhar horários)
             const labsMap = new Map<number, string>();
             prof.horarios.forEach((h) =>
-              h.labs.forEach((l) => labsMap.set(l.id, l.label))
+              h.labs.forEach((l) => labsMap.set(l.id, l.label)),
             );
             return (
               <div
@@ -1409,8 +1416,8 @@ export default function Cronograma() {
                                 sabadoBloqueado
                                   ? "Sábado somente período da manhã"
                                   : !podeEditar
-                                  ? "Horário não disponível para edição"
-                                  : undefined
+                                    ? "Horário não disponível para edição"
+                                    : undefined
                               }
                             >
                               —
@@ -1427,14 +1434,20 @@ export default function Cronograma() {
                                 Carregando...
                               </div>
                             )}
-                            <ProfessorAutocomplete
-                              value={tabelaAtiva[linha][coluna]}
-                              onChange={(val) =>
-                                atualizarCelula(linha, coluna, val)
-                              }
-                              professores={professores}
-                              disabled={loadingTabela}
-                            />
+                            {canEditCronograma ? (
+                              <ProfessorAutocomplete
+                                value={tabelaAtiva[linha][coluna]}
+                                onChange={(val) =>
+                                  atualizarCelula(linha, coluna, val)
+                                }
+                                professores={professores}
+                                disabled={loadingTabela}
+                              />
+                            ) : (
+                              <div className="flex min-h-[50px] items-center justify-center px-2 py-3 text-center text-sm font-semibold text-theme-blue">
+                                {tabelaAtiva[linha][coluna] || ""}
+                              </div>
+                            )}
                           </td>
                         );
                       })}
@@ -1446,63 +1459,64 @@ export default function Cronograma() {
           </table>
         </div>
         {/* Conflitos atuais do cronograma (sem inline nas células) */}
-        {(() => {
-          const cards = conflitosEdicaoPorProfessor;
-          if (!cards.length) return null;
-          return (
-            <div className="w-full grid gap-3 md:grid-cols-2 mt-3">
-              {cards.map((prof) => {
-                // Unifica por (dia, lab) ignorando horário
-                const pares = new Map<
-                  string,
-                  { diaIdx: number; labLabel: string }
-                >();
-                prof.itens.forEach((it) => {
-                  const key = `${it.diaIdx}__${it.labLabel}`;
-                  if (!pares.has(key))
-                    pares.set(key, {
-                      diaIdx: it.diaIdx,
-                      labLabel: it.labLabel,
-                    });
-                });
-                return (
-                  <div
-                    key={prof.professor + (prof.professorId ?? "")}
-                    className="rounded-[12px] border border-yellow-500 bg-yellow-50 text-yellow-900 p-3 shadow-sm"
-                  >
-                    <div className="mb-1 inline-flex items-center gap-1 text-[0.8rem] font-semibold text-yellow-950">
-                      <span className="text-[0.9rem]">⚠️</span>
-                      <span className="uppercase tracking-wide">
-                        Conflito de horário
-                      </span>
-                    </div>
-                    <div className="font-semibold text-[1rem] leading-snug mb-1">
-                      {prof.professor}
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {Array.from(pares.values()).map((p) => (
-                        <span
-                          key={`${p.diaIdx}__${p.labLabel}`}
-                          className="inline-flex items-center gap-1 rounded-full bg-yellow-100 text-yellow-900 border border-yellow-300 px-2 py-0.5 text-[0.75rem] font-medium"
-                        >
-                          <strong>{dias[p.diaIdx]}</strong> — {p.labLabel}
+        {canEditCronograma &&
+          (() => {
+            const cards = conflitosEdicaoPorProfessor;
+            if (!cards.length) return null;
+            return (
+              <div className="w-full grid gap-3 md:grid-cols-2 mt-3">
+                {cards.map((prof) => {
+                  // Unifica por (dia, lab) ignorando horário
+                  const pares = new Map<
+                    string,
+                    { diaIdx: number; labLabel: string }
+                  >();
+                  prof.itens.forEach((it) => {
+                    const key = `${it.diaIdx}__${it.labLabel}`;
+                    if (!pares.has(key))
+                      pares.set(key, {
+                        diaIdx: it.diaIdx,
+                        labLabel: it.labLabel,
+                      });
+                  });
+                  return (
+                    <div
+                      key={prof.professor + (prof.professorId ?? "")}
+                      className="rounded-[12px] border border-yellow-500 bg-yellow-50 text-yellow-900 p-3 shadow-sm"
+                    >
+                      <div className="mb-1 inline-flex items-center gap-1 text-[0.8rem] font-semibold text-yellow-950">
+                        <span className="text-[0.9rem]">⚠️</span>
+                        <span className="uppercase tracking-wide">
+                          Conflito de horário
                         </span>
-                      ))}
+                      </div>
+                      <div className="font-semibold text-[1rem] leading-snug mb-1">
+                        {prof.professor}
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {Array.from(pares.values()).map((p) => (
+                          <span
+                            key={`${p.diaIdx}__${p.labLabel}`}
+                            className="inline-flex items-center gap-1 rounded-full bg-yellow-100 text-yellow-900 border border-yellow-300 px-2 py-0.5 text-[0.75rem] font-medium"
+                          >
+                            <strong>{dias[p.diaIdx]}</strong> — {p.labLabel}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })()}
+                  );
+                })}
+              </div>
+            );
+          })()}
         <div
           className={`w-full flex items-center ${
-            cookies.usuario?.permissao?.geral
+            canEditCronograma && cookies.usuario?.permissao?.geral
               ? "justify-between"
               : "justify-end"
           } mt-4`}
         >
-          {cookies.usuario?.permissao?.geral ? (
+          {canEditCronograma && cookies.usuario?.permissao?.geral ? (
             <button
               type="button"
               className="bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px]"
@@ -1512,16 +1526,18 @@ export default function Cronograma() {
             </button>
           ) : null}
 
-          <button
-            type="button"
-            onClick={salvarTabela}
-            disabled={salvando}
-            className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] ${
-              salvando ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            {salvando ? "Salvando..." : "Salvar"}
-          </button>
+          {canEditCronograma ? (
+            <button
+              type="button"
+              onClick={salvarTabela}
+              disabled={salvando}
+              className={`bg-theme-blue font-medium h-[35px] flex items-center justify-center text-[0.9rem] w-full max-w-[150px] text-white rounded-[10px] ${
+                salvando ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {salvando ? "Salvando..." : "Salvar"}
+            </button>
+          ) : null}
         </div>
       </div>
       <CustomModal

@@ -12,6 +12,14 @@ export interface UserPermissions {
   relatorio?: boolean;
 }
 
+const permissionKeys: (keyof UserPermissions)[] = [
+  "geral",
+  "cadastro",
+  "alteracao",
+  "advertencia",
+  "relatorio",
+];
+
 interface CookiesLike {
   [key: string]: unknown;
   usuario?: {
@@ -34,15 +42,22 @@ export function getUserPermissions(cookiesObj?: CookiesLike): UserPermissions {
 
 export function hasPermission(
   perm: keyof UserPermissions,
-  cookiesObj?: CookiesLike
+  cookiesObj?: CookiesLike,
 ): boolean {
   const p = getUserPermissions(cookiesObj);
   return p.geral === true || p[perm] === true;
 }
 
+export function hasAnyGrantedPermission(
+  permissions?: UserPermissions | null,
+): boolean {
+  if (!permissions) return false;
+  return permissionKeys.some((key) => permissions[key] === true);
+}
+
 export function canAny(
   perms: (keyof UserPermissions)[],
-  cookiesObj?: CookiesLike
+  cookiesObj?: CookiesLike,
 ): boolean {
   const p = getUserPermissions(cookiesObj);
   if (p.geral) return true;
@@ -71,7 +86,7 @@ const pageRules: Record<PageKey, (p: UserPermissions) => boolean> = {
   emprestimo: (p) => !!p.geral || !!p.cadastro,
   registros: (p) => !!p.geral,
   cronograma: () => true, // livre
-  agenda: () => true, // livre
+  agenda: (p) => hasAnyGrantedPermission(p),
 };
 
 // Ações internas (exemplos) - podem ser expandidas conforme necessário
@@ -81,6 +96,7 @@ type ActionKey =
   | "encerrar-emprestimo"
   | "emitir-advertencia"
   | "gerar-relatorio"
+  | "editar-cronograma"
   | "criar-usuario"
   | "editar-usuario"
   | "criar-permissao"
@@ -93,6 +109,7 @@ const actionRules: Record<ActionKey, (p: UserPermissions) => boolean> = {
   "encerrar-emprestimo": (p) => !!p.geral || !!p.cadastro,
   "emitir-advertencia": (p) => !!p.advertencia,
   "gerar-relatorio": (p) => !!p.relatorio,
+  "editar-cronograma": (p) => !!p.geral || !!p.alteracao,
   "criar-usuario": (p) => !!p.geral,
   "editar-usuario": (p) => !!p.geral || !!p.alteracao,
   "criar-permissao": (p) => !!p.geral,
@@ -102,7 +119,7 @@ const actionRules: Record<ActionKey, (p: UserPermissions) => boolean> = {
 
 export function canAccessPage(
   page: PageKey,
-  cookiesObj?: CookiesLike
+  cookiesObj?: CookiesLike,
 ): boolean {
   const p = getUserPermissions(cookiesObj);
   const rule = pageRules[page];
@@ -111,7 +128,7 @@ export function canAccessPage(
 
 export function canExecuteAction(
   action: ActionKey,
-  cookiesObj?: CookiesLike
+  cookiesObj?: CookiesLike,
 ): boolean {
   const p = getUserPermissions(cookiesObj);
   const rule = actionRules[action];

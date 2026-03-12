@@ -18,6 +18,7 @@ import {
   getAlertColor,
 } from "@/utils/emprestimoUtils";
 import { useRouter } from "next/navigation";
+import { hasAnyGrantedPermission } from "@/utils/permissions";
 
 export default function Inicio() {
   const [loading, setLoading] = useState(true);
@@ -46,6 +47,7 @@ export default function Inicio() {
   const alunosAdvertenciaAvisadosRef = useRef<Set<number>>(new Set());
   const [cookies] = useCookies(["usuario"]);
   const permissions = cookies?.usuario?.permissao || {};
+  const onlyScheduleView = !hasAnyGrantedPermission(permissions);
   // Ações de emprestimo (aprovar/recusar/encerrar) podem ser feitas por 'geral' ou 'cadastro'
   const canAcao = permissions?.geral === true || permissions?.cadastro === true;
   const [data, setData] = useState<IEmprestimo[]>([]);
@@ -88,14 +90,19 @@ export default function Inicio() {
     }
   };
   useEffect(() => {
+    if (onlyScheduleView) {
+      setLoading(false);
+      router.replace("/dashboard/cronograma");
+      return;
+    }
     async function fetchData() {
       try {
         const countResponse = await apiOnline.get<{ count: number }>(
-          "/emprestimo/count?ativo=true"
+          "/emprestimo/count?ativo=true",
         );
         const count = countResponse?.count ?? 0;
         const response = await apiOnline.get(
-          `/emprestimo?page=${currentPage}&items=${itemsPerPage}`
+          `/emprestimo?page=${currentPage}&items=${itemsPerPage}`,
         );
         let lista: unknown = Array.isArray(response)
           ? response
@@ -107,19 +114,19 @@ export default function Inicio() {
         if (!Array.isArray(lista)) lista = [];
         const emprestimos = (lista as unknown[]).filter(
           (x): x is IEmprestimo =>
-            !!x && typeof x === "object" && "laboratorio" in x && "aluno" in x
+            !!x && typeof x === "object" && "laboratorio" in x && "aluno" in x,
         );
         setTotalPages(Math.ceil(count / itemsPerPage));
         setData(emprestimos);
 
         // Aviso sobre empréstimos antigos
         const antigos = emprestimos.filter((item) =>
-          isFromPreviousDay(item.dataHoraEntrada)
+          isFromPreviousDay(item.dataHoraEntrada),
         );
 
         if (antigos.length > 0) {
           const criticos = antigos.filter(
-            (item) => getDaysAgo(item.dataHoraEntrada) >= 7
+            (item) => getDaysAgo(item.dataHoraEntrada) >= 7,
           );
 
           if (criticos.length > 0) {
@@ -127,7 +134,7 @@ export default function Inicio() {
               `ATENÇÃO: ${criticos.length} empréstimo${
                 criticos.length > 1 ? "s" : ""
               } aberto${criticos.length > 1 ? "s" : ""} há mais de 7 dias!`,
-              { autoClose: 10000 }
+              { autoClose: 10000 },
             );
           } else if (antigos.length > 0) {
             toast.info(
@@ -136,7 +143,7 @@ export default function Inicio() {
               } em aberto de dia${antigos.length > 1 ? "s" : ""} anterior${
                 antigos.length > 1 ? "es" : ""
               }`,
-              { autoClose: 7000 }
+              { autoClose: 7000 },
             );
           }
         }
@@ -147,11 +154,12 @@ export default function Inicio() {
       }
     }
     fetchData();
-  }, [currentPage, update]);
+  }, [currentPage, onlyScheduleView, router, update]);
 
   // Polling de solicitações a cada 5s (com cleanup adequado)
   const solicitacoesPrevRef = useRef<Set<string>>(new Set());
   useEffect(() => {
+    if (onlyScheduleView) return;
     let interval: ReturnType<typeof setInterval> | null = null;
     const fetchSolicitacoes = async () => {
       try {
@@ -171,7 +179,7 @@ export default function Inicio() {
             toast.info(
               novas.length === 1
                 ? `Nova solicitação: ${novas[0].aluno.nome} - Lab ${novas[0].laboratorio.numero}`
-                : `${novas.length} novas solicitações de laboratório`
+                : `${novas.length} novas solicitações de laboratório`,
             );
           }
           // atualizar ref
@@ -181,10 +189,12 @@ export default function Inicio() {
 
         // Buscar advertências apenas para alunos ainda não consultados
         const idsAlunoUnicos = Array.from(
-          new Set(responseData.map((s) => s.idAluno).filter((id) => id != null))
+          new Set(
+            responseData.map((s) => s.idAluno).filter((id) => id != null),
+          ),
         );
         const novosIds = idsAlunoUnicos.filter(
-          (id) => !(id in advertenciasAlunos)
+          (id) => !(id in advertenciasAlunos),
         );
         if (novosIds.length) {
           try {
@@ -203,7 +213,7 @@ export default function Inicio() {
                 } catch {
                   return { id, flag: false };
                 }
-              })
+              }),
             );
             const atual: Record<number, boolean> = {};
             resultados.forEach((r) => (atual[r.id] = r.flag));
@@ -212,14 +222,14 @@ export default function Inicio() {
               resultados.forEach((r) => {
                 if (r.flag && !alunosAdvertenciaAvisadosRef.current.has(r.id)) {
                   const solicitacao = responseData.find(
-                    (s) => s.idAluno === r.id
+                    (s) => s.idAluno === r.id,
                   );
                   const nome = solicitacao?.aluno?.nome || `Aluno ${r.id}`;
                   const ra = solicitacao?.aluno?.ra
                     ? ` (${solicitacao.aluno.ra})`
                     : "";
                   toast.warning(
-                    `Atenção: ${nome}${ra} possui advertências registradas no último mês.`
+                    `Atenção: ${nome}${ra} possui advertências registradas no último mês.`,
                   );
                   alunosAdvertenciaAvisadosRef.current.add(r.id);
                 }
@@ -238,7 +248,7 @@ export default function Inicio() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, []);
+  }, [onlyScheduleView]);
 
   if (loading) {
     return (
@@ -248,14 +258,24 @@ export default function Inicio() {
     );
   }
 
+  if (onlyScheduleView) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <p className="text-sm text-theme-text">
+          Redirecionando para o cronograma.
+        </p>
+      </div>
+    );
+  }
+
   console.log("data - ", data);
 
   // Calcula empréstimos de dias anteriores
   const emprestimosAntigos = data.filter((item) =>
-    isFromPreviousDay(item.dataHoraEntrada)
+    isFromPreviousDay(item.dataHoraEntrada),
   );
   const emprestimosCriticos = emprestimosAntigos.filter(
-    (item) => getDaysAgo(item.dataHoraEntrada) >= 7
+    (item) => getDaysAgo(item.dataHoraEntrada) >= 7,
   );
 
   return (
@@ -357,9 +377,9 @@ export default function Inicio() {
                                   laboratorioNumero: item.laboratorio?.numero,
                                   dataHoraEntrada: item.dataHoraEntrada,
                                   diasEmAberto: getDaysAgo(
-                                    item.dataHoraEntrada
+                                    item.dataHoraEntrada,
                                   ),
-                                })
+                                }),
                               );
                               router.push("/dashboard/advertencia");
                             }}
@@ -559,9 +579,9 @@ export default function Inicio() {
                                             item.laboratorio?.numero,
                                           dataHoraEntrada: item.dataHoraEntrada,
                                           diasEmAberto: getDaysAgo(
-                                            item.dataHoraEntrada
+                                            item.dataHoraEntrada,
                                           ),
-                                        })
+                                        }),
                                       );
                                       router.push("/dashboard/advertencia");
                                     }}

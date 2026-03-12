@@ -7,8 +7,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { fetchAndCountNotifications } from "@/utils/fetchNotifications";
+import { hasAnyGrantedPermission } from "@/utils/permissions";
 import { stepsMenu } from "../GuidedTour/stepsMenu";
-import HelpIcon from '@mui/icons-material/Help';
+import HelpIcon from "@mui/icons-material/Help";
 import Popover from "../Popover";
 import { useTour } from "@reactour/tour";
 
@@ -25,7 +26,7 @@ interface SidebarItemProps {
   isOpen?: boolean;
   disabled?: boolean;
   title?: string;
-  extendclass?: string
+  extendclass?: string;
 }
 
 function SidebarItem({
@@ -36,20 +37,22 @@ function SidebarItem({
   isOpen,
   disabled = false,
   title,
-  extendclass
+  extendclass,
 }: SidebarItemProps) {
   return (
     <li
       className={`${extendclass} relative flex items-center p-3 my-2 rounded-[10px] transition-colors duration-200
-        ${disabled
-          ? "cursor-not-allowed opacity-40 bg-[#4F6B98]"
-          : "cursor-pointer hover:bg-[#5679b1]"
+        ${
+          disabled
+            ? "cursor-not-allowed opacity-40 bg-[#4F6B98]"
+            : "cursor-pointer hover:bg-[#5679b1]"
         }
-        ${active && !disabled
-          ? "bg-theme-blue text-theme-white"
-          : !active
-            ? "bg-[#4F6B98]"
-            : ""
+        ${
+          active && !disabled
+            ? "bg-theme-blue text-theme-white"
+            : !active
+              ? "bg-[#4F6B98]"
+              : ""
         }
       `}
       onClick={() => {
@@ -80,6 +83,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const user = cookies.usuario;
   const isAcademico = user && !isNaN(user.login);
   const permissions = user?.permissao || {};
+  const hasAnyPermission = hasAnyGrantedPermission(permissions);
   // Matriz de regras:
   // geral: pode listar e cadastrar usuários, permissões, cursos, professores, laboratórios e acessar registros
   // advertencia: somente emitir advertência
@@ -127,8 +131,9 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       <aside
         className={`h-screen bg-theme-blue flex flex-col p-4 shadow-lg transition-transform duration-500 z-50
             fixed left-0 top-0
-            ${isOpen ? "translate-x-0 w-[380px]" : "-translate-x-full w-[380px]"
-          }
+            ${
+              isOpen ? "translate-x-0 w-[380px]" : "-translate-x-full w-[380px]"
+            }
           `}
       >
         <div className="flex items-center justify-between gap-2 px-2 border-b border-theme-blue/70">
@@ -184,6 +189,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 router.push("/dashboard/");
               }}
               isOpen={isOpen}
+              disabled={!hasAnyPermission}
               extendclass="step-menu-inicio"
             />
             <SidebarItem
@@ -254,6 +260,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 router.push("/dashboard/agenda");
               }}
               isOpen={isOpen}
+              disabled={!hasAnyPermission}
               extendclass="step-menu-add-notificacao"
             />
             <SidebarItem
@@ -274,7 +281,10 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         <div className="mt-auto">
           <div className="w-full flex items-center justify-end">
             <Popover title={"Ajuda com o menu!"}>
-              <HelpIcon onClick={handleOpenTour} className="text-theme-white cursor-pointer" />
+              <HelpIcon
+                onClick={handleOpenTour}
+                className="text-theme-white cursor-pointer"
+              />
             </Popover>
           </div>
 
