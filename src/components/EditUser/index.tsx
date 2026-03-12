@@ -163,6 +163,11 @@ function EditUserModal<T extends object>({
     return val;
   };
 
+  const getFieldLabel = (key: string) => {
+    if (key === "temHorarios") return "Cronograma";
+    return key.charAt(0).toUpperCase() + key.slice(1);
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <div
@@ -205,7 +210,7 @@ function EditUserModal<T extends object>({
                   className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
                   key={key}
                   type="number"
-                  placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                  placeholder={getFieldLabel(key)}
                   value={(value as number) ?? 0}
                   onChange={(e) => {
                     if (key === "anoCurso") {
@@ -247,7 +252,7 @@ function EditUserModal<T extends object>({
                   type="text"
                   disabled
                   readOnly
-                  placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                  placeholder={getFieldLabel(key)}
                   value={
                     typeof value === "object" && value !== null
                       ? (value as Record<string, unknown>)?.nome?.toString() ??
@@ -342,7 +347,7 @@ function EditUserModal<T extends object>({
             if (typeof value === "boolean") {
               return (
                 <label className="flex items-center gap-4" key={key}>
-                  {key}
+                  {getFieldLabel(key)}
                   <CustomSwitch
                     checked={value as boolean}
                     onChange={(e) =>
@@ -359,7 +364,7 @@ function EditUserModal<T extends object>({
                 type={
                   getInputType(key) === "phone" ? "text" : getInputType(key)
                 }
-                placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                placeholder={getFieldLabel(key)}
                 value={
                   getInputType(key) === "date"
                     ? formatDateForInput(value as string)

@@ -24,6 +24,7 @@ export interface FormLaboratorioType {
   nome: string;
   numero: string;
   restrito: boolean;
+  temHorarios?: boolean;
   ativo?: boolean;
 }
 

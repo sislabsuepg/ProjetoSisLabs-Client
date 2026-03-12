@@ -32,7 +32,7 @@ export const formMap: Record<number, IData> = {
     curso: undefined,
   }, // Acadêmico
   2: { id: 0, nome: "", email: "" }, // Professor
-  3: { id: 0, nome: "", numero: "", restrito: false }, // Laboratório
+  3: { id: 0, nome: "", numero: "", restrito: false, temHorarios: false }, // Laboratório
   4: {
     id: 0,
     idAluno: 0,

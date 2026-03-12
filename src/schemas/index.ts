@@ -182,6 +182,7 @@ export const edicao_laboratorio = Yup.object().shape(
     numero: Yup.string()
       .max(8, 'O campo "Número" deve ter no máximo 8 caracteres')
       .required('O campo "Número" é obrigatório'),
+    temHorarios: Yup.boolean(),
   })
 );
 
