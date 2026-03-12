@@ -255,8 +255,8 @@ function EditUserModal<T extends object>({
                   placeholder={getFieldLabel(key)}
                   value={
                     typeof value === "object" && value !== null
-                      ? (value as Record<string, unknown>)?.nome?.toString() ??
-                        ""
+                      ? ((value as Record<string, unknown>)?.nome?.toString() ??
+                        "")
                       : (String(value ?? "") as string)
                   }
                   className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
@@ -290,12 +290,12 @@ function EditUserModal<T extends object>({
                       console.log("Atualizando idPermissao:", id);
                       onChange(
                         key as keyof T,
-                        selected as unknown as T[keyof T]
+                        selected as unknown as T[keyof T],
                       );
                       // Sempre atualizar o idPermissao quando mudar a permissão
                       onChange(
                         "idPermissao" as keyof T,
-                        id as unknown as T[keyof T]
+                        id as unknown as T[keyof T],
                       );
                     } else if (key === "idPermissao") {
                       // Se estamos atualizando diretamente o idPermissao
@@ -305,7 +305,7 @@ function EditUserModal<T extends object>({
                       if ("permissaoUsuario" in formData) {
                         onChange(
                           "permissaoUsuario" as keyof T,
-                          selected as unknown as T[keyof T]
+                          selected as unknown as T[keyof T],
                         );
                       }
                     } else {
@@ -335,8 +335,8 @@ function EditUserModal<T extends object>({
                   disabled
                   value={
                     typeof value === "object" && value !== null
-                      ? (value as Record<string, unknown>)?.nome?.toString() ??
-                        ""
+                      ? ((value as Record<string, unknown>)?.nome?.toString() ??
+                        "")
                       : (String(value ?? "") as string)
                   }
                   className="w-full font-normal p-3 text-[0.9rem] rounded-md bg-theme-inputBg"
@@ -369,8 +369,8 @@ function EditUserModal<T extends object>({
                   getInputType(key) === "date"
                     ? formatDateForInput(value as string)
                     : getInputType(key) === "phone"
-                    ? maskPhone(value as string)
-                    : (value as string)
+                      ? maskPhone(value as string)
+                      : (value as string)
                 }
                 onChange={(e) => {
                   let newValue = e.target.value;
@@ -382,12 +382,12 @@ function EditUserModal<T extends object>({
                   } else if (getInputType(key) === "date") {
                     console.log(
                       `Campo de data ${key} - valor original:`,
-                      e.target.value
+                      e.target.value,
                     );
                     newValue = formatDateForSave(e.target.value);
                     console.log(
                       `Campo de data ${key} - valor formatado:`,
-                      newValue
+                      newValue,
                     );
                   }
 

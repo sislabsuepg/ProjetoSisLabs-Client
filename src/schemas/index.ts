@@ -42,7 +42,7 @@ export const cadastro_academico = Yup.object().shape(
         if (!value || value.trim() === "") return false;
         return /^\d+$/.test(value);
       }),
-  })
+  }),
 );
 
 export const cadastro_laboratorio = Yup.object().shape(
@@ -53,15 +53,15 @@ export const cadastro_laboratorio = Yup.object().shape(
     numero: Yup.string()
       .max(8, 'O campo "Número" deve ter no máximo 8 caracteres')
       .required('O campo "Número" é obrigatório'),
-  })
+  }),
 );
 
 export const cadastro_permissao = Yup.object().shape(
   createNewSchema({
     nomePermissao: Yup.string().required(
-      'O campo "Nome da permissão" é obrigatório'
+      'O campo "Nome da permissão" é obrigatório',
     ),
-  })
+  }),
 );
 
 export const cadastro_professor = Yup.object().shape(
@@ -74,7 +74,7 @@ export const cadastro_professor = Yup.object().shape(
       .max(40, "O campo 'E-mail' deve ter no máximo 40 caracteres")
       .email("E-mail inválido")
       .required('O campo "E-mail" é obrigatório'),
-  })
+  }),
 );
 
 export const cadastro_orientacao = Yup.object().shape({
@@ -90,7 +90,7 @@ export const cadastro_orientacao = Yup.object().shape({
         const dataInicio = new Date(String(value));
         const dataFim = new Date(String(context.parent.dataFim));
         return dataInicio < dataFim;
-      }
+      },
     )
     .required('O campo "Data de início" é obrigatório'),
   dataFim: Yup.string()
@@ -119,13 +119,13 @@ export const cadastro_curso = Yup.object().shape(
       .required('O campo "Quantos anos tem o curso?" é obrigatório')
       .min(
         1,
-        'O campo "Quantos anos tem o curso?" deve ser um número maior que 0'
+        'O campo "Quantos anos tem o curso?" deve ser um número maior que 0',
       )
       .max(
         8,
-        'O campo "Quantos anos tem o curso?" deve ser um número menor que 9'
+        'O campo "Quantos anos tem o curso?" deve ser um número menor que 9',
       ),
-  })
+  }),
 );
 
 export const cadastro_usuario = Yup.object().shape(
@@ -144,7 +144,7 @@ export const cadastro_usuario = Yup.object().shape(
     idPermissao: Yup.number()
       .required('O campo "Permissão" é obrigatório')
       .min(1, 'O campo "Permissão" deve ser um número válido'),
-  })
+  }),
 );
 
 // FUNÇÕES DE VALIDAÇÃO DE FORMULÁRIOS DE EDIÇÃO
@@ -166,12 +166,12 @@ export const edicao_academico = Yup.object().shape(
         } else {
           return value.length >= 10;
         }
-      }
+      },
     ),
     anoCurso: Yup.number()
       .required('O campo "Ano/Série" é obrigatório')
       .min(1, 'O campo "Ano/Série" deve ser um número válido'),
-  })
+  }),
 );
 
 export const edicao_laboratorio = Yup.object().shape(
@@ -183,15 +183,15 @@ export const edicao_laboratorio = Yup.object().shape(
       .max(8, 'O campo "Número" deve ter no máximo 8 caracteres')
       .required('O campo "Número" é obrigatório'),
     temHorarios: Yup.boolean(),
-  })
+  }),
 );
 
 export const edicao_permissao = Yup.object().shape(
   createNewSchema({
     nomePermissao: Yup.string().required(
-      'O campo "Nome da permissão" é obrigatório'
+      'O campo "Nome da permissão" é obrigatório',
     ),
-  })
+  }),
 );
 
 export const edicao_professor = Yup.object().shape(
@@ -204,7 +204,7 @@ export const edicao_professor = Yup.object().shape(
       .max(40, "O campo 'E-mail' deve ter no máximo 40 caracteres")
       .email("E-mail inválido")
       .required('O campo "E-mail" é obrigatório'),
-  })
+  }),
 );
 
 export const edicao_orientacao = Yup.object().shape({
@@ -220,7 +220,7 @@ export const edicao_orientacao = Yup.object().shape({
         const dataInicio = new Date(String(value));
         const dataFim = new Date(String(context.parent.dataFim));
         return dataInicio < dataFim;
-      }
+      },
     )
     .required('O campo "Data de início" é obrigatório'),
   dataFim: Yup.string()
@@ -240,13 +240,13 @@ export const edicao_curso = Yup.object().shape(
       .required('O campo "Quantos anos tem o curso?" é obrigatório')
       .min(
         1,
-        'O campo "Quantos anos tem o curso?" deve ser um número maior que 0'
+        'O campo "Quantos anos tem o curso?" deve ser um número maior que 0',
       )
       .max(
         8,
-        'O campo "Quantos anos tem o curso?" deve ser um número menor que 9'
+        'O campo "Quantos anos tem o curso?" deve ser um número menor que 9',
       ),
-  })
+  }),
 );
 
 export const edicao_usuario = Yup.object().shape(
@@ -258,7 +258,7 @@ export const edicao_usuario = Yup.object().shape(
     idPermissao: Yup.number()
       .required('O campo "Permissão" é obrigatório')
       .min(1, 'O campo "Permissão" deve ser um número válido'),
-  })
+  }),
 );
 
 export const atualizarPerfil = Yup.object().shape(
@@ -275,5 +275,5 @@ export const atualizarPerfil = Yup.object().shape(
           return value.length >= 11 && value.length <= 15;
         }
       }),
-  })
+  }),
 );
