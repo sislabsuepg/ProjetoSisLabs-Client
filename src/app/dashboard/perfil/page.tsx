@@ -64,7 +64,6 @@ export default function Perfil() {
       toast.error("Erro ao atualizar senha. Tente novamente.");
     }
 
-    // Aqui você pode adicionar a lógica para atualizar a senha
   }
 
   return (
@@ -154,13 +153,13 @@ export default function Perfil() {
                   text={"Atualizar senha"}
                   disabled={
                     !form.senha_atual ||
-                    form.senha_atual.length < 6 ||
+                    form.senha_atual.length < 4 ||
                     form.senha_atual.length > 20 ||
                     !form.nova_senha ||
-                    form.nova_senha.length < 6 ||
+                    form.nova_senha.length < 4 ||
                     form.nova_senha.length > 20 ||
                     !form.confirmar_nova_senha ||
-                    form.confirmar_nova_senha.length < 6 ||
+                    form.confirmar_nova_senha.length < 4 ||
                     form.confirmar_nova_senha.length > 20 ||
                     form.nova_senha !== form.confirmar_nova_senha
                   }
