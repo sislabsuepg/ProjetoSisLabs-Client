@@ -50,7 +50,7 @@ export default function ListUsuario({
                   key={item.id}
                   className={`${
                     index % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
-                  } border-b last:border-0`}
+                  } border-b last:border-0 transition-colors duration-150 hover:bg-[#D6E6FF]`}
                 >
                   <td className="px-4 py-3 text-[0.8rem] font-medium text-theme-text w-1/3">
                     <Popover title={item.nome}>{item.nome}</Popover>

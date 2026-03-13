@@ -56,7 +56,9 @@ export default function ListOrientacao({
               list.map((item, index) => (
                 <tr
                   key={item.id}
-                  className={index % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"}
+                  className={`${
+                    index % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
+                  } transition-colors duration-150 hover:bg-[#D6E6FF]`}
                 >
                   <td className="px-4 py-3 text-[0.8rem] font-medium max-w-[100px] text-theme-text">
                     <Popover title={item?.aluno?.nome}>
