@@ -1,6 +1,6 @@
 {
   "name": "sislabs",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "main": "electron/main.cjs",
   "private": true,
   "scripts": {
@@ -11,7 +11,9 @@
     "electron:dev": "electron electron/main.cjs --dev",
     "electron:start": "npm run build && electron electron/main.cjs",
     "electron:pack": "npm run build && electron-builder --dir",
-    "electron:dist": "npm run build && electron-builder"
+    "electron:dist": "npm run build && electron-builder",
+    "electron:dist:win": "npm run build && electron-builder --win nsis",
+    "release:win": "npm run lint && npm run electron:dist:win"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -51,6 +53,7 @@
   "build": {
     "appId": "com.sislabs.client",
     "productName": "SisLabs",
+    "artifactName": "SisLabs-Setup-${version}.${ext}",
     "asarUnpack": [
       ".next/**/*"
     ],
@@ -58,10 +61,13 @@
       "electron/**/*",
       ".next/**/*",
       "public/**/*",
+      ".env",
+      ".env.production",
       "next.config.ts",
       "package.json"
     ],
     "win": {
+      "signAndEditExecutable": false,
       "target": [
         "nsis"
       ]

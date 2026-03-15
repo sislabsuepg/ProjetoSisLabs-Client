@@ -132,7 +132,7 @@ export default function Login() {
       const callRoute = form.login.match(/^\d{1,13}$/) ? "aluno/" : "usuario/";
       const data: {
         data: IAcademico | IUsuario;
-      } = await apiOnline.post(`/${callRoute}login`, {
+      } = await apiOnline.post(`/${callRoute}login/`, {
         login: form.login,
         senha: form.senha,
       });
