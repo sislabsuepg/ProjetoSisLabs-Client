@@ -22,4 +22,15 @@ export default defineConfig([
       "react/react-in-jsx-scope": "off",
     },
   },
+  {
+    files: ["electron/**/*.cjs"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
 ]);
