@@ -3,9 +3,43 @@
 import { useEffect } from "react";
 import HelpIcon from "@mui/icons-material/Help";
 import { usePathname } from "next/navigation";
-import { useTour } from "@reactour/tour";
+import { StepType, useTour } from "@reactour/tour";
 import { useGuidedTour } from "@/components/GuidedTour/TourContext";
 import { toursByPage } from "@/components/GuidedTour/stepsPages";
+
+const MAX_TOUR_OPEN_RETRIES = 10;
+const TOUR_OPEN_RETRY_DELAY_MS = 150;
+
+function resolveStepsForPage(
+  pathname: string,
+  activeSection?: string,
+): StepType[] | null {
+  const tourPage = toursByPage[pathname];
+  if (!tourPage) return null;
+
+  if (Array.isArray(tourPage)) {
+    return tourPage;
+  }
+
+  if (activeSection && Array.isArray(tourPage[activeSection])) {
+    return tourPage[activeSection];
+  }
+
+  const firstSection = Object.keys(tourPage)[0];
+  if (firstSection && Array.isArray(tourPage[firstSection])) {
+    return tourPage[firstSection];
+  }
+
+  return null;
+}
+
+function hasAnyStepTargetInDom(steps: StepType[]): boolean {
+  return steps.some((step) => {
+    const selector = typeof step.selector === "string" ? step.selector : "";
+    if (!selector) return false;
+    return !!document.querySelector(selector);
+  });
+}
 
 export default function HelpFloatingButton() {
   const pathname = usePathname();
@@ -13,21 +47,26 @@ export default function HelpFloatingButton() {
   const { setIsOpen, setSteps, setCurrentStep } = useTour();
 
   const handleOpenTour = () => {
-    const tourPage = toursByPage[pathname];
-    if (!tourPage) {
+    const steps = resolveStepsForPage(pathname, activeSection);
+    if (!steps || steps.length === 0) {
       alert("Nenhum tour disponível para esta página!");
       return;
     }
 
-    const steps = Array.isArray(tourPage)
-      ? tourPage
-      : tourPage[activeSection!];
+    const openTour = (retries = 0) => {
+      if (hasAnyStepTargetInDom(steps) || retries >= MAX_TOUR_OPEN_RETRIES) {
+        setSteps!(steps);
+        setCurrentStep!(0);
+        setIsOpen!(true);
+        return;
+      }
 
-    setTimeout(() => {
-      setSteps!(steps);
-      setCurrentStep!(0);
-      setIsOpen!(true);
-    }, 300);
+      setTimeout(() => {
+        openTour(retries + 1);
+      }, TOUR_OPEN_RETRY_DELAY_MS);
+    };
+
+    openTour();
   };
 
   useEffect(() => {
