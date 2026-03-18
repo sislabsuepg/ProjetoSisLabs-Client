@@ -9,12 +9,35 @@ import { toursByPage } from "@/components/GuidedTour/stepsPages";
 
 const MAX_TOUR_OPEN_RETRIES = 10;
 const TOUR_OPEN_RETRY_DELAY_MS = 150;
+const PRODUCTION_BASE_PATH = "/sislabs";
+
+function normalizePathCandidates(pathname: string): string[] {
+  const cleanPath = pathname.split("?")[0].split("#")[0] || "/";
+  const withoutTrailingSlash =
+    cleanPath.length > 1 ? cleanPath.replace(/\/+$/, "") : cleanPath;
+  const withoutBasePath = withoutTrailingSlash.startsWith(PRODUCTION_BASE_PATH)
+    ? withoutTrailingSlash.slice(PRODUCTION_BASE_PATH.length) || "/"
+    : withoutTrailingSlash;
+
+  return Array.from(
+    new Set([
+      cleanPath,
+      withoutTrailingSlash,
+      withoutBasePath,
+      withoutBasePath.length > 1 ? `${withoutBasePath}/` : withoutBasePath,
+    ]),
+  );
+}
 
 function resolveStepsForPage(
   pathname: string,
   activeSection?: string,
 ): StepType[] | null {
-  const tourPage = toursByPage[pathname];
+  const normalizedCandidates = normalizePathCandidates(pathname);
+  const tourPage = normalizedCandidates
+    .map((candidate) => toursByPage[candidate])
+    .find(Boolean);
+
   if (!tourPage) return null;
 
   if (Array.isArray(tourPage)) {
