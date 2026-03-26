@@ -1215,7 +1215,7 @@ export default function Cronograma() {
                     return (
                       <div
                         key={o.key}
-                        className="absolute rounded-md border border-red-800 bg-red-700/95 text-white shadow-md overflow-hidden"
+                        className="absolute rounded-md border border-red-800 bg-red-700/95 text-white shadow-md overflow-hidden pointer-events-auto"
                         style={{
                           left: o.left,
                           width: o.width,
@@ -1242,8 +1242,10 @@ export default function Cronograma() {
                                 ? "text-[0.75rem] font-semibold leading-tight truncate w-full"
                                 : "text-[0.9rem] font-bold leading-snug truncate w-full"
                             }
+                            title={o.nome}
                           >
                             {o.nome}
+
                           </div>
                           {!small && (
                             <div
@@ -1252,12 +1254,13 @@ export default function Cronograma() {
                                   ? "text-[0.7rem] font-semibold leading-tight truncate w-full"
                                   : "text-[0.8rem] font-semibold leading-snug truncate w-full"
                               }
+                              title={o.hora}
                             >
                               {o.hora}
                             </div>
                           )}
                           {!small && !medium && o.responsavel ? (
-                            <div className="text-[0.75rem] font-medium leading-snug truncate w-full opacity-95">
+                            <div className="text-[0.75rem] font-medium leading-snug truncate w-full opacity-95" title={o.responsavel}>
                               {o.responsavel}
                             </div>
                           ) : null}
