@@ -1215,7 +1215,7 @@ export default function Cronograma() {
                     return (
                       <div
                         key={o.key}
-                        className="absolute rounded-md border border-sky-800 bg-sky-700/95 text-white shadow-md overflow-hidden"
+                        className="absolute rounded-md border border-red-800 bg-red-700/95 text-white shadow-md overflow-hidden"
                         style={{
                           left: o.left,
                           width: o.width,
