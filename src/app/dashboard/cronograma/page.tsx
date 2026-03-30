@@ -134,13 +134,31 @@ export default function Cronograma() {
           (resp.data && Array.isArray(resp.data)
             ? resp.data
             : (resp as { eventos?: IEvento[] }).eventos) || [];
+        const agora = new Date();
+        const hojeLocal = new Date(
+          agora.getFullYear(),
+          agora.getMonth(),
+          agora.getDate(),
+        );
+        const hojeFimLocal = new Date(
+          agora.getFullYear(),
+          agora.getMonth(),
+          agora.getDate(),
+          23,
+          59,
+          59,
+          999,
+        );
+        const hojeIsoLocal = `${agora.getFullYear()}-${String(
+          agora.getMonth() + 1,
+        ).padStart(2, "0")}-${String(agora.getDate()).padStart(2, "0")}`;
         const filtrados = lista.filter((e) => {
-          const hoje = new Date().setHours(0, 0, 0, 0);
-          const hojeFim = new Date().setHours(23, 59, 59, 999);
-          const evento = new Date(e.data).getTime();
-          return evento > hoje && evento < hojeFim;
+          const dataRaw = typeof e.data === "string" ? e.data.slice(0, 10) : "";
+          if (dataRaw === hojeIsoLocal) return true;
+          const evento = new Date(e.data);
+          return evento >= hojeLocal && evento <= hojeFimLocal;
         });
-        if (lista.length) setTodosEventos(filtrados);
+        setTodosEventos(filtrados);
       } catch (e) {
         console.error("Erro ao buscar eventos", e);
       }
