@@ -389,6 +389,38 @@ export default function Cronograma() {
     if (idx < horarios.length - 1) return toMin(horarios[idx + 1]);
     return toMin(horarios[idx]) + 55;
   };
+  const firstSlotStart = slotStarts[0] ?? 0;
+  const lastSlotStart = slotStarts[slotStarts.length - 1] ?? 0;
+
+  const getEventoLabLabel = (ev: IEvento) => {
+    if (ev.idLaboratorio) {
+      const fromLabs = getLaboratorioNomeById(ev.idLaboratorio);
+      if (fromLabs) return fromLabs;
+    }
+    const sigla = (ev.laboratorio?.numero || "").trim();
+    const nome = (ev.laboratorio?.nome || "").trim();
+    if (sigla && nome) return `${sigla} - ${nome}`;
+    if (nome) return nome;
+    return ev.idLaboratorio ? `Lab ${ev.idLaboratorio}` : "Laboratório não informado";
+  };
+
+  const eventosForaGrade = useMemo(() => {
+    return todosEventos
+      .filter((ev) => {
+        const dt = new Date(ev.data);
+        const startMin = dt.getHours() * 60 + dt.getMinutes();
+        return startMin < firstSlotStart || startMin > lastSlotStart;
+      })
+      .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
+  }, [todosEventos, firstSlotStart, lastSlotStart]);
+
+  const eventosDentroGrade = useMemo(() => {
+    return todosEventos.filter((ev) => {
+      const dt = new Date(ev.data);
+      const startMin = dt.getHours() * 60 + dt.getMinutes();
+      return startMin >= firstSlotStart && startMin <= lastSlotStart;
+    });
+  }, [todosEventos, firstSlotStart, lastSlotStart]);
 
   const laboratoriosUnificados = useMemo(() => {
     const map = new Map<number, ILaboratorio>();
@@ -447,17 +479,21 @@ export default function Cronograma() {
     });
     todosEventos.forEach((ev) => {
       if (!ev.idLaboratorio) return;
-      const label =
-        getLaboratorioNomeById(ev.idLaboratorio) || `Lab ${ev.idLaboratorio}`;
+      const label = getEventoLabLabel(ev);
       if (!labsMap.has(ev.idLaboratorio)) labsMap.set(ev.idLaboratorio, label);
     });
     const labs = Array.from(labsMap.entries())
-      .map(([id]) => {
+      .map(([id, rawLabel]) => {
         const l = laboratorios.find((x) => x.id === id);
         const sigla = (l?.numero || "").trim();
         const nome = (l?.nome || "").trim();
-        const label = sigla ? `${sigla} - ${nome}` : nome;
-        return { id, label, sigla };
+        const label =
+          sigla || nome
+            ? sigla
+              ? `${sigla} - ${nome}`
+              : nome
+            : rawLabel;
+        return { id, label, sigla: sigla || rawLabel.split(" - ")[0] || "" };
       })
       .sort((a, b) =>
         (a.sigla || "").localeCompare(b.sigla || "", "pt", {
@@ -469,11 +505,11 @@ export default function Cronograma() {
     // Horários (linhas) presentes em aulas ou que tenham interseção com algum evento
     const horasSet = new Set<string>();
     aulasOrdenadas.forEach((a) => horasSet.add(normalizeHorario(a.horario)));
-    if (todosEventos.length) {
+    if (eventosDentroGrade.length) {
       for (let i = 0; i < horarios.length; i++) {
         const s = slotStarts[i];
         const e = slotEndAt(i);
-        const intersects = todosEventos.some((ev) => {
+        const intersects = eventosDentroGrade.some((ev) => {
           const dt = new Date(ev.data);
           const evStart = dt.getHours() * 60 + dt.getMinutes();
           const dur =
@@ -497,7 +533,7 @@ export default function Cronograma() {
       mapa[chave] = a.professor;
     });
     return { horarios: hrs, laboratorios: labs, mapa };
-  }, [aulasOrdenadas, laboratorios, todosEventos, slotStarts]);
+  }, [aulasOrdenadas, laboratorios, todosEventos, eventosDentroGrade, slotStarts]);
 
   // (removido) Index de eventos por lab não é necessário com overlay absoluto
 
@@ -573,7 +609,7 @@ export default function Cronograma() {
       responsavel?: string;
       hora: string;
     }> = [];
-    for (const ev of todosEventos) {
+    for (const ev of eventosDentroGrade) {
       const labId = ev.idLaboratorio;
       if (!labId) continue;
       const col = colGeom.get(labId);
@@ -617,7 +653,7 @@ export default function Cronograma() {
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, [todosEventos, tabelaAulasHoje, horarios]);
+  }, [eventosDentroGrade, tabelaAulasHoje, horarios]);
 
   // Índice do primeiro horário considerado "noite" (>= 18:00)
   const firstNightIndex = useMemo(() => {
@@ -1269,6 +1305,40 @@ export default function Cronograma() {
                     );
                   })}
                 </div>
+              </div>
+            </div>
+          )}
+          {eventosForaGrade.length > 0 && (
+            <div className="mt-4 rounded-[10px] border border-red-200 bg-red-50/70 p-3">
+              <p className="text-[0.78rem] font-semibold text-red-800 uppercase tracking-wide mb-2">
+                Eventos fora do expediente (após 21:30 ou antes de 08:15)
+              </p>
+              <div className="grid gap-2 md:grid-cols-2">
+                {eventosForaGrade.map((ev) => {
+                  const dt = new Date(ev.data);
+                  const dur =
+                    typeof ev.duracao === "number" && ev.duracao > 0
+                      ? ev.duracao
+                      : 1;
+                  const endDt = new Date(dt.getTime() + dur * 60 * 1000);
+                  const pad2 = (n: number) => (n < 10 ? `0${n}` : String(n));
+                  const hora = `${pad2(dt.getHours())}:${pad2(dt.getMinutes())} – ${pad2(
+                    endDt.getHours(),
+                  )}:${pad2(endDt.getMinutes())}`;
+                  return (
+                    <div
+                      key={`fora_${ev.id ?? ev.nome}_${ev.data}`}
+                      className="rounded-[8px] border border-red-300 bg-white px-3 py-2 text-[0.75rem] text-red-900"
+                    >
+                      <p className="font-bold leading-tight">{ev.nome}</p>
+                      <p className="font-semibold opacity-90">{hora}</p>
+                      <p className="opacity-90">{getEventoLabLabel(ev)}</p>
+                      {ev.responsavel ? (
+                        <p className="opacity-80">Responsável: {ev.responsavel}</p>
+                      ) : null}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
