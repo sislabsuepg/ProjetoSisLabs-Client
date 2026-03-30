@@ -135,28 +135,14 @@ export default function Cronograma() {
             ? resp.data
             : (resp as { eventos?: IEvento[] }).eventos) || [];
         const agora = new Date();
-        const hojeLocal = new Date(
-          agora.getFullYear(),
-          agora.getMonth(),
-          agora.getDate(),
-        );
-        const hojeFimLocal = new Date(
-          agora.getFullYear(),
-          agora.getMonth(),
-          agora.getDate(),
-          23,
-          59,
-          59,
-          999,
-        );
-        const hojeIsoLocal = `${agora.getFullYear()}-${String(
-          agora.getMonth() + 1,
-        ).padStart(2, "0")}-${String(agora.getDate()).padStart(2, "0")}`;
+        // Usa UTC para comparação (ISO format sempre é UTC)
+        const anoUTC = agora.getUTCFullYear();
+        const mesUTC = String(agora.getUTCMonth() + 1).padStart(2, "0");
+        const diaUTC = String(agora.getUTCDate()).padStart(2, "0");
+        const hojeIsoUTC = `${anoUTC}-${mesUTC}-${diaUTC}`;
         const filtrados = lista.filter((e) => {
           const dataRaw = typeof e.data === "string" ? e.data.slice(0, 10) : "";
-          if (dataRaw === hojeIsoLocal) return true;
-          const evento = new Date(e.data);
-          return evento >= hojeLocal && evento <= hojeFimLocal;
+          return dataRaw === hojeIsoUTC;
         });
         setTodosEventos(filtrados);
       } catch (e) {
