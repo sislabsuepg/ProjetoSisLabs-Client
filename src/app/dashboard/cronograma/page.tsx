@@ -394,7 +394,7 @@ export default function Cronograma() {
     return toMin(horarios[idx]) + 55;
   };
   const firstSlotStart = slotStarts[0] ?? 0;
-  const lastSlotStart = slotStarts[slotStarts.length - 1] ?? 0;
+  const lastSlotStart = 22 * 60; // 22:00 - depois desse horário é considerado fora do expediente
 
   const getEventoLabLabel = (ev: IEvento) => {
     if (ev.idLaboratorio) {
@@ -1313,9 +1313,10 @@ export default function Cronograma() {
             </div>
           )}
           {eventosForaGrade.length > 0 && (
-            <div className="mt-4 rounded-[10px] border border-red-200 bg-red-50/70 p-3">
-              <p className="text-[0.78rem] font-semibold text-red-800 uppercase tracking-wide mb-2">
-                Eventos fora do expediente (após 21:30 ou antes de 08:15)
+            <div className="mt-4 rounded-[10px] border-2 border-amber-400 bg-gradient-to-br from-amber-100 to-amber-50/60 p-4 shadow-md">
+              <p className="text-[0.8rem] font-bold text-amber-900 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <span className="text-[1.1rem]">⏰</span>
+                Eventos fora do expediente (após 22:00 ou antes de 08:15)
               </p>
               <div className="grid gap-2 md:grid-cols-2">
                 {eventosForaGrade.map((ev) => {
@@ -1332,7 +1333,7 @@ export default function Cronograma() {
                   return (
                     <div
                       key={`fora_${ev.id ?? ev.nome}_${ev.data}`}
-                      className="rounded-[8px] border border-red-300 bg-white px-3 py-2 text-[0.75rem] text-red-900"
+                      className="rounded-[8px] border-2 border-amber-300 bg-amber-100 px-3 py-2 text-[0.75rem] text-amber-900 shadow-sm hover:shadow-md transition-shadow"
                     >
                       <p className="font-bold leading-tight">{ev.nome}</p>
                       <p className="font-semibold opacity-90">{hora}</p>
