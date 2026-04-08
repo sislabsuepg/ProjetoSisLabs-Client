@@ -167,7 +167,7 @@ export default function Login() {
           } as UserData,
           {
             path: "/",
-            expires: new Date(Date.now() + 8 * 60 * 60 * 1000), // Expira em 4 horas
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Expira em 24 horas
           },
         );
       }
@@ -187,7 +187,7 @@ export default function Login() {
           } as unknown as UserData,
           {
             path: "/",
-            expires: new Date(Date.now() + 8 * 60 * 60 * 1000), // Expira em 4 horas
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Expira em 24 horas
           },
         );
       }
