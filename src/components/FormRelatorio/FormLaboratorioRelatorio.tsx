@@ -72,7 +72,7 @@ export default function FormLaboratorioRelatorio() {
       link.href = url;
       link.setAttribute(
         "download",
-        `relatorio_laboratorio_${laboratorios.filter(e => e.id.toString() == form.laboratorioId).map(e => e.numero).join("_")}_${dataInicio}_a_${dataFim}.pdf`
+        `relatorio_laboratorio_${laboratorios.filter(e => e.id.toString() == form.laboratorioId).map(e => e.nome).join("_")}_${dataInicio}_a_${dataFim}.pdf`
       );
       document.body.appendChild(link);
       link.click();
