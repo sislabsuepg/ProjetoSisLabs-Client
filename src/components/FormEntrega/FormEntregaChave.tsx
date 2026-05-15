@@ -113,7 +113,7 @@ export default function FormEntregaChave() {
                       );
                     if (advertenciaResponse.data == true) {
                       toast.warning(
-                        "Atenção: O aluno possui advertências registradas no ultimo mês."
+                        "Atenção: O aluno possui advertências registradas nos últimos 6 meses."
                       );
                     }
                     setForm((prev) => ({
@@ -139,7 +139,7 @@ export default function FormEntregaChave() {
               variant="filled"
               type="password"
               name="senha"
-              disabled={form.idAluno === 0}
+              disabled={orientacao?.laboratorio == null}
               value={form.senha}
               onChange={(e) => {
                 const { name, value } = e.target;

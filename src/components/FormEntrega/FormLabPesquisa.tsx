@@ -140,7 +140,7 @@ export default function FormEntregaPesquisa() {
                           );
                         if (advertenciaResponse.data == true) {
                           toast.warning(
-                            "Atenção: O aluno possui advertências registradas no ultimo mês."
+                            "Atenção: O aluno possui advertências registradas nos últimos 6 meses."
                           );
                         }
                         setForm((f) => ({ ...f, idAluno: r.id! }));

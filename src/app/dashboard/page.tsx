@@ -429,7 +429,7 @@ export default function Inicio() {
                   {advertenciasAlunos[s.idAluno] && (
                     <span
                       className="mt-1 inline-block text-[0.6rem] px-2 py-[2px] rounded-full bg-amber-500/90 text-white font-semibold tracking-wide shadow-sm"
-                      title="Aluno possui advertências recentes"
+                      title="Aluno possui advertências nos últimos 6 meses"
                     >
                       Advertência
                     </span>
